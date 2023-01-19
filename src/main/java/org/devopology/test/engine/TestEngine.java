@@ -26,7 +26,7 @@ import org.devopology.test.engine.internal.descriptor.TestParameterTestDescripto
 import org.devopology.test.engine.logger.Logger;
 import org.devopology.test.engine.logger.LoggerFactory;
 import org.devopology.test.engine.internal.util.Switch;
-import org.devopology.test.engine.internal.util.TestUtils;
+import org.devopology.test.engine.internal.TestEngineUtils;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -74,14 +74,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Predicate to determine if a class is a test class (has @Test methods)
      */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> TestUtils.getTestMethods(clazz).size() > 0;
+    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> TestEngineUtils.getTestMethods(clazz).size() > 0;
 
     /**
      * Predicate to determine if a method is a test method (declared class has @Test methods)
      */
     private static final Predicate<Method> IS_TEST_METHOD = method -> {
         Class<?> testClass = method.getDeclaringClass();
-        return TestUtils.getTestMethods(testClass).contains(method);
+        return TestEngineUtils.getTestMethods(testClass).contains(method);
     };
 
     private Mode mode;
@@ -140,7 +140,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
             for (Class<?> clazz : classList) {
                 //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
             }
         }
 
@@ -152,7 +152,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
             for (Class<?> clazz : classList) {
                 //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
             }
         }
 
@@ -163,7 +163,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
             if (IS_TEST_CLASS.test(clazz)) {
                 //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
             }
         }
 
@@ -203,7 +203,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 Collection<Object> testParameters = null;
 
                 // Try to get test parameters using a @ParameterSupplier field
-                Field parameterSupplierField = TestUtils.getParameterSupplierField(testClass);
+                Field parameterSupplierField = TestEngineUtils.getParameterSupplierField(testClass);
                 if (parameterSupplierField != null) {
                     LOGGER.trace("test class @ParameterSupplier field [%s]", parameterSupplierField.getName());
                     try {
@@ -224,7 +224,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
                 if (testParameters == null) {
                     // No parameters found, so try to get test parameters using a @ParameterSupplier method
-                    Method paremterSupplierMethod = TestUtils.getParameterSupplierMethod(testClass);
+                    Method paremterSupplierMethod = TestEngineUtils.getParameterSupplierMethod(testClass);
                     if (paremterSupplierMethod != null) {
                         LOGGER.trace("test class @ParameterSupplier method [%s]", paremterSupplierMethod.getName());
                         try {
@@ -255,7 +255,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 }
 
                 // Validate that we have a @Parameter field
-                Field parameterField = TestUtils.getParameterField(testClass);
+                Field parameterField = TestEngineUtils.getParameterField(testClass);
                 if (parameterField == null) {
                     throw new TestClassConfigurationException(
                             String.format(
@@ -270,7 +270,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 if (testParameters.size() > 0) {
                     // Build the test descriptor tree if we have test parameters
                     // i.e. Tests with an empty set of parameters will be ignored
-                    String testClassDisplayName = TestUtils.getDisplayName(testClass);
+                    String testClassDisplayName = TestEngineUtils.getDisplayName(testClass);
 
                     TestClassTestDescriptor testClassTestDescriptor =
                             new TestClassTestDescriptor(
@@ -282,7 +282,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     for (int i = 0; i < testParameterList.size(); i++) {
                         // Build the test descriptor for each test class / test parameter
                         Object testParameter = testParameterList.get(i);
-                        String testParameterDisplayName = TestUtils.getTestParameterDisplayName(testParameter, i);
+                        String testParameterDisplayName = TestEngineUtils.getTestParameterDisplayName(testParameter, i);
                         String testParameterUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
                         TestParameterTestDescriptor testParameterTestDescriptor =
@@ -294,7 +294,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
                         for (Method testMethod : testClassToMethodMap.get(testClass)) {
                             // Build the test descriptor for each test class / test parameter / test method
-                            String testMethodDisplayName = TestUtils.getDisplayName(testMethod);
+                            String testMethodDisplayName = TestEngineUtils.getDisplayName(testMethod);
                             String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
                             TestMethodTestDescriptor testMethodTestDescriptor =
@@ -368,7 +368,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             EngineExecutionContext testEngineExecutionContext) {
 
         // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-        if (TestUtils.hasSiblings(testClassTestDescriptor)) {
+        if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
             testEngineExecutionContext.getEngineExecutionListener().executionStarted(testClassTestDescriptor);
         }
 
@@ -397,13 +397,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         } finally {
             if (throwableCollector.isEmpty()) {
                 // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-                if (TestUtils.hasSiblings(testClassTestDescriptor)) {
+                if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
                     testEngineExecutionContext.getEngineExecutionListener().executionFinished(
                             testClassTestDescriptor, TestExecutionResult.successful());
                 }
             } else {
                 // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-                if (TestUtils.hasSiblings(testClassTestDescriptor)) {
+                if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
                     testEngineExecutionContext.getEngineExecutionListener().executionFinished(
                             testClassTestDescriptor,
                             TestExecutionResult.failed(throwableCollector.getFirstThrowable()));
@@ -429,12 +429,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         Class<?> testClass = testParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testParameterTestDescriptor.getTestParameter();
-        Field testParameterfield = TestUtils.getParameterField(testClass);
+        Field testParameterfield = TestEngineUtils.getParameterField(testClass);
 
         try {
             testParameterfield.set(testInstance, testParameter);
 
-            for (Method beforeAllMethod : TestUtils.getBeforeAllMethods(testClass)) {
+            for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
                 beforeAllMethod.invoke(testInstance, (Object[]) null);
             }
         } catch (Throwable t) {
@@ -453,7 +453,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         }
 
         try {
-            for (Method afterAllMethod : TestUtils.getAfterAllMethods(testClass)) {
+            for (Method afterAllMethod : TestEngineUtils.getAfterAllMethods(testClass)) {
                 afterAllMethod.invoke(testInstance, (Object[]) null);
             }
         } catch (Throwable t) {
@@ -489,7 +489,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         Object testInstance = testEngineExecutionContext.getTestInstance();
 
         try {
-            for (Method beforeEachMethod : TestUtils.getBeforeEachMethods(testClass)) {
+            for (Method beforeEachMethod : TestEngineUtils.getBeforeEachMethods(testClass)) {
                 beforeEachMethod.invoke(testInstance, (Object[]) null);
             }
         } catch (Throwable t) {
@@ -508,7 +508,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         }
 
         try {
-            for (Method afterEachMethod : TestUtils.getAfterEachMethods(testClass)) {
+            for (Method afterEachMethod : TestEngineUtils.getAfterEachMethods(testClass)) {
                 afterEachMethod.invoke(testInstance, (Object[]) null);
             }
         } catch (Throwable t) {

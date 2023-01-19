@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.internal.util;
+package org.devopology.test.engine.internal;
 
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.AfterEach;
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-public class TestUtils {
+public class TestEngineUtils {
 
     private static Map<Class<?>, Field> parameterFieldCache;
     private static Map<Class<?>, Field> parameterSupplierFieldCache;
@@ -71,7 +71,7 @@ public class TestUtils {
     /**
      * Constructor
      */
-    private TestUtils() {
+    private TestEngineUtils() {
         // DO NOTHING
     }
 
@@ -337,7 +337,7 @@ public class TestUtils {
         }
 
         if (displayName.isEmpty()) {
-            synchronized (TestUtils.class) {
+            synchronized (TestEngineUtils.class) {
                 displayName = "[" + index + "] (empty)";
             }
         }
