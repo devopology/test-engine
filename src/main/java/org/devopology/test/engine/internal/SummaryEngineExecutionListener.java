@@ -23,7 +23,6 @@ import org.devopology.test.engine.internal.util.AnsiColor;
 import org.devopology.test.engine.internal.util.Counter;
 import org.devopology.test.engine.internal.util.Manager;
 import org.devopology.test.engine.internal.util.Padding;
-import org.devopology.test.engine.internal.util.Separator;
 import org.devopology.test.engine.internal.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -40,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SummaryEngineExecutionListener implements EngineExecutionListener {
 
+    private static final String SEPARATOR = "----------------------";
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
 
     private long startMilliseconds;
@@ -65,9 +65,9 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         counterManager.put("methods.skipped", new Counter());
         counterManager.put("methods.failed", new Counter());
 
-        printStream.println(INFO + Separator.SEPARATOR);
+        printStream.println(INFO + SEPARATOR);
         printStream.println(INFO + "Devopology Test Engine");
-        printStream.println(INFO + Separator.SEPARATOR);
+        printStream.println(INFO + SEPARATOR);
         printStream.println(INFO + "Scanning for tests...");
     }
 
@@ -195,9 +195,9 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
     public void printSummary(PrintStream printStream) {
         long finishMilliseconds = System.currentTimeMillis();
 
-        printStream.println(INFO + "------------------------------------------");
+        printStream.println(INFO + SEPARATOR + "--------");
         printStream.println("[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] Devopology Test Engine Summary");
-        printStream.println(INFO + "------------------------------------------");
+        printStream.println(INFO + SEPARATOR + "--------");
         printStream.println(INFO);
 
         int pad = Padding.calculatePadding(imageNameSet.size(), classNameSet.size(), methodNameSet.size());
@@ -260,18 +260,18 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         printStream.println(INFO);
         
         if (!hasFailures()) {
-            printStream.println(INFO + Separator.SEPARATOR);
+            printStream.println(INFO + SEPARATOR);
             printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
 
         } else {
-            printStream.println(INFO + Separator.SEPARATOR);
+            printStream.println(INFO + SEPARATOR);
             printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
         }
 
-        printStream.println(INFO + Separator.SEPARATOR);
+        printStream.println(INFO + SEPARATOR);
         printStream.println(INFO + "Total time: " + toHumanReadable(finishMilliseconds - startMilliseconds, true));
         printStream.println(INFO + "Finished at: " + finishedAt());
-        printStream.println(INFO + Separator.SEPARATOR);
+        printStream.println(INFO + SEPARATOR);
     }
 
     private static String capitalize(String string) {

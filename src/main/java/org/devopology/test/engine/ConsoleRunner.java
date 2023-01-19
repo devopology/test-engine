@@ -18,8 +18,8 @@ package org.devopology.test.engine;
 
 import org.devopology.test.engine.internal.ConfigurationParameters;
 import org.devopology.test.engine.internal.SummaryEngineExecutionListener;
-import org.devopology.test.engine.internal.util.Logger;
-import org.devopology.test.engine.internal.util.LoggerFactory;
+import org.devopology.test.engine.logger.Logger;
+import org.devopology.test.engine.logger.LoggerFactory;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -55,16 +55,24 @@ public class ConsoleRunner {
         new ConsoleRunner().run(args);
     }
 
+    public ConsoleRunner() {
+        LOGGER.trace("ConsoleRunner()");
+    }
+
     /**
      * Method to run the test engine
      */
     public void run(String[] args) throws MalformedURLException {
+        LOGGER.trace("run()");
+
         SummaryEngineExecutionListener testExecutionSummaryListener = new SummaryEngineExecutionListener(System.out);
 
         File file =
                 new File(
                         ConsoleRunner.class
                                 .getProtectionDomain().getCodeSource().getLocation().getPath());
+
+        LOGGER.trace("enclosing jar [%s]", file.getAbsoluteFile());
 
         Set<Path> classPathRoots = new HashSet<>();
         classPathRoots.add(file.getAbsoluteFile().toPath());
@@ -74,7 +82,7 @@ public class ConsoleRunner {
             for (String arg : args) {
                 File jarFile = new File(arg);
                 if (jarFile.exists() && jarFile.isFile() && jarFile.canRead()) {
-                    LOGGER.trace(String.format("Adding jar to classpath [%s]", jarFile.getAbsolutePath()));
+                    LOGGER.trace("adding jar to classpath [%s]", jarFile.getAbsolutePath());
                     classPathRoots.add(jarFile.getAbsoluteFile().toPath());
                     urlList.add(jarFile.getAbsoluteFile().toURI().toURL());
                 }
@@ -85,11 +93,12 @@ public class ConsoleRunner {
                 Thread.currentThread().setContextClassLoader(urlClassLoader);
             }
         } else {
-            LOGGER.trace("No jars defined");
+            LOGGER.error("No arguments provided");
+            System.exit(1);
         }
 
         for (Path path : classPathRoots) {
-            LOGGER.trace(String.format("classPathRoot [%s]", path));
+            LOGGER.trace("class path root [%s]", path);
         }
 
         LauncherDiscoveryRequest launcherDiscoveryRequest =

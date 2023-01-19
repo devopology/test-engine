@@ -23,8 +23,8 @@ import org.devopology.test.engine.internal.ThrowableCollector;
 import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
-import org.devopology.test.engine.internal.util.Logger;
-import org.devopology.test.engine.internal.util.LoggerFactory;
+import org.devopology.test.engine.logger.Logger;
+import org.devopology.test.engine.logger.LoggerFactory;
 import org.devopology.test.engine.internal.util.Switch;
 import org.devopology.test.engine.internal.util.TestUtils;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -101,7 +101,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     public TestEngine(Mode mode) {
         LOGGER.trace("TestEngine()");
-        LOGGER.trace(String.format("mode = [%s]", mode));
+        LOGGER.trace("mode = [%s]", mode);
 
         this.mode = mode;
     }
@@ -134,47 +134,47 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // For each test class that was selected, add all test methods
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
-        LOGGER.trace(String.format("ClasspathRootSelector size [%d]", discoverySelectorList.size()));
+        LOGGER.trace("ClasspathRootSelector size [%d]", discoverySelectorList.size());
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             URI uri = ((ClasspathRootSelector) discoverySelector).getClasspathRoot();
             List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
             for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("testClass [%s]", clazz.getName()));
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
                 testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
             }
         }
 
         // For each test class that was selected, add all test methods
         discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
-        LOGGER.debug(String.format("PackageSelector size [%d]", discoverySelectorList.size()));
+        LOGGER.debug("PackageSelector size [%d]", discoverySelectorList.size());
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             String packageName = ((PackageSelector) discoverySelector).getPackageName();
             List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
             for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("testClass [%s]", clazz.getName()));
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
                 testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
             }
         }
 
         // For each test class selected, add all test methods
         discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
-        LOGGER.debug(String.format("ClassSelector size [%d]", discoverySelectorList.size()));
+        LOGGER.debug("ClassSelector size [%d]", discoverySelectorList.size());
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
             if (IS_TEST_CLASS.test(clazz)) {
-                LOGGER.trace(String.format("testClass [%s]", clazz.getName()));
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
                 testClassToMethodMap.putIfAbsent(clazz, TestUtils.getTestMethods(clazz));
             }
         }
 
         // For each test method that was selected, add the test class and method
         discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
-        LOGGER.debug(String.format("MethodSelector size [%d]", discoverySelectorList.size()));
+        LOGGER.debug("MethodSelector size [%d]", discoverySelectorList.size());
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             Method method = ((MethodSelector) discoverySelector).getJavaMethod();
             Class<?> clazz = method.getDeclaringClass();
             if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("testClass [%s] testMethod [%s]", clazz.getName(), method.getName()));
+                //LOGGER.trace(String.format("test class [%s] @Test method [%s]", clazz.getName(), method.getName()));
                 List<Method> methods = testClassToMethodMap.get(clazz);
                 if (methods == null) {
                     methods = new ArrayList<>();
@@ -191,21 +191,21 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         //DEBUG code to print test class / test method selection / ordering
         for (Class<?> testClass : testClassToMethodMap.keySet()) {
-            LOGGER.trace(String.format("testClass [%s]", testClass.getName()));
             List<Method> testMethodList = testClassToMethodMap.get(testClass);
             for (Method method : testMethodList) {
-                LOGGER.debug(String.format("  testMethod [%s]", method.getName()));
+                LOGGER.trace(String.format("test class [%s] @Test method [%s]", testClass.getName(), method.getName()));
             }
         }
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
-                LOGGER.trace(String.format("process testClass [%s]", testClass.getName()));
+                LOGGER.trace("processing test class [%s]", testClass.getName());
                 Collection<Object> testParameters = null;
 
                 // Try to get test parameters using a @ParameterSupplier field
                 Field parameterSupplierField = TestUtils.getParameterSupplierField(testClass);
                 if (parameterSupplierField != null) {
+                    LOGGER.trace("test class @ParameterSupplier field [%s]", parameterSupplierField.getName());
                     try {
                         testParameters = (Collection<Object>) parameterSupplierField.get(null);
                         if (testParameters == null) {
@@ -226,6 +226,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     // No parameters found, so try to get test parameters using a @ParameterSupplier method
                     Method paremterSupplierMethod = TestUtils.getParameterSupplierMethod(testClass);
                     if (paremterSupplierMethod != null) {
+                        LOGGER.trace("test class @ParameterSupplier method [%s]", paremterSupplierMethod.getName());
                         try {
                             testParameters =
                                     (Collection<Object>) paremterSupplierMethod.invoke(null, (Object[]) null);
@@ -260,7 +261,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             String.format(
                                     "Test class [%s] public (non-static) @Parameter field required",
                                     testClass.getName()));
+                } else {
+                    LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 }
+
+                LOGGER.trace("test class parameter count [%d]", testParameters.size());
 
                 if (testParameters.size() > 0) {
                     // Build the test descriptor tree if we have test parameters

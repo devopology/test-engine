@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.internal.logger.impl;
+package org.devopology.test.engine.logger.impl;
+
+import org.devopology.test.engine.logger.Logger;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -26,16 +28,16 @@ import java.util.Objects;
 /**
  * Class to implement logger
  */
-public class Logger {
+public class LoggerImpl implements Logger {
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     private static int OFF = 0;
-    private static int ERROR = 200;
-    private static int WARNING = 300;
-    private static int INFO = 400;
-    private static int DEBUG = 500;
-    private static int TRACE = 600;
+    private static int ERROR = 100;
+    private static int WARNING = 200;
+    private static int INFO = 300;
+    private static int DEBUG = 400;
+    private static int TRACE = 500;
 
     private static final Map<String, Integer> LOG_LEVEL_MAP;
 
@@ -57,7 +59,7 @@ public class Logger {
      *
      * @param className
      */
-    Logger(String className) {
+    public LoggerImpl(String className) {
         this.className = className;
 
         String logLevelString = System.getProperty("devopology.test.engine.log.level");
@@ -72,7 +74,7 @@ public class Logger {
             }
         }
 
-        if ((logLevelString == null) || !logLevelString.isEmpty()) {
+        if ((logLevelString == null) || logLevelString.isEmpty()) {
             logLevel = INFO;
         } else {
             logLevel = LOG_LEVEL_MAP.getOrDefault(logLevelString, INFO);

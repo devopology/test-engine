@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.internal.util;
+package org.devopology.test.engine.logger;
+
+import org.devopology.test.engine.logger.impl.LoggerImpl;
 
 /**
  * Class to implement a LoggerFactory to create a Logger
@@ -45,6 +47,6 @@ public class LoggerFactory {
      * @return
      */
     public static Logger getLogger(String name) {
-        return new Logger(name);
+        return new LoggerImpl(name);
     }
 }
