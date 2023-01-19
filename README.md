@@ -174,7 +174,6 @@ public class WithParameterSupplierMethod {
     }
 
     // must be public (non-static) - required
-    // no arguments, void return type
     @Parameter
     public String value;
 
