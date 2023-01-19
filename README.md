@@ -209,7 +209,7 @@ public class WithParameterSupplierMethod {
 
 Notes:
 
-- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct import.
+- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports.
 
 Other examples
 
