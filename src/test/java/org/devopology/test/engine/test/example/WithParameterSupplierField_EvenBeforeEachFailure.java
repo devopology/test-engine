@@ -14,7 +14,7 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Example test engine test... only runs from an IDE or via TestEnginRunner
+ * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
 public class WithParameterSupplierField_EvenBeforeEachFailure {
 

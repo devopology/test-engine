@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Example test engine test... only runs from an IDE or via TestEnginRunner
+ * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
 @DisplayName("Test class with @ParameterSupplier field and display names")
 public class WithParameterSupplierFieldWithDisplayNames {
