@@ -88,37 +88,53 @@ public class WithParameterSupplierField {
         }
     }
 
+    // public be pubic and static - required
+    // void return type
+    // must return a Collection of the parameter type
     @ParameterSupplier
     public static Collection<String> VALUES = StringParameterSupplier.values();
 
+    // must be public (non-static) - required
     @Parameter
     public String value;
 
+    // must be public (non-static)
+    // no arguments, void return type
     @BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @Test
     public void test1() {
         System.out.println("test1(" + value + ")");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @Test
     public void test2() {
         System.out.println("test2(" + value + ")");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
@@ -145,6 +161,9 @@ import java.util.Collection;
  */
 public class WithParameterSupplierMethod {
 
+    // must be public and static - required
+    // no arguments
+    // must return a Collection of the parameter type
     @ParameterSupplier
     public static Collection<String> values() {
         Collection<String> collection = new ArrayList<>();
@@ -154,24 +173,34 @@ public class WithParameterSupplierMethod {
         return collection;
     }
 
+    // must be public (non-static) - required
+    // no arguments, void return type
     @Parameter
     public String value;
 
+    // must be public (non-static)
+    // no arguments, void return type
     @BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @Test
     public void test1() {
         System.out.println("test1(" + value + ")");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @Test
     public void test2() {
         System.out.println("test2(" + value + ")");
     }
 
+    // must be public (non-static)
+    // no arguments, void return type
     @AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
@@ -186,3 +215,8 @@ Notes:
 Other examples
 
 https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
+
+---
+
+# Design
+
