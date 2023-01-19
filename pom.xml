@@ -7,7 +7,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>Devopology - Test Engine</name>
 
     <properties>
@@ -74,6 +74,18 @@
                             <sourceFile>target/assembly/${project.artifactId}-${project.version}-jar-with-dependencies.jar</sourceFile>
                             <destinationFile>target/${project.artifactId}-${project.version}-console.jar</destinationFile>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
