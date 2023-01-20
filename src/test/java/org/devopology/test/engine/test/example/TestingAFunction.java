@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
@@ -27,6 +28,7 @@ public class TestingAFunction {
 
             String[] words = string.split("[\\W_]+");
             StringBuilder builder = new StringBuilder();
+
             for (int i = 0; i < words.length; i++) {
                 String word = words[i];
                 if (i == 0) {
@@ -36,6 +38,7 @@ public class TestingAFunction {
                 }
                 builder.append(word);
             }
+
             return builder.toString();
         }
     }
@@ -49,21 +52,23 @@ public class TestingAFunction {
             this.input = input;
             this.expected = expected;
         }
-
-        // Optional / called via reflection
-        public String getDisplayName() {
-            return input + " -> " + expected;
-        }
     }
 
     @ParameterSupplier
-    public static Collection<Tuple> values() {
-        Collection<Tuple> collection = new ArrayList<>();
+    public static Collection<Object> values() {
+        Collection<Object> collection = new ArrayList<>();
 
-        collection.add(new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase"));
-        collection.add(new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase"));
-        collection.add(new Tuple("THIS", "this"));
-        collection.add(new Tuple("tHis", "this"));
+        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("tHis", "this");
+        collection.add(Named.of(tuple.input, tuple));
 
         return collection;
     }

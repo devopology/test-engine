@@ -2,6 +2,7 @@ package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
+import org.devopology.test.engine.api.NamedIndex;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
@@ -14,40 +15,17 @@ import java.util.Collection;
  */
 public class WithParameterSupplierMethod3 {
 
-    private static class ValueContainer {
-
-        private String value;
-
-        public ValueContainer(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        // Optional / called via reflection
-        public String getDisplayName() {
-            return "ValueContainer { " + value + " }";
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
     @ParameterSupplier
-    public static Collection<ValueContainer> values() {
-        Collection<ValueContainer> collection = new ArrayList<>();
+    public static Collection<Object> values() {
+        Collection<Object> collection = new ArrayList<>();
         for(int i = 0; i < 10; i++) {
-            collection.add(new ValueContainer(String.valueOf(i)));
+            collection.add(NamedIndex.of("(%d)", String.valueOf(i * 3)));
         }
         return collection;
     }
 
     @Parameter
-    public ValueContainer valueContainer;
+    public String parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -56,14 +34,12 @@ public class WithParameterSupplierMethod3 {
 
     @Test
     public void test1() {
-        String value = valueContainer.getValue();
-        System.out.println("test1(" + value + ")");
+        System.out.println("test1(" + parameter + ")");
     }
 
     @Test
     public void test2() {
-        String value = valueContainer.getValue();
-        System.out.println("test2(" + value + ")");
+        System.out.println("test2(" + parameter + ")");
     }
 
     @AfterAll

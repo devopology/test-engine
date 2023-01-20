@@ -338,9 +338,15 @@ public class TestEngineUtils {
     public static String getTestParameterDisplayName(Object object, int index) {
         String displayName = null;
 
-        if (object instanceof ParameterMap) {
-            displayName = ((ParameterMap) object).getDisplayName();
+        if (object instanceof Named) {
+            return ((Named) object).getName();
+        } else if (object instanceof NamedIndex) {
+            NamedIndex namedIndex = (NamedIndex) object;
+            return String.format(namedIndex.getFormat(), index);
+        } else if (object instanceof ParameterMap) {
+            displayName = ((ParameterMap) object).getName();
         } else {
+            /*
             Method[] methods = object.getClass().getDeclaredMethods();
             for (Method method : methods) {
                 int modifiers = method.getModifiers();
@@ -359,21 +365,24 @@ public class TestEngineUtils {
                             break;
                         }
                     } catch (Throwable t) {
-                        t.getStackTrace();
+                        // DO NOTHING
                     }
                 }
             }
+            */
         }
 
         if (displayName == null) {
             displayName = object.toString();
         }
 
+        /*
         if (displayName.isEmpty()) {
             synchronized (TestEngineUtils.class) {
                 displayName = "[" + index + "] (empty)";
             }
         }
+        */
 
         return displayName;
     }

@@ -19,7 +19,7 @@ public class WithParameterSupplierMethod2 {
     public static Collection<ParameterMap> values() {
         Collection<ParameterMap> collection = new ArrayList<>();
         for(int i = 0; i < 10; i++) {
-            collection.add(ParameterMap.withName("value " + i).put("value", String.valueOf(i)));
+            collection.add(ParameterMap.of("value " + i).put("value", String.valueOf(i)));
         }
         return collection;
     }

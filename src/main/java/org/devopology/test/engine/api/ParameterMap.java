@@ -30,7 +30,7 @@ public interface ParameterMap {
      * Method to get the display name
      * @return
      */
-    default String getDisplayName() {
+    default String getName() {
         return this.getClass().getName();
     }
 
@@ -62,18 +62,18 @@ public interface ParameterMap {
     /**
      * Method to create a {@link ParameterMap}
      * <p/>
-     * @param displayName
-     * @return an empty {@link ParameterMap} with display name
+     * @param name
+     * @return an empty {@link ParameterMap} with a name
      */
-    static ParameterMap withName(String displayName) {
-        Objects.requireNonNull(displayName);
+    static ParameterMap of(String name) {
+        Objects.requireNonNull(name);
 
-        displayName = displayName.trim();
-        if (displayName.isEmpty()) {
+        name = name.trim();
+        if (name.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return new ParameterMapImpl(displayName);
+        return new ParameterMapImpl(name);
     }
 
     /**
@@ -81,24 +81,24 @@ public interface ParameterMap {
      */
     class ParameterMapImpl implements ParameterMap {
 
-        private String displayName;
+        private String name;
         private Map<String, Object> map;
 
-        private ParameterMapImpl(String displayName) {
-            Objects.requireNonNull(displayName);
+        private ParameterMapImpl(String name) {
+            Objects.requireNonNull(name);
 
-            displayName = displayName.trim();
-            if (displayName.isEmpty()) {
+            name = name.trim();
+            if (name.isEmpty()) {
                 throw new IllegalArgumentException();
             }
 
-            this.displayName = displayName;
+            this.name = name;
             map = new LinkedHashMap<>();
         }
 
         @Override
-        public String getDisplayName() {
-            return displayName;
+        public String getName() {
+            return name;
         }
 
         @Override
@@ -144,12 +144,12 @@ public interface ParameterMap {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ParameterMapImpl that = (ParameterMapImpl) o;
-            return Objects.equals(displayName, that.displayName) && Objects.equals(map, that.map);
+            return Objects.equals(name, that.name) && Objects.equals(map, that.map);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(displayName, map);
+            return Objects.hash(name, map);
         }
     }
 }

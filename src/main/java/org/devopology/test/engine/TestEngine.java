@@ -16,6 +16,8 @@
 
 package org.devopology.test.engine;
 
+import org.devopology.test.engine.api.NamedIndex;
+import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.internal.EngineExecutionContext;
 import org.devopology.test.engine.internal.PrintStreamEngineExecutionListener;
 import org.devopology.test.engine.internal.TestClassConfigurationException;
@@ -310,6 +312,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         // Build the test descriptor for each test class / test parameter
                         Object testParameter = testParameterList.get(i);
                         String testParameterDisplayName = TestEngineUtils.getTestParameterDisplayName(testParameter, i);
+
+                        if (testParameter instanceof Named) {
+                            testParameter = ((Named) testParameter).getPayload();
+                        } else if (testParameter instanceof NamedIndex) {
+                            testParameter = ((NamedIndex) testParameter).getPayload();
+                        }
+
                         String testParameterUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
                         TestParameterTestDescriptor testParameterTestDescriptor =
