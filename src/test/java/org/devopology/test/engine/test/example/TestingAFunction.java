@@ -1,7 +1,5 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
@@ -11,7 +9,6 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
@@ -64,6 +61,7 @@ public class TestingAFunction {
         Collection<Tuple> collection = new ArrayList<>();
 
         collection.add(new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase"));
+        collection.add(new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase"));
         collection.add(new Tuple("THIS", "this"));
         collection.add(new Tuple("tHis", "this"));
 
