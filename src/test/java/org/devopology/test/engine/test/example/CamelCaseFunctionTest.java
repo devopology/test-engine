@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * Made up... in real life you wouldn't do this
  */
-public class TestingAFunction {
+public class CamelCaseFunctionTest {
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
@@ -27,15 +28,19 @@ public class TestingAFunction {
 
             String[] words = string.split("[\\W_]+");
             StringBuilder builder = new StringBuilder();
+
             for (int i = 0; i < words.length; i++) {
                 String word = words[i];
+
                 if (i == 0) {
                     word = word.isEmpty() ? word : word.toLowerCase();
                 } else {
                     word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
                 }
+
                 builder.append(word);
             }
+
             return builder.toString();
         }
     }
@@ -49,32 +54,34 @@ public class TestingAFunction {
             this.input = input;
             this.expected = expected;
         }
-
-        // Optional / called via reflection
-        public String getDisplayName() {
-            return input + " -> " + expected;
-        }
     }
 
     @ParameterSupplier
-    public static Collection<Tuple> values() {
-        Collection<Tuple> collection = new ArrayList<>();
+    public static Collection<Object> parameters() {
+        Collection<Object> collection = new ArrayList<>();
 
-        collection.add(new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase"));
-        collection.add(new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase"));
-        collection.add(new Tuple("THIS", "this"));
-        collection.add(new Tuple("tHis", "this"));
+        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("tHis", "this");
+        collection.add(Named.of(tuple.input, tuple));
 
         return collection;
     }
 
     @Parameter
-    public Tuple tuple;
+    public Tuple parameter;
 
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
     @Test
     public void test() {
-        assertThat(FUNCTION.apply(tuple.input)).isEqualTo(tuple.expected);
+        assertThat(FUNCTION.apply(parameter.input)).isEqualTo(parameter.expected);
     }
 }

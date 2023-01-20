@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine;
 
+import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.internal.EngineExecutionContext;
 import org.devopology.test.engine.internal.PrintStreamEngineExecutionListener;
 import org.devopology.test.engine.internal.TestClassConfigurationException;
@@ -297,7 +298,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 if (testParameters.size() > 0) {
                     // Build the test descriptor tree if we have test parameters
                     // i.e. Tests with an empty set of parameters will be ignored
-                    String testClassDisplayName = TestEngineUtils.getDisplayName(testClass);
+                    String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
                     TestClassTestDescriptor testClassTestDescriptor =
                             new TestClassTestDescriptor(
@@ -309,7 +310,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     for (int i = 0; i < testParameterList.size(); i++) {
                         // Build the test descriptor for each test class / test parameter
                         Object testParameter = testParameterList.get(i);
-                        String testParameterDisplayName = TestEngineUtils.getTestParameterDisplayName(testParameter, i);
+                        String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
+
+                        if (testParameter instanceof Named) {
+                            testParameter = ((Named) testParameter).getPayload();
+                        }
+
                         String testParameterUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
                         TestParameterTestDescriptor testParameterTestDescriptor =
@@ -329,7 +335,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             }
 
                             // Build the test descriptor for each test class / test parameter / test method
-                            String testMethodDisplayName = TestEngineUtils.getDisplayName(testMethod);
+                            String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
                             String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
                             TestMethodTestDescriptor testMethodTestDescriptor =
@@ -598,7 +604,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         testParameterTestDescriptor ->
                                 stringBuilder
                                         .append("parameter -> ")
-                                        .append(testParameterTestDescriptor.getTestParameter().toString())),
+                                        .append(testParameterTestDescriptor.getTestParameter())),
                 Switch.switchCase(
                         TestClassTestDescriptor.class,
                         testClassTestDescriptor ->

@@ -1,10 +1,9 @@
 package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
 import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
 import org.devopology.test.engine.api.Parameter;
+import org.devopology.test.engine.api.ParameterMap;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
@@ -14,47 +13,37 @@ import java.util.Collection;
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
-public class WithParameterSupplierField {
-
-    private static class StringParameterSupplier {
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
-            }
-            return collection;
-        }
-    }
+public class ParameterMapTest {
 
     @ParameterSupplier
-    public static Collection<String> VALUES = StringParameterSupplier.values();
+    public static Collection<ParameterMap> parameters() {
+        Collection<ParameterMap> collection = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            collection.add(ParameterMap.of("parameter map [" + i + "]").put("value", String.valueOf(i)));
+        }
+
+        return collection;
+    }
 
     @Parameter
-    public String value;
+    public ParameterMap parameter;
 
     @BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
-    @BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
-
     @Test
     public void test1() {
+        String value = parameter.get("value");
         System.out.println("test1(" + value + ")");
     }
 
     @Test
     public void test2() {
+        String value = parameter.get("value");
         System.out.println("test2(" + value + ")");
-    }
-
-    @AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
     }
 
     @AfterAll

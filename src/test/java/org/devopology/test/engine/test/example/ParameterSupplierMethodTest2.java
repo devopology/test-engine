@@ -3,29 +3,31 @@ package org.devopology.test.engine.test.example;
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterMap;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
-public class WithParameterSupplierMethod2 {
+public class ParameterSupplierMethodTest2 {
 
     @ParameterSupplier
-    public static Collection<ParameterMap> values() {
-        Collection<ParameterMap> collection = new ArrayList<>();
-        for(int i = 0; i < 10; i++) {
-            collection.add(ParameterMap.withName("value " + i).put("value", String.valueOf(i)));
+    public static Collection<String> parameters() {
+        Set<String> collection = new TreeSet<>();
+
+        for (int i = 0; i < 10; i++) {
+            collection.add(String.valueOf(i));
         }
+
         return collection;
     }
 
     @Parameter
-    public ParameterMap parameterMap;
+    public String parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -34,14 +36,12 @@ public class WithParameterSupplierMethod2 {
 
     @Test
     public void test1() {
-        String value = parameterMap.get("value");
-        System.out.println("test1(" + value + ")");
+        System.out.println("test1(" + parameter + ")");
     }
 
     @Test
     public void test2() {
-        String value = parameterMap.get("value");
-        System.out.println("test2(" + value + ")");
+        System.out.println("test2(" + parameter + ")");
     }
 
     @AfterAll

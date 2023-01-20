@@ -16,48 +16,41 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.internal.api.ParameterMapImpl;
+import org.devopology.test.engine.internal.api.NamedImpl;
 
 import java.util.Objects;
 
 /**
- * Interface to implement a parameter map
+ * Interface to implement a payload wrapper that is describable
  */
-@SuppressWarnings("unchecked")
-public interface ParameterMap extends Metadata {
+public interface Named extends Metadata, Comparable {
 
     /**
-     * Method to put a key / value into the {@link ParameterMap}
-     * <p/>
-     * @param key
-     * @param value
+     * Method to get the payload
+     *
      * @return
      */
-    ParameterMap put(String key, Object value);
+    Object getPayload();
 
     /**
-     * Method to determine if a {@link ParameterMap} contains a value for a key
-     * <p/>
-     * @param key
-     * @return
-     */
-    boolean containsKey(String key);
-
-    /**
-     * Method to get a value for a key from the {@link ParameterMap}
-     * <p/>
-     * @param key
-     * @return the value for a key or {@code null} if none exists
-     */
-    <T> T get(String key);
-
-    /**
-     * Method to create a {@link ParameterMap}
-     * <p/>
+     * Method to create a Named object (useful for a static import)
+     *
      * @param name
-     * @return an empty {@link ParameterMap} with a name
+     * @param payload
+     * @return
      */
-    static ParameterMap of(String name) {
+    static Named named(String name, Object payload) {
+        return of(name, payload);
+    }
+
+    /**
+     * Method to create a Named object
+     *
+     * @param name
+     * @param payload
+     * @return
+     */
+    static Named of(String name, Object payload) {
         Objects.requireNonNull(name);
 
         name = name.trim();
@@ -65,7 +58,6 @@ public interface ParameterMap extends Metadata {
             throw new IllegalArgumentException();
         }
 
-        return new ParameterMapImpl(name);
+        return new NamedImpl(name, payload);
     }
-
 }

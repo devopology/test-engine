@@ -39,8 +39,10 @@ public class Switch {
      * @param <T>
      */
     public static <T> void switchType(Object object, Consumer... consumers) {
-        for (Consumer consumer : consumers) {
-            consumer.accept(object);
+        if (consumers != null) {
+            for (Consumer consumer : consumers) {
+                consumer.accept(object);
+            }
         }
     }
 
@@ -52,6 +54,10 @@ public class Switch {
      * @param <T>
      */
     public static <T> Consumer switchCase(Class<T> clazz, Consumer<T> consumer) {
-        return object -> Optional.of(object).filter(clazz::isInstance).map(clazz::cast).ifPresent(consumer);
+        if ((clazz != null) && (consumer != null)){
+            return object -> Optional.ofNullable(object).filter(clazz::isInstance).map(clazz::cast).ifPresent(consumer);
+        } else {
+            return null;
+        }
     }
 }
