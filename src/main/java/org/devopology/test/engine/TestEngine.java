@@ -200,71 +200,93 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
                 LOGGER.trace("processing test class [%s]", testClass.getName());
+
                 Collection<Object> testParameters = null;
 
-                // Try to get test parameters using a @ParameterSupplier field
-                Field parameterSupplierField = TestEngineUtils.getParameterSupplierField(testClass);
-                if (parameterSupplierField != null) {
-                    LOGGER.trace("test class @ParameterSupplier field [%s]", parameterSupplierField.getName());
+                // Try to get test parameters using a @ParameterSupplier fields and methods
+                List<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
+                LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
+
+                for (Field field : parameterSupplierFields) {
+                    LOGGER.trace("test class [%s] parameter supplier field name [%s]", testClass.getName(), field.getName());
+                }
+
+                List<Method> parameterSupplierMethods = TestEngineUtils.getParameterSupplierMethods(testClass);
+                LOGGER.trace("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size());
+
+                for (Method method : parameterSupplierMethods) {
+                    LOGGER.trace("test class [%s] parameter supplier method name [%s]", testClass.getName(), method.getName());
+                }
+
+                if ((parameterSupplierFields.size() > 0) && (parameterSupplierMethods.size() > 0)) {
+                    // @ParameterSupplier field(s) and method(s) both found
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] contains both a @ParameterSupplier field and method",
+                                    testClass.getName()));
+                }
+
+                if ((parameterSupplierFields.size() == 0) && (parameterSupplierMethods.size() == 0)) {
+                    // No @ParameterSupplier field or method found
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] requires either @ParameterSupplier field or method",
+                                    testClass.getName()));
+                }
+
+                if (parameterSupplierFields.size() > 1) {
+                    // More than one @ParameterSupplier field found
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] contains more than one @ParameterSupplier field",
+                                    testClass.getName()));
+                } else if (parameterSupplierFields.size() == 1) {
                     try {
-                        testParameters = (Collection<Object>) parameterSupplierField.get(null);
-                        if (testParameters == null) {
-                            throw new TestClassConfigurationException(
-                                    String.format(
-                                            "Test class [%s] @ParameterSupplier field returned null",
-                                            testClass.getName()));
-                        }
+                        testParameters = (Collection<Object>) parameterSupplierFields.get(0).get(null);
                     } catch (ClassCastException e) {
                         throw new TestClassConfigurationException(
                                 String.format(
                                         "Test class [%s] @ParameterSupplier field must return a Collection",
                                         testClass.getName()));
                     }
-                }
-
-                if (testParameters == null) {
-                    // No parameters found, so try to get test parameters using a @ParameterSupplier method
-                    Method paremterSupplierMethod = TestEngineUtils.getParameterSupplierMethod(testClass);
-                    if (paremterSupplierMethod != null) {
-                        LOGGER.trace("test class @ParameterSupplier method [%s]", paremterSupplierMethod.getName());
-                        try {
-                            testParameters =
-                                    (Collection<Object>) paremterSupplierMethod.invoke(null, (Object[]) null);
-
-                            if (testParameters == null) {
-                                throw new TestClassConfigurationException(
-                                        String.format(
-                                                "Test class [%s] @ParameterSupplier method returned null",
-                                                testClass.getName()));
-                            }
-                        } catch (ClassCastException e) {
-                            throw new TestClassConfigurationException(
-                                    String.format(
-                                            "Test class [%s] @ParameterSupplier method must return a Collection",
-                                            testClass.getName()));
-                        }
+                } else if (parameterSupplierMethods.size() > 1) {
+                    // More than one @ParameterSupplier method found
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] contains more than one @ParameterSupplier method",
+                                    testClass.getName()));
+                } else {
+                    try {
+                        testParameters = (Collection<Object>) parameterSupplierMethods.get(0).invoke(null, (Object[]) null);
+                    } catch (ClassCastException e) {
+                        throw new TestClassConfigurationException(
+                                String.format(
+                                        "Test class [%s] @ParameterSupplier method must return a Collection",
+                                        testClass.getName()));
                     }
                 }
 
-                // Test parameters are required, but could be empty
-                if (testParameters == null) {
+                // Validate that we have a @Parameter field
+                List<Field> parameterFields = TestEngineUtils.getParameterFields(testClass);
+                Field parameterField;
+
+                if (parameterFields.size() > 1) {
+                    // More than one @Parameter field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] public static @ParameterSupplier field or method required",
+                                    "Test class [%s] contains more than one @Parameter field",
                                     testClass.getName()));
-                }
-
-                // Validate that we have a @Parameter field
-                Field parameterField = TestEngineUtils.getParameterField(testClass);
-                if (parameterField == null) {
+                } else if (parameterFields.size() == 1) {
+                    parameterField = parameterFields.get(0);
+                } else {
+                    // No @Parameter field found
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] public (non-static) @Parameter field required",
                                     testClass.getName()));
-                } else {
-                    LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 }
 
+                LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
 
                 if (testParameters.size() > 0) {
@@ -318,9 +340,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             return engineDescriptor;
         } catch (Throwable t) {
             if (t instanceof TestClassConfigurationException) {
-                throw (TestClassConfigurationException) t;
+                LOGGER.error(t.getMessage());
+                System.exit(1);
+                return null;
             } else {
-                throw new TestClassConfigurationException(t);
+                throw new TestEngineException("Exception in test engine", t);
             }
         }
     }
@@ -429,10 +453,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         Class<?> testClass = testParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testParameterTestDescriptor.getTestParameter();
-        Field testParameterfield = TestEngineUtils.getParameterField(testClass);
+        List<Field> testParameterfields = TestEngineUtils.getParameterFields(testClass);
 
         try {
-            testParameterfield.set(testInstance, testParameter);
+            testParameterfields.get(0).set(testInstance, testParameter);
 
             for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
                 beforeAllMethod.invoke(testInstance, (Object[]) null);

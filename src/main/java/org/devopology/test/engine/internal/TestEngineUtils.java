@@ -44,9 +44,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TestEngineUtils {
 
-    private static Map<Class<?>, Field> parameterFieldCache;
-    private static Map<Class<?>, Field> parameterSupplierFieldCache;
-    private static Map<Class<?>, Method> parameterSupplierMethodCache;
+    private static Map<Class<?>, List<Field>> parameterFieldsCache;
+    private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
+    private static Map<Class<?>, List<Method>> parameterSupplierMethodsCache;
     private static Map<Class<?>, List<Method>> beforeAllMethodListCache;
     private static Map<Class<?>, List<Method>> beforeEachMethodListCache;
     private static Map<Class<?>, List<Method>> testMethodListCache;
@@ -56,9 +56,9 @@ public class TestEngineUtils {
     private static Map<Method, String> methodDisplayNameCache;
 
     static {
-        parameterFieldCache = new HashMap<>();
-        parameterSupplierFieldCache = new HashMap<>();
-        parameterSupplierMethodCache = new HashMap<>();
+        parameterFieldsCache = new HashMap<>();
+        parameterSupplierFieldsCache = new HashMap<>();
+        parameterSupplierMethodsCache = new HashMap<>();
         beforeAllMethodListCache = new HashMap<>();
         beforeEachMethodListCache = new HashMap<>();
         testMethodListCache = new HashMap<>();
@@ -76,71 +76,78 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get the first test class @Parameter field
+     * Method to get a List of @Parameter fields sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static Field getParameterField(Class<?> clazz) {
-        Field parameterField = parameterFieldCache.get(clazz);
-        if (parameterField != null) {
-            return parameterField;
+    public static List<Field> getParameterFields(Class<?> clazz) {
+        List<Field> parameterFields = parameterFieldsCache.get(clazz);
+        if (parameterFields != null) {
+            return parameterFields;
         }
 
+        parameterFields = new ArrayList<>();
+        
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(Parameter.class)) {
                 int modifiers = field.getModifiers();
                 if (!Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    parameterFieldCache.put(clazz, field);
-                    return field;
+                    parameterFields.add(field);
                 }
             }
         }
 
-        return null;
+        parameterFields.sort(Comparator.comparing(Field::getName));        
+        parameterFieldsCache.put(clazz, parameterFields);
+
+        return parameterFields;
     }
 
     /**
-     * Method to get the first @ParameterSupplier field
+     * Method to get a List of @ParameterSupplier fields sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static Field getParameterSupplierField(Class<?> clazz) {
-        Field parameterSupplierField = parameterSupplierFieldCache.get(clazz);
-        if (parameterSupplierField != null) {
-            return parameterSupplierField;
+    public static List<Field> getParameterSupplierFields(Class<?> clazz) {
+        List<Field> parameterSupplierFields = parameterSupplierFieldsCache.get(clazz);
+        if (parameterSupplierFields != null) {
+            return parameterSupplierFields;
         }
+
+        parameterSupplierFields = new ArrayList<>();
 
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(ParameterSupplier.class)) {
                 int modifiers = field.getModifiers();
                 if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    Class<?> fieldType = field.getType();
-                    if (Collection.class.isAssignableFrom(fieldType)) {
-                        parameterSupplierFieldCache.put(clazz, field);
-                        return field;
-                    }
+                    parameterSupplierFields.add(field);
                 }
             }
         }
 
-        return null;
+        parameterSupplierFields.sort(Comparator.comparing(Field::getName));
+        parameterSupplierFieldsCache.put(clazz, parameterSupplierFields);
+
+        return parameterSupplierFields;
     }
 
     /**
-     * Method to get the first @ParameterSupplier method
+     * Method to get a List of @ParameterSupplier fields sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static Method getParameterSupplierMethod(Class<?> clazz) {
-        Method parameterSupplierMethod = parameterSupplierMethodCache.get(clazz);
-        if (parameterSupplierMethod != null) {
-            return parameterSupplierMethod;
+    public static List<Method> getParameterSupplierMethods(Class<?> clazz) {
+        List<Method> parameterSupplierMethods = parameterSupplierMethodsCache.get(clazz);
+        if (parameterSupplierMethods != null) {
+            return parameterSupplierMethods;
         }
+
+        parameterSupplierMethods = new ArrayList<>();
 
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
@@ -150,19 +157,21 @@ public class TestEngineUtils {
                     if (method.getParameterCount() == 0) {
                         Class<?> returnType = method.getReturnType();
                         if (Collection.class.isAssignableFrom(returnType)) {
-                            parameterSupplierMethodCache.put(clazz, method);
-                            return method;
+                            parameterSupplierMethods.add(method);
                         }
                     }
                 }
             }
         }
 
-        return null;
+        parameterSupplierMethods.sort(Comparator.comparing(Method::getName));
+        parameterSupplierMethodsCache.put(clazz, parameterSupplierMethods);
+
+        return parameterSupplierMethods;
     }
 
     /**
-     * Method to get a Collection of @BeforeAll methods sorted alphabetically
+     * Method to get a List of @BeforeAll methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -179,7 +188,7 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of @BeforeEach methods sorted alphabetically
+     * Method to get a List of @BeforeEach methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -196,7 +205,7 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of @Test methods sorted alphabetically
+     * Method to get a List of @Test methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -213,7 +222,7 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of @AfterEach methods sorted alphabetically
+     * Method to get a List of @AfterEach methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -230,7 +239,7 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of @AfterAll methods sorted alphabetically
+     * Method to get a List of @AfterAll methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -360,7 +369,7 @@ public class TestEngineUtils {
     }
 
     /**
-     * Class to get a Collection of methods with a specific annotation sorted alphabetically
+     * Class to get a List of methods with a specific annotation sorted alphabetically
      *
      * @param clazz
      * @param annotation
