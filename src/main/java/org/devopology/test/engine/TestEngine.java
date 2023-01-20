@@ -199,6 +199,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
+                if (TestEngineUtils.isDisabled(testClass)) {
+                    LOGGER.trace("test class [%s] is disabled", testClass.getName());
+                    continue;
+                }
+
                 LOGGER.trace("processing test class [%s]", testClass.getName());
 
                 Collection<Object> testParameters = null;
@@ -315,6 +320,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                         testParameter);
 
                         for (Method testMethod : testClassToMethodMap.get(testClass)) {
+                            if (TestEngineUtils.isDisabled(testMethod)) {
+                                LOGGER.trace(
+                                        "test class [%s] test method [%s] is disabled",
+                                        testClass.getName(),
+                                        testMethod.getName());
+                                continue;
+                            }
+
                             // Build the test descriptor for each test class / test parameter / test method
                             String testMethodDisplayName = TestEngineUtils.getDisplayName(testMethod);
                             String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
@@ -330,10 +343,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             testParameterTestDescriptor.addChild(testMethodTestDescriptor);
                         }
 
-                        testClassTestDescriptor.addChild(testParameterTestDescriptor);
+                        if (testParameterTestDescriptor.getChildren().size() > 0) {
+                            testClassTestDescriptor.addChild(testParameterTestDescriptor);
+                        }
                     }
 
-                    engineDescriptor.addChild(testClassTestDescriptor);
+                    if (testClassTestDescriptor.getChildren().size() > 0) {
+                        engineDescriptor.addChild(testClassTestDescriptor);
+                    }
                 }
             }
 

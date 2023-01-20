@@ -16,15 +16,7 @@
 
 package org.devopology.test.engine.internal;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
-import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
-import org.devopology.test.engine.api.DisplayName;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterMap;
-import org.devopology.test.engine.api.ParameterSupplier;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.*;
 import org.junit.platform.engine.TestDescriptor;
 
 import java.lang.annotation.Annotation;
@@ -255,6 +247,32 @@ public class TestEngineUtils {
         return methodList;
     }
 
+    /**
+     * Method to get whether a test class is disabled
+     *
+     * @param clazz
+     * @return
+     */
+    public static boolean isDisabled(Class<?> clazz) {
+        return clazz.isAnnotationPresent(Disabled.class);
+    }
+
+    /**
+     * Method to get whether a test method is disabled
+     *
+     * @param method
+     * @return
+     */
+    public static boolean isDisabled(Method method) {
+        return method.isAnnotationPresent(Disabled.class);
+    }
+
+    /**
+     * Method to get the optional test class display name
+     *
+     * @param clazz
+     * @return
+     */
     public static String getDisplayName(Class<?> clazz) {
         String displayName = classDisplayNameCache.get(clazz);
         if (displayName != null) {
@@ -280,6 +298,12 @@ public class TestEngineUtils {
         return displayName;
     }
 
+    /**
+     * Method to get the optional test method display name
+     *
+     * @param method
+     * @return
+     */
     public static String getDisplayName(Method method) {
         String displayName = methodDisplayNameCache.get(method);
         if (displayName != null) {
