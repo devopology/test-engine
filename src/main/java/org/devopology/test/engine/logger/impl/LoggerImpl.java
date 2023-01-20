@@ -64,13 +64,13 @@ public class LoggerImpl implements Logger {
 
         String logLevelString = System.getProperty("devopology.test.engine.log.level");
         if (logLevelString != null) {
-            logLevelString = logLevelString.trim();
+            logLevelString = logLevelString.toUpperCase().trim();
         }
 
         if (logLevelString == null) {
             logLevelString = System.getenv().get("DEVOPOLOGY_TEST_ENGINE_LOG_LEVEL");
             if (logLevelString != null) {
-                logLevelString = logLevelString.trim();
+                logLevelString = logLevelString.toUpperCase().trim();
             }
         }
 
