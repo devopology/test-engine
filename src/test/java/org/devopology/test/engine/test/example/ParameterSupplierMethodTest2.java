@@ -2,25 +2,27 @@ package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.NamedIndex;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
-public class WithParameterSupplierMethod3 {
+public class ParameterSupplierMethodTest2 {
 
     @ParameterSupplier
-    public static Collection<Object> values() {
-        Collection<Object> collection = new ArrayList<>();
-        for(int i = 0; i < 10; i++) {
-            collection.add(NamedIndex.of("(%d)", String.valueOf(i * 3)));
+    public static Collection<String> parameters() {
+        Set<String> collection = new TreeSet<>();
+
+        for (int i = 0; i < 10; i++) {
+            collection.add(String.valueOf(i));
         }
+
         return collection;
     }
 

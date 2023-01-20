@@ -16,23 +16,15 @@
 
 package org.devopology.test.engine.api;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.devopology.test.engine.internal.api.ParameterMapImpl;
+
 import java.util.Objects;
 
 /**
  * Interface to implement a parameter map
  */
 @SuppressWarnings("unchecked")
-public interface ParameterMap {
-
-    /**
-     * Method to get the display name
-     * @return
-     */
-    default String getName() {
-        return this.getClass().getName();
-    }
+public interface ParameterMap extends Metadata {
 
     /**
      * Method to put a key / value into the {@link ParameterMap}
@@ -76,80 +68,4 @@ public interface ParameterMap {
         return new ParameterMapImpl(name);
     }
 
-    /**
-     * Class to implement a {@link ParameterMap}
-     */
-    class ParameterMapImpl implements ParameterMap {
-
-        private String name;
-        private Map<String, Object> map;
-
-        private ParameterMapImpl(String name) {
-            Objects.requireNonNull(name);
-
-            name = name.trim();
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            this.name = name;
-            map = new LinkedHashMap<>();
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public ParameterMap put(String key, Object object) {
-            Objects.requireNonNull(key);
-            Objects.requireNonNull(object);
-
-            key = key.trim();
-            if (key.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            map.put(key, object);
-            return this;
-        }
-
-        @Override
-        public boolean containsKey(String key) {
-            Objects.requireNonNull(key);
-
-            key = key.trim();
-            if (key.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            return map.containsKey(key);
-        }
-
-        @Override
-        public <T> T get(String key) {
-            Objects.requireNonNull(key);
-
-            key = key.trim();
-            if (key.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            return (T) map.get(key);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ParameterMapImpl that = (ParameterMapImpl) o;
-            return Objects.equals(name, that.name) && Objects.equals(map, that.map);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, map);
-        }
-    }
 }

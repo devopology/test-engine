@@ -16,21 +16,14 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.internal.NamedImpl;
+import org.devopology.test.engine.internal.api.NamedImpl;
 
 import java.util.Objects;
 
 /**
- * Class to implement a payload wrapper with specific display name
+ * Interface to implement a payload wrapper that is describable
  */
-public interface Named {
-
-    /**
-     * Method to get the display name
-     *
-     * @return
-     */
-    String getName();
+public interface Named extends Metadata, Comparable {
 
     /**
      * Method to get the payload
@@ -59,7 +52,6 @@ public interface Named {
      */
     static Named of(String name, Object payload) {
         Objects.requireNonNull(name);
-        Objects.requireNonNull(payload);
 
         name = name.trim();
         if (name.isEmpty()) {

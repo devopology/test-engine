@@ -167,7 +167,7 @@ public class WithParameterSupplierMethod {
     @ParameterSupplier
     public static Collection<String> values() {
         Collection<String> collection = new ArrayList<>();
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             collection.add(String.valueOf(i));
         }
         return collection;
@@ -252,7 +252,7 @@ public class WithParameterSupplierMethod3 {
     @ParameterSupplier
     public static Collection<ValueContainer> values() {
         Collection<ValueContainer> collection = new ArrayList<>();
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             collection.add(new ValueContainer(String.valueOf(i)));
         }
         return collection;

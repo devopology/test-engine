@@ -11,28 +11,29 @@ import org.devopology.test.engine.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */
-public class WithParameterSupplierField_EvenTestFailure {
+public class ParameterSupplierFieldTest {
 
-    private static class StringParameterSupplier {
-        public static Collection<Integer> values() {
-            Collection<Integer> collection = new ArrayList<>();
+    private static class TestParameterSupplier {
+
+        public static Collection<String> values() {
+            Collection<String> collection = new ArrayList<>();
+
             for (int i = 0; i < 10; i++) {
-                collection.add(i);
+                collection.add(String.valueOf(i));
             }
+
             return collection;
         }
     }
 
     @ParameterSupplier
-    public static Collection<Integer> VALUES = StringParameterSupplier.values();
+    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @Parameter
-    public Integer value;
+    public String parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -46,16 +47,12 @@ public class WithParameterSupplierField_EvenTestFailure {
 
     @Test
     public void test1() {
-        System.out.println("test1(" + value + ")");
+        System.out.println("test1(" + parameter + ")");
     }
 
     @Test
     public void test2() {
-        if ((value % 2) == 0) {
-            fail("forced failure");
-        } else {
-            System.out.println("test1(" + value + ")");
-        }
+        System.out.println("test2(" + parameter + ")");
     }
 
     @AfterEach

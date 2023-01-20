@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * Made up... in real life you wouldn't do this
  */
-public class TestingAFunction {
+public class CamelCaseFunctionTest {
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
@@ -31,11 +31,13 @@ public class TestingAFunction {
 
             for (int i = 0; i < words.length; i++) {
                 String word = words[i];
+
                 if (i == 0) {
                     word = word.isEmpty() ? word : word.toLowerCase();
                 } else {
                     word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
                 }
+
                 builder.append(word);
             }
 
@@ -55,7 +57,7 @@ public class TestingAFunction {
     }
 
     @ParameterSupplier
-    public static Collection<Object> values() {
+    public static Collection<Object> parameters() {
         Collection<Object> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
@@ -74,12 +76,12 @@ public class TestingAFunction {
     }
 
     @Parameter
-    public Tuple tuple;
+    public Tuple parameter;
 
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
     @Test
     public void test() {
-        assertThat(FUNCTION.apply(tuple.input)).isEqualTo(tuple.expected);
+        assertThat(FUNCTION.apply(parameter.input)).isEqualTo(parameter.expected);
     }
 }

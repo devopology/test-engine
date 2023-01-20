@@ -17,6 +17,7 @@
 package org.devopology.test.engine.internal;
 
 import org.devopology.test.engine.api.*;
+import org.devopology.test.engine.internal.util.Switch;
 import org.junit.platform.engine.TestDescriptor;
 
 import java.lang.annotation.Annotation;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class to implement methods to get test class fields / methods, caching the information
@@ -273,7 +275,7 @@ public class TestEngineUtils {
      * @param clazz
      * @return
      */
-    public static String getDisplayName(Class<?> clazz) {
+    public static String getClassDisplayName(Class<?> clazz) {
         String displayName = classDisplayNameCache.get(clazz);
         if (displayName != null) {
             return displayName;
@@ -304,7 +306,7 @@ public class TestEngineUtils {
      * @param method
      * @return
      */
-    public static String getDisplayName(Method method) {
+    public static String getMethodDisplayName(Method method) {
         String displayName = methodDisplayNameCache.get(method);
         if (displayName != null) {
             return displayName;
@@ -330,59 +332,30 @@ public class TestEngineUtils {
     }
 
     /**
-     * Method to get the optional object display name (public String getDisplayName() method)
+     * Method to get a display name
      *
      * @param object
      * @return
      */
-    public static String getTestParameterDisplayName(Object object, int index) {
-        String displayName = null;
+    public static String getDisplayName(Object object) {
+        String displayName;
 
-        if (object instanceof Named) {
-            return ((Named) object).getName();
-        } else if (object instanceof NamedIndex) {
-            NamedIndex namedIndex = (NamedIndex) object;
-            return String.format(namedIndex.getFormat(), index);
-        } else if (object instanceof ParameterMap) {
-            displayName = ((ParameterMap) object).getName();
-        } else {
-            /*
-            Method[] methods = object.getClass().getDeclaredMethods();
-            for (Method method : methods) {
-                int modifiers = method.getModifiers();
-                if (method.getName().equals("getDisplayName")
-                        && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)) {
-                    try {
-                        method.setAccessible(true);
-                        Object o = method.invoke(object, (Object[]) null);
-                        if (o != null) {
-                            if (o instanceof String) {
-                                displayName = (String) o;
-                            } else {
-                                displayName = o.toString();
-                            }
-                            break;
-                        }
-                    } catch (Throwable t) {
-                        // DO NOTHING
-                    }
-                }
-            }
-            */
-        }
+        AtomicReference<String> result = new AtomicReference<>();
+
+        Switch.switchType(
+                object,
+                Switch.switchCase(Metadata.class, metadata -> result.set(metadata.getDisplayName())));
+
+        displayName = result.get();
 
         if (displayName == null) {
             displayName = object.toString();
-        }
-
-        /*
-        if (displayName.isEmpty()) {
-            synchronized (TestEngineUtils.class) {
-                displayName = "[" + index + "] (empty)";
+        } else {
+            displayName = displayName.trim();
+            if (displayName.isEmpty()) {
+                displayName = object.toString();
             }
         }
-        */
 
         return displayName;
     }
