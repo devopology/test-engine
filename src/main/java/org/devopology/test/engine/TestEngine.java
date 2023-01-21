@@ -102,6 +102,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     public TestEngine(Mode mode) {
         LOGGER.trace("TestEngine()");
+        LOGGER.info("version : " + TestEngineVersion.)
         LOGGER.trace("mode = [%s]", mode);
 
         this.mode = mode;
