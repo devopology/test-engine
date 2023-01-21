@@ -157,7 +157,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test engine test... only runs from an IDE or via the TestEngine (main method) (Maven work is pending)
  */
 public class WithParameterSupplierMethod {
 
@@ -167,9 +167,11 @@ public class WithParameterSupplierMethod {
     @ParameterSupplier
     public static Collection<String> values() {
         Collection<String> collection = new ArrayList<>();
+        
         for (int i = 0; i < 10; i++) {
             collection.add(String.valueOf(i));
         }
+        
         return collection;
     }
 
@@ -222,7 +224,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test engine test... only runs from an IDE or via the TestEngine (main method) (Maven work is pending)
  */
 public class WithParameterSupplierMethod3 {
 
@@ -252,9 +254,11 @@ public class WithParameterSupplierMethod3 {
     @ParameterSupplier
     public static Collection<ValueContainer> values() {
         Collection<ValueContainer> collection = new ArrayList<>();
+        
         for (int i = 0; i < 10; i++) {
             collection.add(new ValueContainer(String.valueOf(i)));
         }
+    
         return collection;
     }
 
