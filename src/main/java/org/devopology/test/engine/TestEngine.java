@@ -17,17 +17,19 @@
 package org.devopology.test.engine;
 
 import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.internal.ConfigurationParameters;
 import org.devopology.test.engine.internal.EngineExecutionContext;
 import org.devopology.test.engine.internal.PrintStreamEngineExecutionListener;
+import org.devopology.test.engine.internal.SummaryEngineExecutionListener;
 import org.devopology.test.engine.internal.TestClassConfigurationException;
+import org.devopology.test.engine.internal.TestEngineUtils;
 import org.devopology.test.engine.internal.ThrowableCollector;
 import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
+import org.devopology.test.engine.internal.util.Switch;
 import org.devopology.test.engine.logger.Logger;
 import org.devopology.test.engine.logger.LoggerFactory;
-import org.devopology.test.engine.internal.util.Switch;
-import org.devopology.test.engine.internal.TestEngineUtils;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -38,26 +40,36 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
+
+import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
  * Test engine
@@ -102,7 +114,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     public TestEngine(Mode mode) {
         LOGGER.trace("TestEngine()");
-        LOGGER.info("version : " + TestEngineVersion.getVersion());
         LOGGER.trace("mode = [%s]", mode);
 
         this.mode = mode;
@@ -641,6 +652,80 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     printStream.println("    at " + stackTraceElement);
                 }
             }
+        }
+    }
+
+    /**
+     * Main method to run via the console
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        try {
+            LOGGER.trace("main()");
+
+            Set<Path> classPathSet = new HashSet<>();
+
+            // Add the jar containing the code to list of path... in the scenario it's embedded in a jar
+            File file = new File(TestEngine.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+            classPathSet.add(file.toPath());
+
+            // Add addition paths of jars
+            if (args != null) {
+                for (String argument : args) {
+                    argument = argument.trim();
+                    if (!argument.isEmpty()) {
+                        classPathSet.add(new File(argument).toPath());
+                    }
+                }
+            }
+
+            List<URL> urlList = new ArrayList<>();
+            if (args != null) {
+                for (String arg : args) {
+                    File jarFile = new File(arg);
+                    if (jarFile.exists() && jarFile.isFile() && jarFile.canRead()) {
+                        LOGGER.trace("adding jar to classpath [%s]", jarFile.getAbsolutePath());
+                        classPathSet.add(jarFile.getAbsoluteFile().toPath());
+                        urlList.add(jarFile.getAbsoluteFile().toURI().toURL());
+                    }
+                }
+            }
+
+            URLClassLoader urlClassLoader = new URLClassLoader(urlList.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+            Thread.currentThread().setContextClassLoader(urlClassLoader);
+
+            SummaryEngineExecutionListener testExecutionSummaryListener = new SummaryEngineExecutionListener(System.out);
+
+            LauncherDiscoveryRequest launcherDiscoveryRequest =
+                    LauncherDiscoveryRequestBuilder.request()
+                            .selectors(DiscoverySelectors.selectClasspathRoots(classPathSet))
+                            .filters(includeClassNamePatterns(".*"))
+                            .build();
+
+            TestEngine testEngine = new TestEngine(TestEngine.Mode.CONSOLE);
+
+            TestDescriptor testDescriptor =
+                    testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+
+            ConfigurationParameters testEngineConfigurationParameters = new ConfigurationParameters();
+
+            testEngine.execute(
+                    ExecutionRequest.create(
+                            testDescriptor,
+                            testExecutionSummaryListener,
+                            testEngineConfigurationParameters));
+
+            testExecutionSummaryListener.printSummary(System.out);
+
+            if (!testExecutionSummaryListener.hasFailures()) {
+                System.exit(0);
+            } else {
+                System.exit(1);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(1);
         }
     }
 }
