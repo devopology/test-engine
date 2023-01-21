@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine.internal;
 
+import org.devopology.test.engine.TestEngineVersion;
 import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
@@ -39,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SummaryEngineExecutionListener implements EngineExecutionListener {
 
-    private static final String SEPARATOR = "----------------------";
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
 
     private long startMilliseconds;
@@ -65,9 +65,18 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         counterManager.put("methods.skipped", new Counter());
         counterManager.put("methods.failed", new Counter());
 
-        printStream.println(INFO + SEPARATOR);
-        printStream.println(INFO + "Devopology Test Engine");
-        printStream.println(INFO + SEPARATOR);
+        String banner = "Devopology Test Engine " + TestEngineVersion.getVersion();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (char c : banner.toCharArray()) {
+            stringBuilder.append("-");
+        }
+
+        String separator = stringBuilder.toString();
+
+        printStream.println(INFO + separator);
+        printStream.println(INFO + banner);
+        printStream.println(INFO + separator);
         printStream.println(INFO + "Scanning for tests...");
     }
 
@@ -195,9 +204,18 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
     public void printSummary(PrintStream printStream) {
         long finishMilliseconds = System.currentTimeMillis();
 
-        printStream.println(INFO + SEPARATOR + "--------");
-        printStream.println("[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] Devopology Test Engine Summary");
-        printStream.println(INFO + SEPARATOR + "--------");
+        String banner = "Devopology Test Engine " + TestEngineVersion.getVersion() + " Summary";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (char c : banner.toCharArray()) {
+            stringBuilder.append("-");
+        }
+
+        String separator = stringBuilder.toString();
+
+        printStream.println(INFO + separator);
+        printStream.println("[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] " + banner);
+        printStream.println(INFO + separator);
         printStream.println(INFO);
 
         int pad = Padding.calculatePadding(imageNameSet.size(), classNameSet.size(), methodNameSet.size());
@@ -260,18 +278,18 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         printStream.println(INFO);
         
         if (!hasFailures()) {
-            printStream.println(INFO + SEPARATOR);
+            printStream.println(INFO + separator);
             printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
 
         } else {
-            printStream.println(INFO + SEPARATOR);
+            printStream.println(INFO + separator);
             printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
         }
 
-        printStream.println(INFO + SEPARATOR);
+        printStream.println(INFO + separator);
         printStream.println(INFO + "Total time: " + toHumanReadable(finishMilliseconds - startMilliseconds, true));
         printStream.println(INFO + "Finished at: " + finishedAt());
-        printStream.println(INFO + SEPARATOR);
+        printStream.println(INFO + separator);
     }
 
     private static String capitalize(String string) {
