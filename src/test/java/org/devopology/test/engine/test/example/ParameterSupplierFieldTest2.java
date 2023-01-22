@@ -9,6 +9,7 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,9 +21,12 @@ public class ParameterSupplierFieldTest2 {
     private static class TestParameterSupplier {
 
         public static Collection<Named> values() {
-            return List.of(
-                    Named.of("array 0", new String[] { "1", "2" }),
-                    Named.of("array 1", new String[] { "1", "2", "3" }));
+            List<Named> list = new ArrayList<>();
+
+            list.add(Named.of("array 0", new String[] { "1", "2" }));
+            list.add(Named.of("array 1", new String[] { "1", "2", "3" }));
+
+            return list;
         }
     }
 

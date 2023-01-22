@@ -7,7 +7,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6-SNAPSHOT</version>
     <name>Devopology - Test Engine</name>
 
     <properties>
@@ -38,9 +38,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <excludes>
-                        <!-- <exclude>org.devopology.test.engine.test.example.**</exclude> -->
-                    </excludes>
+                    <argLine>-Ddevopology.test.engine.mode=console</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -54,7 +52,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.devopology.test.engine.ConsoleRunner</mainClass>
+                            <mainClass>org.devopology.test.engine.TestEngine</mainClass>
                         </manifest>
                     </archive>
                     <outputDirectory>${project.build.directory}/assembly</outputDirectory>

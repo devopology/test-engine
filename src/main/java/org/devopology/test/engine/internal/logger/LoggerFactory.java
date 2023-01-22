@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.logger;
+package org.devopology.test.engine.internal.logger;
 
-import org.devopology.test.engine.logger.impl.LoggerImpl;
+import org.devopology.test.engine.internal.logger.impl.LoggerImpl;
 
 /**
  * Class to implement a LoggerFactory to create a Logger

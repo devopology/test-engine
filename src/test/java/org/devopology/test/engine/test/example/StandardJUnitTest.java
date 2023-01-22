@@ -13,11 +13,6 @@ public class StandardJUnitTest {
         System.out.println("beforeAll()");
     }
 
-    @BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
-
     @Test
     public void test1() {
         System.out.println("test1()");
@@ -28,9 +23,14 @@ public class StandardJUnitTest {
         System.out.println("test2()");
     }
 
-    @AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
+    @Test
+    public void test3() {
+        System.out.println("test3()");
+    }
+
+    @Test
+    public void test4() {
+        System.out.println("test4()");
     }
 
     @AfterAll

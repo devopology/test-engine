@@ -32,7 +32,7 @@ public class TestParameterTestDescriptor extends AbstractTestDescriptor {
 
     @Override
     public Type getType() {
-        return Type.TEST;
+        return Type.CONTAINER_AND_TEST;
     }
 
     public Class<?> getTestClass() {

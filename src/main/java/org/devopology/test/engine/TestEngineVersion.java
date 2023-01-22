@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public class TestEngineVersion {
 
-    private static final String RESOURCE_PATH = "/test-engine.properties";
+    private static final String RESOURCE_PATH = "/devopology-test-engine.properties";
 
     public static String getVersion() {
         return getProperty("version", "Unknown");

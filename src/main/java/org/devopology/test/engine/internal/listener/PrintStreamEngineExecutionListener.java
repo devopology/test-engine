@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.internal;
+package org.devopology.test.engine.internal.listener;
 
 import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;

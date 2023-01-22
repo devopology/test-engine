@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.logger;
+package org.devopology.test.engine.internal.logger;
 
 public interface Logger {
 

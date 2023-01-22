@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.logger.impl;
+package org.devopology.test.engine.internal.logger.impl;
 
-import org.devopology.test.engine.logger.Logger;
+import org.devopology.test.engine.internal.logger.Logger;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
