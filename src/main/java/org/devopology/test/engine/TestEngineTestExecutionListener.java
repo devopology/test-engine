@@ -43,9 +43,9 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
     public void testPlanExecutionStarted(TestPlan testPlan) {
         ConfigurationParameters configurationParameters = testPlan.getConfigurationParameters();
         for (String key : configurationParameters.keySet()) {
-            if (key.startsWith("devopology.test.engine")) {
+            if (key.startsWith("devopology.test.engine.output")) {
                 configurationParameters.get(key).ifPresent(value -> {
-                    if ("console".equals(value)) {
+                    if ("detailed".equalsIgnoreCase(value)) {
                         mode = Mode.CONSOLE;
                     }
                 });
