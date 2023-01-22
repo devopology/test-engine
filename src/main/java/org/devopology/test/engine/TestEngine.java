@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine;
 
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -52,7 +53,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     public TestEngine() {
-
+        // DO NOTHING
     }
 
     @Override

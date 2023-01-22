@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.assertj.core.api.Fail.fail;
 
 /**
@@ -46,7 +48,7 @@ public class CamelCaseFunctionTest {
         }
     }
 
-    private static class Tuple {
+    private static class Tuple implements Metadata {
 
         public String input;
         public String expected;
@@ -54,6 +56,11 @@ public class CamelCaseFunctionTest {
         public Tuple(String input, String expected) {
             this.input = input;
             this.expected = expected;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Tuple { " + input + " | " + expected + " }";
         }
     }
 

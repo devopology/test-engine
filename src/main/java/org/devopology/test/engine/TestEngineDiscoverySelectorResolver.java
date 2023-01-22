@@ -1,6 +1,7 @@
 package org.devopology.test.engine;
 
 import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.ParameterMap;
 import org.devopology.test.engine.internal.TestClassConfigurationException;
 import org.devopology.test.engine.internal.TestEngineUtils;
 import org.devopology.test.engine.internal.descriptor.TestClassTestTestDescriptor;
@@ -9,6 +10,7 @@ import org.devopology.test.engine.internal.descriptor.TestParameterTestDescripto
 import org.devopology.test.engine.internal.logger.Logger;
 import org.devopology.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
@@ -51,6 +53,7 @@ public class TestEngineDiscoverySelectorResolver {
     public void resolveSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolveSelectors()");
 
+        ConfigurationParameters configurationParameters = engineDiscoveryRequest.getConfigurationParameters();
         UniqueId uniqueId = engineDescriptor.getUniqueId();
 
         // Test class to test method list mapping, sorted by test class name

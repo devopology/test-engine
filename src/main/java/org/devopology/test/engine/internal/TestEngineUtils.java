@@ -347,6 +347,10 @@ public class TestEngineUtils {
      * @return
      */
     public static String getDisplayName(Object object) {
+        if (object == null) {
+            return "null";
+        }
+
         String displayName;
 
         AtomicReference<String> result = new AtomicReference<>();
