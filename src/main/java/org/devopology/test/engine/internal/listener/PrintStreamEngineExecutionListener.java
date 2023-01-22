@@ -16,7 +16,7 @@
 
 package org.devopology.test.engine.internal.listener;
 
-import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
+import org.devopology.test.engine.internal.descriptor.TestClassTestTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
 import org.devopology.test.engine.internal.util.AnsiColor;
@@ -52,7 +52,7 @@ public class PrintStreamEngineExecutionListener implements EngineExecutionListen
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestClassTestDescriptor.class, consumer -> {}),
+                Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestParameterTestDescriptor.class, consumer -> {
                     TestParameterTestDescriptor testClassTestDescriptor = (TestParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testClassTestDescriptor.getTestClass();
@@ -89,7 +89,7 @@ public class PrintStreamEngineExecutionListener implements EngineExecutionListen
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestClassTestDescriptor.class, consumer -> {}),
+                Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestParameterTestDescriptor.class, consumer -> {
                     TestParameterTestDescriptor testClassTestDescriptor = (TestParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testClassTestDescriptor.getTestClass();

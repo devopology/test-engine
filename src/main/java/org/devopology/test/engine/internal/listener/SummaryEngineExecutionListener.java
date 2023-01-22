@@ -17,7 +17,7 @@
 package org.devopology.test.engine.internal.listener;
 
 import org.devopology.test.engine.TestEngineVersion;
-import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
+import org.devopology.test.engine.internal.descriptor.TestClassTestTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
 import org.devopology.test.engine.internal.util.AnsiColor;
@@ -90,7 +90,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> executionSkipped((EngineDescriptor) testDescriptor, reason)),
-                Switch.switchCase(TestClassTestDescriptor.class, consumer -> executionSkipped((TestClassTestDescriptor) testDescriptor, reason)),
+                Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> executionSkipped((TestClassTestTestDescriptor) testDescriptor, reason)),
                 Switch.switchCase(TestParameterTestDescriptor.class, consumer -> executionSkipped((TestParameterTestDescriptor) testDescriptor, reason)),
                 Switch.switchCase(TestMethodTestDescriptor.class, consumer -> executionSkipped((TestMethodTestDescriptor) testDescriptor, reason)));
     }
@@ -99,7 +99,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         // TODO
     }
 
-    public void executionSkipped(TestClassTestDescriptor TestClassTestDescriptor, String reason) {
+    public void executionSkipped(TestClassTestTestDescriptor TestClassTestDescriptor, String reason) {
         // TODO
     }
 
@@ -115,7 +115,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> executionStarted((EngineDescriptor) testDescriptor)),
-                Switch.switchCase(TestClassTestDescriptor.class, consumer -> executionStarted((TestClassTestDescriptor) testDescriptor)),
+                Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> executionStarted((TestClassTestTestDescriptor) testDescriptor)),
                 Switch.switchCase(TestParameterTestDescriptor.class, consumer -> executionStarted((TestParameterTestDescriptor) testDescriptor)),
                 Switch.switchCase(TestMethodTestDescriptor.class, consumer -> executionStarted((TestMethodTestDescriptor) testDescriptor)));
     }
@@ -124,7 +124,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         // DO NOTHING
     }
 
-    public void executionStarted(TestClassTestDescriptor TestClassTestDescriptor) {
+    public void executionStarted(TestClassTestTestDescriptor TestClassTestDescriptor) {
         // DO NOTHING
     }
 
@@ -146,7 +146,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> executionFinished((EngineDescriptor) testDescriptor, testExecutionResult)),
-                Switch.switchCase(TestClassTestDescriptor.class, consumer -> executionFinished((TestClassTestDescriptor) testDescriptor, testExecutionResult)),
+                Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> executionFinished((TestClassTestTestDescriptor) testDescriptor, testExecutionResult)),
                 Switch.switchCase(TestParameterTestDescriptor.class, consumer -> executionFinished((TestParameterTestDescriptor) testDescriptor, testExecutionResult)),
                 Switch.switchCase(TestMethodTestDescriptor.class, consumer -> executionFinished((TestMethodTestDescriptor) testDescriptor, testExecutionResult)));
     }
@@ -155,7 +155,7 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         // DO NOTHING
     }
 
-    public void executionFinished(TestClassTestDescriptor TestClassTestDescriptor, TestExecutionResult testExecutionResult) {
+    public void executionFinished(TestClassTestTestDescriptor TestClassTestDescriptor, TestExecutionResult testExecutionResult) {
         // DO NOTHING
     }
 

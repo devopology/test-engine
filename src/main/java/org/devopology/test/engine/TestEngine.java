@@ -51,6 +51,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
+    public TestEngine() {
+
+    }
+
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         // Create a EngineDescriptor as the target

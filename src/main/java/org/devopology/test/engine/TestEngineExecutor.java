@@ -19,7 +19,7 @@ package org.devopology.test.engine;
 import org.devopology.test.engine.internal.EngineExecutionContext;
 import org.devopology.test.engine.internal.TestEngineUtils;
 import org.devopology.test.engine.internal.ThrowableCollector;
-import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
+import org.devopology.test.engine.internal.descriptor.TestClassTestTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
 import org.devopology.test.engine.internal.util.Switch;
@@ -69,10 +69,10 @@ public class TestEngineExecutor {
 
         if (rootTestDescriptor instanceof EngineDescriptor) {
             for (TestDescriptor testDescriptor : rootTestDescriptor.getChildren()) {
-                execute((TestClassTestDescriptor) testDescriptor, testEngineExecutionContext);
+                execute((TestClassTestTestDescriptor) testDescriptor, testEngineExecutionContext);
             }
-        } else if (rootTestDescriptor instanceof TestClassTestDescriptor) {
-            execute((TestClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext);
+        } else if (rootTestDescriptor instanceof TestClassTestTestDescriptor) {
+            execute((TestClassTestTestDescriptor) rootTestDescriptor, testEngineExecutionContext);
         }
     }
 
@@ -83,7 +83,7 @@ public class TestEngineExecutor {
      * @param testEngineExecutionContext
      */
     private void execute(
-            TestClassTestDescriptor testClassTestDescriptor,
+            TestClassTestTestDescriptor testClassTestDescriptor,
             EngineExecutionContext testEngineExecutionContext) {
 
         // If test class descriptor is part of a hierarchy (has siblings) notify listeners
@@ -290,7 +290,7 @@ public class TestEngineExecutor {
                                         .append("parameter -> ")
                                         .append(testParameterTestDescriptor.getTestParameter())),
                 Switch.switchCase(
-                        TestClassTestDescriptor.class,
+                        TestClassTestTestDescriptor.class,
                         testClassTestDescriptor ->
                                 stringBuilder.append("class -> " + testDescriptor.getDisplayName())),
                 Switch.switchCase(

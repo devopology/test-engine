@@ -155,4 +155,8 @@ public class AnsiColor {
     public static boolean isSupported() {
         return ANSI_COLOR_SUPPORTED;
     }
+
+    public static void force() {
+        ANSI_COLOR_SUPPORTED = true;
+    }
 }

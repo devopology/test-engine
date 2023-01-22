@@ -3,7 +3,7 @@ package org.devopology.test.engine;
 import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.internal.TestClassConfigurationException;
 import org.devopology.test.engine.internal.TestEngineUtils;
-import org.devopology.test.engine.internal.descriptor.TestClassTestDescriptor;
+import org.devopology.test.engine.internal.descriptor.TestClassTestTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.devopology.test.engine.internal.descriptor.TestParameterTestDescriptor;
 import org.devopology.test.engine.internal.logger.Logger;
@@ -223,8 +223,8 @@ public class TestEngineDiscoverySelectorResolver {
                     // i.e. Tests with an empty set of parameters will be ignored
                     String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
-                    TestClassTestDescriptor testClassTestDescriptor =
-                            new TestClassTestDescriptor(
+                    TestClassTestTestDescriptor testClassTestDescriptor =
+                            new TestClassTestTestDescriptor(
                                     uniqueId.append("/", testClassDisplayName),
                                     testClassDisplayName,
                                     testClass);

@@ -16,21 +16,30 @@
 
 package org.devopology.test.engine.internal.descriptor;
 
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-public class TestClassTestDescriptor extends AbstractTestDescriptor {
+import java.util.Optional;
 
+public class TestClassTestTestDescriptor extends TestEngineAbstractTestDescriptor {
+
+    private TestSource testSource;
     private Class<?> testClass;
 
-    public TestClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
+    public TestClassTestTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
+        this.testSource = new TestEngineTestSource(this);
         this.testClass = testClass;
     }
 
     @Override
     public Type getType() {
         return Type.CONTAINER_AND_TEST;
+    }
+
+    @Override
+    public Optional<TestSource> getSource() {
+        return Optional.of(testSource);
     }
 
     public Class<?> getTestClass() {
