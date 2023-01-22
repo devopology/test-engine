@@ -16,9 +16,14 @@
 
 package org.devopology.test.engine;
 
-import org.devopology.test.engine.internal.listener.PrintStreamEngineExecutionListener;
-import org.devopology.test.engine.internal.listener.SummaryEngineExecutionListener;
-import org.junit.platform.engine.ConfigurationParameters;
+import org.devopology.test.engine.support.TestEngineConfigurationParameters;
+import org.devopology.test.engine.support.TestEngineEngineDiscoveryRequest;
+import org.devopology.test.engine.support.TestEngineDiscoverySelectorResolver;
+import org.devopology.test.engine.support.TestEngineExecutor;
+import org.devopology.test.engine.support.TestEngineInformation;
+import org.devopology.test.engine.support.listener.PrintStreamEngineExecutionListener;
+import org.devopology.test.engine.support.listener.SummaryEngineExecutionListener;
+import org.devopology.test.engine.support.util.AnsiColor;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -29,23 +34,22 @@ import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
+/**
+ * Class to implement a TestEngine
+ */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final String ENGINE_ID = "devopology-test-engine";
     private static final String GROUP_ID = "org.devopology";
     private static final String ARTIFACT_ID = "test-engine";
-    private static final String VERSION = TestEngineVersion.getVersion();
+    private static final String VERSION = TestEngineInformation.getVersion();
 
     @Override
     public String getId() {
@@ -67,12 +71,16 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
-    public TestEngine() {
-        // DO NOTHING
-    }
-
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
+        // Create configuration parameters which first gets the
+        // discovery request parameters then merges System properties
+        TestEngineConfigurationParameters configurationParameters =
+                new TestEngineConfigurationParameters(discoveryRequest.getConfigurationParameters());
+
+        // Wrap the discovery request
+        discoveryRequest = new TestEngineEngineDiscoveryRequest(discoveryRequest, configurationParameters);
+
         // Create a EngineDescriptor as the target
         EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
@@ -86,65 +94,50 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        // Create a DevopologyTestEngineExecutor and execute the execution request
         new TestEngineExecutor().execute(executionRequest);
     }
 
+    /**
+     * Method to run the TestEngine as a console application
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-        String classPath = System.getProperty("java.class.path");
+        AnsiColor.force();
 
+        Set<Path> classPathRoots = new HashSet<>();
+
+        // Add the jar containing the test engine to the class path to search for tests
         File file =
                 new File(
                         TestEngine.class
                                 .getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        Set<Path> classPathRoots = new HashSet<>();
         classPathRoots.add(file.getAbsoluteFile().toPath());
 
+        // Add all jars in the class path to search for tests
+        String classPath = System.getProperty("java.class.path");
         String[] jars = classPath.split(File.pathSeparator);
         for (String jar : jars) {
-            //System.out.println("adding jar [" + jar + "]");
             classPathRoots.add(new File(jar).getAbsoluteFile().toPath());
         }
 
-        /*
-
-        if (args != null) {
-            List<URL> urlList = new ArrayList<>();
-            for (String arg : args) {
-                File jarFile = new File(arg);
-                if (jarFile.exists() && jarFile.isFile() && jarFile.canRead()) {
-                    classPathRoots.add(jarFile.getAbsoluteFile().toPath());
-                    urlList.add(jarFile.getAbsoluteFile().toURI().toURL());
-                }
-            }
-
-            if (urlList.size() > 0) {
-                URLClassLoader urlClassLoader = new URLClassLoader(urlList.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
-                Thread.currentThread().setContextClassLoader(urlClassLoader);
-            }
-        } else {
-            LOGGER.error("No arguments provided");
-            System.exit(1);
-        }
-
-        for (Path path : classPathRoots) {
-            LOGGER.trace("class path root [%s]", path);
-        }
-        */
+        TestEngineConfigurationParameters configurationParameters = new TestEngineConfigurationParameters();
 
         LauncherDiscoveryRequest launcherDiscoveryRequest =
                 LauncherDiscoveryRequestBuilder.request()
                         .selectors(DiscoverySelectors.selectClasspathRoots(classPathRoots))
                         .filters(includeClassNamePatterns(".*"))
+                        .configurationParameters(configurationParameters.getConfigurationMap())
                         .build();
 
         TestEngine testEngine = new TestEngine();
 
+        SummaryEngineExecutionListener summaryEngineExecutionListener = new SummaryEngineExecutionListener(System.out);
+
         TestDescriptor testDescriptor =
                 testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
 
-        SummaryEngineExecutionListener summaryEngineExecutionListener = new SummaryEngineExecutionListener(System.out);
         PrintStreamEngineExecutionListener printStreamEngineExecutionListener = new PrintStreamEngineExecutionListener(summaryEngineExecutionListener, System.out);
 
         testEngine.execute(
