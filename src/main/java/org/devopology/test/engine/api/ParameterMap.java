@@ -16,7 +16,7 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.internal.api.ParameterMapImpl;
+import org.devopology.test.engine.support.api.ParameterMapImpl;
 
 import java.util.Objects;
 

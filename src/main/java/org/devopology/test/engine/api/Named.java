@@ -16,7 +16,7 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.internal.api.NamedImpl;
+import org.devopology.test.engine.support.api.NamedImpl;
 
 import java.util.Objects;
 

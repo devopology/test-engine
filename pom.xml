@@ -7,7 +7,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <name>Devopology - Test Engine</name>
 
     <properties>
@@ -24,8 +24,8 @@
                 <version>3.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
                 <executions>
                     <execution>
@@ -36,11 +36,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M8</version>
                 <configuration>
-                    <excludes>
-                        <!-- <exclude>org.devopology.test.engine.test.example.**</exclude> -->
-                    </excludes>
+                    <!-- test engine detailed test output -->
+                    <argLine>-Ddevopology.test.engine.output=detailed</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -54,7 +53,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.devopology.test.engine.ConsoleRunner</mainClass>
+                            <mainClass>org.devopology.test.engine.TestEngine</mainClass>
                         </manifest>
                     </archive>
                     <outputDirectory>${project.build.directory}/assembly</outputDirectory>
@@ -69,38 +68,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.coderplus.maven.plugins</groupId>
-                <artifactId>copy-rename-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-file</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <sourceFile>target/assembly/${project.artifactId}-${project.version}-jar-with-dependencies.jar</sourceFile>
-                            <destinationFile>target/${project.artifactId}-${project.version}-console.jar</destinationFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 
