@@ -182,9 +182,9 @@ For each test class found {
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@BeforeEach` methods
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspExecute the test instance's `@Test` method
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@Test` method
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspExecute the test instance's `@AfterEach` methods
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@AfterEach` methods
 
 &nbsp;&nbsp;&nbsp;&nbsp;}
 
