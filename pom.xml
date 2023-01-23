@@ -55,7 +55,7 @@
                 <version>3.3.0</version>
                 <executions>
                     <execution>
-                        <phase>integration-test</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
