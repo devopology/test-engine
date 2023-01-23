@@ -307,13 +307,14 @@ public class WithParameterSupplierMethod3 {
 }
 ```
 
-Notes:
+Other example testsexamples
+
+https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
+
+**Notes**
 
 - While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports.
 
-Other examples
-
-https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
 
 ---
 
