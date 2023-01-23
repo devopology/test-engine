@@ -74,9 +74,9 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
 
         String separator = stringBuilder.toString();
 
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println(INFO + banner);
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println(INFO + "Scanning for tests...");
     }
 
@@ -213,9 +213,9 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
 
         String separator = stringBuilder.toString();
 
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println("[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] " + banner);
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println(INFO);
 
         int pad = Padding.calculatePadding(parameterStringSet.size(), classNameSet.size(), methodNameSet.size());
@@ -278,18 +278,18 @@ public class SummaryEngineExecutionListener implements EngineExecutionListener {
         printStream.println(INFO);
         
         if (!hasFailures()) {
-            printStream.println(INFO + separator);
-            printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("TESTS PASSED"));
 
         } else {
-            printStream.println(INFO + separator);
-            printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("TESTS FAILED"));
         }
 
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println(INFO + "Total time: " + toHumanReadable(finishMilliseconds - startMilliseconds, true));
         printStream.println(INFO + "Finished at: " + finishedAt());
-        printStream.println(INFO + separator);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
     }
 
     private static String capitalize(String string) {

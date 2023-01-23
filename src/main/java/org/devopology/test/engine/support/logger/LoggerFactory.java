@@ -18,10 +18,15 @@ package org.devopology.test.engine.support.logger;
 
 import org.devopology.test.engine.support.logger.impl.LoggerImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class to implement a LoggerFactory to create a Logger
  */
 public class LoggerFactory {
+
+    private static Map<String, Logger> LOGGER_MAP = new HashMap<>();
 
     /**
      * Constructor
@@ -47,6 +52,22 @@ public class LoggerFactory {
      * @return
      */
     public static Logger getLogger(String name) {
-        return new LoggerImpl(name);
+        synchronized (LOGGER_MAP) {
+            if (name == null) {
+                name = "UNDEFINED";
+            } else {
+                name = name.trim();
+                if (name.isEmpty()) {
+                    name = "UNDEFINED";
+                }
+            }
+
+            Logger logger = LOGGER_MAP.get(name);
+            if (logger == null) {
+                logger = new LoggerImpl(name);
+                LOGGER_MAP.put(name, logger);
+            }
+            return logger;
+        }
     }
 }
