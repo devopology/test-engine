@@ -307,7 +307,7 @@ public class WithParameterSupplierMethod3 {
 }
 ```
 
-Other example testsexamples
+Other example tests
 
 https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
 
