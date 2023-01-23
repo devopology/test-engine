@@ -60,6 +60,14 @@ public class LoggerImpl implements Logger {
      * @param className
      */
     public LoggerImpl(String className) {
+        Objects.requireNonNull(className);
+
+        className = className.trim();
+
+        if (className.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
         this.className = className;
 
         String logLevelString = System.getProperty("devopology.test.engine.log.level");
