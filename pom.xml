@@ -17,13 +17,6 @@
     </properties>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-file</artifactId>
-                <version>3.5.2</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,6 +38,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M8</version>
                 <configuration>
+                    <!-- test engine detailed test output -->
                     <argLine>-Ddevopology.test.engine.output=detailed</argLine>
                 </configuration>
             </plugin>
@@ -71,27 +65,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>maven-wagon-file</artifactId>
-                <version>2.0.2</version>
-                <executions>
-                    <execution>
-                        <id>repository</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>upload</goal>
-                        </goals>
-                        <configuration>
-                            <fromDir>local.dir</fromDir>
-                            <includes>*</includes>
-                            <excludes>pom.xml</excludes>
-                            <url>scp://your.remote.host/</url>
-                            <toDir>remote.dir</toDir>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
