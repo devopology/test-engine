@@ -77,7 +77,7 @@ The test engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xm
 
 Write a test...
 
-Example 1 - `@ParameterSupplier` field
+Example:
 
 ```
 package org.devopology.test.engine.test.example;
