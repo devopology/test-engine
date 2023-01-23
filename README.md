@@ -9,7 +9,7 @@ The Devopology Test Engine is a JUnit 5 based test engine that allows for parame
 Currently, JUnit 5 does not support parameterized tests at the test class level
 - https://github.com/junit-team/junit5/issues/878
 
-## Usage
+## Common Usage
  
 Add the Devopology Maven repository to your `pom.xml` file...
 
@@ -53,7 +53,25 @@ Add the Junit 5 and Devopology test engine jar dependencies...
 </dependency>
 ```
 
-Note: The test engine uses core JUnit 5 jars
+Set up Maven to use the test engine
+
+**Notes**
+
+- The test engine uses core JUnit 5 jars as dependencies
+
+# Command line (standalone) Usage
+
+The test engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+
+Example:
+
+```
+java \
+  -cp <directory of all your dependencies>/* \
+  org.devopology.test.engine.TestEngine
+```
+
+---
 
 Write a test...
 
