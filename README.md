@@ -71,7 +71,7 @@ java \
   org.devopology.test.engine.TestEngine
 ```
 
-The test engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach
+The test engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
 
 ---
 
