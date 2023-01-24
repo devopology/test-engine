@@ -10,8 +10,6 @@ import org.devopology.test.engine.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.assertj.core.api.Fail.fail;
-
 /**
  * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
  */

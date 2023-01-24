@@ -27,7 +27,9 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 import org.devopology.test.engine.support.util.Switch;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.launcher.TestPlan;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -35,6 +37,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -371,6 +374,10 @@ public class TestEngineUtils {
         }
 
         return displayName;
+    }
+
+    public static TestPlan createTestPlan(TestDescriptor testDescriptor, ConfigurationParameters configurationParameters) {
+        return TestPlan.from(Collections.singleton(testDescriptor), configurationParameters);
     }
 
     /**

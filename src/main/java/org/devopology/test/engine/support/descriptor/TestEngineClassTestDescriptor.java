@@ -19,32 +19,22 @@ package org.devopology.test.engine.support.descriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 
-import java.lang.reflect.Method;
 import java.util.Optional;
 
-public class TestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
+public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private TestSource testSource;
     private Class<?> testClass;
-    private Object testParameter;
-    private Method testMethod;
 
-    public TestMethodTestDescriptor(
-            UniqueId uniqueId,
-            String displayName,
-            Class<?> testClass,
-            Object testParameter,
-            Method testMethod) {
+    public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
         this.testSource = new TestEngineTestSource(this);
         this.testClass = testClass;
-        this.testParameter = testParameter;
-        this.testMethod = testMethod;
     }
 
     @Override
     public Type getType() {
-        return Type.TEST;
+        return Type.CONTAINER;
     }
 
     @Override
@@ -54,13 +44,5 @@ public class TestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     public Class<?> getTestClass() {
         return testClass;
-    }
-
-    public Object getTestParameter() {
-        return testParameter;
-    }
-
-    public Method getTestMethod() {
-        return testMethod;
     }
 }

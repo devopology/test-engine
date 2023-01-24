@@ -17,9 +17,9 @@
 package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.api.Named;
-import org.devopology.test.engine.support.descriptor.TestClassTestTestDescriptor;
-import org.devopology.test.engine.support.descriptor.TestMethodTestDescriptor;
-import org.devopology.test.engine.support.descriptor.TestParameterTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -248,8 +248,8 @@ public class TestEngineDiscoverySelectorResolver {
                     // i.e. Tests with an empty set of parameters will be ignored
                     String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
-                    TestClassTestTestDescriptor testClassTestDescriptor =
-                            new TestClassTestTestDescriptor(
+                    TestEngineClassTestDescriptor testClassTestDescriptor =
+                            new TestEngineClassTestDescriptor(
                                     uniqueId.append("/", testClassDisplayName),
                                     testClassDisplayName,
                                     testClass);
@@ -266,8 +266,8 @@ public class TestEngineDiscoverySelectorResolver {
 
                         String testParameterUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
-                        TestParameterTestDescriptor testParameterTestDescriptor =
-                                new TestParameterTestDescriptor(
+                        TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
+                                new TestEngineParameterTestDescriptor(
                                         uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
                                         testParameterDisplayName,
                                         testClass,
@@ -286,19 +286,19 @@ public class TestEngineDiscoverySelectorResolver {
                             String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
                             String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
-                            TestMethodTestDescriptor testMethodTestDescriptor =
-                                    new TestMethodTestDescriptor(
+                            TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
+                                    new TestEngineTestMethodTestDescriptor(
                                             uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
                                             testMethodDisplayName,
                                             testClass,
                                             testParameter,
                                             testMethod);
 
-                            testParameterTestDescriptor.addChild(testMethodTestDescriptor);
+                            testEngineParameterTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
                         }
 
-                        if (testParameterTestDescriptor.getChildren().size() > 0) {
-                            testClassTestDescriptor.addChild(testParameterTestDescriptor);
+                        if (testEngineParameterTestDescriptor.getChildren().size() > 0) {
+                            testClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
                         }
                     }
 

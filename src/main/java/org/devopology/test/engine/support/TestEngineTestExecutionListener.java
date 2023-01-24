@@ -16,10 +16,10 @@
 
 package org.devopology.test.engine.support;
 
-import org.devopology.test.engine.support.descriptor.TestClassTestTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestSource;
-import org.devopology.test.engine.support.descriptor.TestMethodTestDescriptor;
-import org.devopology.test.engine.support.descriptor.TestParameterTestDescriptor;
 import org.devopology.test.engine.support.util.AnsiColor;
 import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
@@ -78,9 +78,9 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
                 Switch.switchType(
                         testDescriptor,
                         Switch.switchCase(EngineDescriptor.class, consumer -> {}),
-                        Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> {}),
-                        Switch.switchCase(TestParameterTestDescriptor.class, consumer -> {
-                            TestParameterTestDescriptor testClassTestDescriptor = (TestParameterTestDescriptor) testDescriptor;
+                        Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
+                        Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
+                            TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                             Class<?> testClass = testClassTestDescriptor.getTestClass();
                             Object testParameter = testClassTestDescriptor.getTestParameter();
                             String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
@@ -89,12 +89,12 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
                                     .append(" Test: ").append(testClass.getName())
                                     .append(" (").append(testParameterDisplayName).append(")");
                         }),
-                        Switch.switchCase(TestMethodTestDescriptor.class, consumer -> {
-                            TestMethodTestDescriptor testMethodTestDescriptor = (TestMethodTestDescriptor) testDescriptor;
-                            Class<?> testClass = testMethodTestDescriptor.getTestClass();
-                            Object testParameter = testMethodTestDescriptor.getTestParameter();
+                        Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
+                            TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
+                            Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
+                            Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                             String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
-                            Method testMethod = testMethodTestDescriptor.getTestMethod();
+                            Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                             stringBuilder
                                     .append(INFO)
                                     .append(" Method: ").append(testClass.getName())
@@ -129,10 +129,10 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
                         testDescriptor,
                         Switch.switchCase(EngineDescriptor.class, consumer -> {
                         }),
-                        Switch.switchCase(TestClassTestTestDescriptor.class, consumer -> {
+                        Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {
                         }),
-                        Switch.switchCase(TestParameterTestDescriptor.class, consumer -> {
-                            TestParameterTestDescriptor testClassTestDescriptor = (TestParameterTestDescriptor) testDescriptor;
+                        Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
+                            TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                             Class<?> testClass = testClassTestDescriptor.getTestClass();
                             Object testParameter = testClassTestDescriptor.getTestParameter();
                             String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
@@ -141,11 +141,11 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
                                     .append(" Test: ").append(testClass.getName())
                                     .append(" (").append(testParameterDisplayName).append(")");
                         }),
-                        Switch.switchCase(TestMethodTestDescriptor.class, consumer -> {
-                            TestMethodTestDescriptor testMethodTestDescriptor = (TestMethodTestDescriptor) testDescriptor;
-                            Class<?> testClass = testMethodTestDescriptor.getTestClass();
-                            Object testParameter = testMethodTestDescriptor.getTestParameter();
-                            Method testMethod = testMethodTestDescriptor.getTestMethod();
+                        Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
+                            TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
+                            Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
+                            Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                            Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                             String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
                             stringBuilder
                                     .append(INFO)

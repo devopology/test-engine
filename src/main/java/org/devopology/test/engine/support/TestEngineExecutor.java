@@ -16,12 +16,12 @@
 
 package org.devopology.test.engine.support;
 
-import org.devopology.test.engine.support.descriptor.TestClassTestTestDescriptor;
-import org.devopology.test.engine.support.descriptor.TestMethodTestDescriptor;
-import org.devopology.test.engine.support.descriptor.TestParameterTestDescriptor;
-import org.devopology.test.engine.support.util.Switch;
+import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
+import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
+import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -33,6 +33,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -54,50 +55,51 @@ public class TestEngineExecutor {
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
         TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
-        ThrowableCollector throwableCollector = new ThrowableCollector();
+        List<TestExecutionResult> testExecutionResultList = new ArrayList<>();
 
         logTestHierarchy(rootTestDescriptor, 0);
 
         TestEngineExecutionContext testEngineExecutionContext =
-                new TestEngineExecutionContext(engineExecutionListener, throwableCollector);
+                new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
 
         if (rootTestDescriptor instanceof EngineDescriptor) {
             for (TestDescriptor testDescriptor : rootTestDescriptor.getChildren()) {
-                execute((TestClassTestTestDescriptor) testDescriptor, testEngineExecutionContext);
+                execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext);
             }
-        } else if (rootTestDescriptor instanceof TestClassTestTestDescriptor) {
-            execute((TestClassTestTestDescriptor) rootTestDescriptor, testEngineExecutionContext);
+        } else if (rootTestDescriptor instanceof TestEngineClassTestDescriptor) {
+            execute((TestEngineClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext);
         }
     }
 
     /**
      * Method to execute a TestClassTestDescriptor
      *
-     * @param testClassTestDescriptor
+     * @param testEngineClassTestDescriptor
      * @param testEngineExecutionContext
      */
     private void execute(
-            TestClassTestTestDescriptor testClassTestDescriptor,
+            TestEngineClassTestDescriptor testEngineClassTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
-
         // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-        if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
-            testEngineExecutionContext.getEngineExecutionListener().executionStarted(testClassTestDescriptor);
+        if (TestEngineUtils.hasSiblings(testEngineClassTestDescriptor)) {
+            testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineClassTestDescriptor);
         }
 
-        ThrowableCollector throwableCollector = new ThrowableCollector();
+        List<TestExecutionResult> testExecutionResultList = testEngineClassTestDescriptor.getTestExecutionResultList();
 
         try {
-            Class<?> testClass = testClassTestDescriptor.getTestClass();
+            Class<?> testClass = testEngineClassTestDescriptor.getTestClass();
             Constructor<?> testClassConstructor = testClass.getDeclaredConstructor((Class<?>[]) null);
             Object testInstance = testClassConstructor.newInstance((Object[]) null);
             testEngineExecutionContext.setTestInstance(testInstance);
 
             // Execute each TestParameterTestDescriptor
-            Set<? extends TestDescriptor> children = testClassTestDescriptor.getChildren();
+            Set<? extends TestDescriptor> children = testEngineClassTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof TestParameterTestDescriptor) {
-                    execute((TestParameterTestDescriptor) testDescriptor, testEngineExecutionContext);
+                if (testDescriptor instanceof TestEngineParameterTestDescriptor) {
+                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                    execute(testEngineParameterTestDescriptor, testEngineExecutionContext);
+                    testExecutionResultList.addAll(testEngineParameterTestDescriptor.getTestExecutionResultList());
                 }
             }
 
@@ -106,44 +108,42 @@ public class TestEngineExecutor {
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
 
-            if (throwableCollector.isEmpty()) {
-                // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-                if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
+            // If test class descriptor is part of a hierarchy (has siblings) notify listeners
+            if (TestEngineUtils.hasSiblings(testEngineClassTestDescriptor)) {
+                if (testExecutionResultList.isEmpty()) {
                     testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                            testClassTestDescriptor, TestExecutionResult.successful());
-                }
-            } else {
-                // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-                if (TestEngineUtils.hasSiblings(testClassTestDescriptor)) {
+                            testEngineClassTestDescriptor, TestExecutionResult.successful());
+                } else {
                     testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                            testClassTestDescriptor,
-                            TestExecutionResult.failed(throwableCollector.getFirstThrowable()));
+                            testEngineClassTestDescriptor,
+                            testExecutionResultList.get(0));
                 }
             }
 
-            testEngineExecutionContext.getThrowableCollector().addAll(throwableCollector);
+            testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
         }
     }
 
     /**
      * Method to execute a TestParameterTestDescriptor
      *
-     * @param testParameterTestDescriptor
+     * @param testEngineParameterTestDescriptor
      * @param testEngineExecutionContext
      */
     private void execute(
-            TestParameterTestDescriptor testParameterTestDescriptor,
+            TestEngineParameterTestDescriptor testEngineParameterTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
-        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testParameterTestDescriptor);
+        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineParameterTestDescriptor);
 
-        ThrowableCollector throwableCollector = new ThrowableCollector();
-        Class<?> testClass = testParameterTestDescriptor.getTestClass();
+        List<TestExecutionResult> testExecutionResultList = testEngineParameterTestDescriptor.getTestExecutionResultList();
+
+        Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
-        Object testParameter = testParameterTestDescriptor.getTestParameter();
+        Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
         List<Field> testParameterfields = TestEngineUtils.getParameterFields(testClass);
 
         try {
@@ -155,16 +155,25 @@ public class TestEngineExecutor {
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
         }
 
-        if (throwableCollector.isEmpty()) {
-            Set<? extends TestDescriptor> children = testParameterTestDescriptor.getChildren();
+        if (testExecutionResultList.isEmpty()) {
+            Set<? extends TestDescriptor> children = testEngineParameterTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof TestMethodTestDescriptor) {
-                    execute((TestMethodTestDescriptor) testDescriptor, testEngineExecutionContext);
+                if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+                    TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
+                    execute(testEngineTestMethodTestDescriptor, testEngineExecutionContext);
+                    testExecutionResultList.addAll(testEngineTestMethodTestDescriptor.getTestExecutionResultList());
+                }
+            }
+        } else {
+            Set<? extends TestDescriptor> children = testEngineParameterTestDescriptor.getChildren();
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+                    testEngineExecutionContext.getEngineExecutionListener().executionSkipped(testDescriptor, "@BeforeAll method exception");
                 }
             }
         }
@@ -176,35 +185,36 @@ public class TestEngineExecutor {
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
         }
 
-        if (throwableCollector.isEmpty()) {
+        if (testExecutionResultList.isEmpty()) {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testParameterTestDescriptor, TestExecutionResult.successful());
+                    testEngineParameterTestDescriptor, TestExecutionResult.successful());
         } else {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testParameterTestDescriptor, TestExecutionResult.failed(throwableCollector.getFirstThrowable()));
+                    testEngineParameterTestDescriptor, testExecutionResultList.get(0));
         }
 
-        testEngineExecutionContext.getThrowableCollector().addAll(throwableCollector);
+        testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
     }
 
     /**
      * Method to execute a TestMethodTestDescriptor
      *
-     * @param testMethodTestDescriptor
+     * @param testEngineTestMethodTestDescriptor
      * @param testEngineExecutionContext
      */
     private void execute(
-            TestMethodTestDescriptor testMethodTestDescriptor,
+            TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
-        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testMethodTestDescriptor);
+        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineTestMethodTestDescriptor);
 
-        ThrowableCollector throwableCollector = new ThrowableCollector();
-        Class<?> testClass = testMethodTestDescriptor.getTestClass();
+        List<TestExecutionResult> testExecutionResultList = testEngineTestMethodTestDescriptor.getTestExecutionResultList();
+
+        Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
 
         try {
@@ -214,18 +224,18 @@ public class TestEngineExecutor {
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
         }
 
         try {
-            Method testMethod = testMethodTestDescriptor.getTestMethod();
+            Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
             testMethod.invoke(testInstance, (Object[]) null);
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
         }
@@ -237,20 +247,20 @@ public class TestEngineExecutor {
         } catch (Throwable t) {
             t = resolve(t);
             printStackTrace(t, System.err);
-            throwableCollector.add(t);
+            testExecutionResultList.add(TestExecutionResult.failed(t));
         } finally {
             flush();
         }
 
-        if (throwableCollector.isEmpty()) {
+        if (testExecutionResultList.isEmpty()) {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testMethodTestDescriptor, TestExecutionResult.successful());
+                    testEngineTestMethodTestDescriptor, TestExecutionResult.successful());
         } else {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testMethodTestDescriptor, TestExecutionResult.failed(throwableCollector.getFirstThrowable()));
+                    testEngineTestMethodTestDescriptor, testExecutionResultList.get(0));
         }
 
-        testEngineExecutionContext.getThrowableCollector().addAll(throwableCollector);
+        //testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
     }
 
     /**
@@ -271,20 +281,20 @@ public class TestEngineExecutor {
 
         Switch.switchType(testDescriptor,
                 Switch.switchCase(
-                        TestMethodTestDescriptor.class,
+                        TestEngineTestMethodTestDescriptor.class,
                         testMethodTestDescriptor ->
                                 stringBuilder
                                         .append("method -> ")
                                         .append(testMethodTestDescriptor.getDisplayName())
                                         .append("()")),
                 Switch.switchCase(
-                        TestParameterTestDescriptor.class,
+                        TestEngineParameterTestDescriptor.class,
                         testParameterTestDescriptor ->
                                 stringBuilder
                                         .append("parameter -> ")
                                         .append(testParameterTestDescriptor.getTestParameter())),
                 Switch.switchCase(
-                        TestClassTestTestDescriptor.class,
+                        TestEngineClassTestDescriptor.class,
                         testClassTestDescriptor ->
                                 stringBuilder.append("class -> " + testDescriptor.getDisplayName())),
                 Switch.switchCase(
@@ -327,5 +337,6 @@ public class TestEngineExecutor {
      */
     private static void flush() {
         System.err.flush();
+        System.out.flush();
     }
 }
