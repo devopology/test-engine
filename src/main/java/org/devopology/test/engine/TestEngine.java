@@ -184,7 +184,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         separator = stringBuilder.toString();
 
         printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println("[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] " + banner);
+        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
         printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
         printStream.println(INFO);
 
