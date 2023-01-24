@@ -17,6 +17,9 @@
 package org.devopology.test.engine.support;
 
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.TestExecutionResult;
+
+import java.util.List;
 
 /**
  * Class to implement a execution context
@@ -24,18 +27,18 @@ import org.junit.platform.engine.EngineExecutionListener;
 public class TestEngineExecutionContext {
 
     private EngineExecutionListener engineExecutionListener;
-    private ThrowableCollector throwableCollector;
+    private List<TestExecutionResult> testExecutionResultList;
     private Object testInstance;
 
     /**
      * Constructor
      *
      * @param engineExecutionListener
-     * @param throwableCollector
+     * @param testExecutionResultList
      */
-    public TestEngineExecutionContext(EngineExecutionListener engineExecutionListener, ThrowableCollector throwableCollector) {
+    public TestEngineExecutionContext(EngineExecutionListener engineExecutionListener, List<TestExecutionResult> testExecutionResultList) {
         this.engineExecutionListener = engineExecutionListener;
-        this.throwableCollector = throwableCollector;
+        this.testExecutionResultList = testExecutionResultList;
     }
 
     /**
@@ -52,8 +55,8 @@ public class TestEngineExecutionContext {
      *
      * @return
      */
-    public ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
+    public List<TestExecutionResult> getTestExecutionResultList() {
+        return testExecutionResultList;
     }
 
     /**
