@@ -99,7 +99,14 @@ public class AnsiColor {
     private static boolean ANSI_COLOR_SUPPORTED;
 
     static {
-        if ((System.console() != null) && (System.getenv().get("TERM") != null)) {
+        if (System.console() == null) {
+            String environmentVariable = System.getenv("TERM");
+            if (environmentVariable == null) {
+                ANSI_COLOR_SUPPORTED = false;
+            } else {
+                ANSI_COLOR_SUPPORTED = true;
+            }
+        } else {
             ANSI_COLOR_SUPPORTED = true;
         }
     }
@@ -134,9 +141,9 @@ public class AnsiColor {
     public String toString() {
         if (!ANSI_COLOR_SUPPORTED) {
             return "";
+        } else {
+            return escapeString;
         }
-
-        return escapeString;
     }
 
     /**
@@ -146,9 +153,5 @@ public class AnsiColor {
      */
     public static boolean isSupported() {
         return ANSI_COLOR_SUPPORTED;
-    }
-
-    public static void force() {
-        ANSI_COLOR_SUPPORTED = true;
     }
 }

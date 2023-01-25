@@ -73,7 +73,7 @@
             <plugin>
                 <artifactId>exec-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
-                <version>1.2.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>tests</id>
@@ -82,6 +82,11 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <environmentVariables>
+                                <environmentVariable>
+                                    <TERM></TERM>
+                                </environmentVariable>
+                            </environmentVariables>
                             <executable>/bin/sh</executable>
                             <workingDirectory>${project.basedir}</workingDirectory>
                             <arguments>

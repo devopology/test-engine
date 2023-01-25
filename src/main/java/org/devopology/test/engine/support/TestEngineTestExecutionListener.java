@@ -37,10 +37,6 @@ import java.lang.reflect.Method;
  */
 public class TestEngineTestExecutionListener implements TestExecutionListener {
 
-    static {
-        AnsiColor.force();
-    }
-
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "]";
     private static final String ABORTED = "[" + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("ABORTED") + "]";
     private static final String FAILED = "[" + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED") + "]";

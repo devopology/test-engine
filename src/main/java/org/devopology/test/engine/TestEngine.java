@@ -54,6 +54,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private static final String GROUP_ID = "org.devopology";
     private static final String ARTIFACT_ID = "test-engine";
     private static final String VERSION = TestEngineInformation.getVersion();
+    private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
 
     @Override
     public String getId() {
@@ -101,8 +102,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         new TestEngineExecutor().execute(executionRequest);
     }
 
-    private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
-
     /**
      * Method to run the TestEngine as a console application
      *
@@ -110,8 +109,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
-
-        AnsiColor.force();
 
         PrintStream printStream = System.out;
 
