@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine.support;
 
+import org.assertj.core.util.Arrays;
 import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
@@ -33,6 +34,7 @@ import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -262,6 +264,10 @@ public class TestEngineDiscoverySelectorResolver {
 
                         if (testParameter instanceof Named) {
                             testParameter = ((Named) testParameter).getPayload();
+                        }
+
+                        if (Arrays.isArray(testParameter)) {
+                            testParameterDisplayName = "Array [" + i + "]";
                         }
 
                         String testParameterUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();

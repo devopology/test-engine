@@ -12,16 +12,16 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test
  */
-public class MetadataParameterTest {
+public class ParameterMetadataTest {
 
     // Custom parameter that has metadata
-    private static class MetadataParameter implements Metadata {
+    private static class ParameterWithMetadata implements Metadata {
 
         private String value;
 
-        public MetadataParameter(String value) {
+        public ParameterWithMetadata(String value) {
             this.value = value;
         }
 
@@ -36,18 +36,18 @@ public class MetadataParameterTest {
     }
 
     @ParameterSupplier
-    public static Collection<MetadataParameter> parameters() {
-        Collection<MetadataParameter> collection = new ArrayList<>();
+    public static Collection<ParameterWithMetadata> parameters() {
+        Collection<ParameterWithMetadata> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(new MetadataParameter(String.valueOf(UUID.randomUUID())));
+            collection.add(new ParameterWithMetadata(String.valueOf(UUID.randomUUID())));
         }
 
         return collection;
     }
 
     @Parameter
-    public MetadataParameter parameter;
+    public ParameterWithMetadata parameter;
 
     @BeforeAll
     public void beforeAll() {

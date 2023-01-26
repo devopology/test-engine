@@ -42,9 +42,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
     private static final String TEST = "[" + AnsiColor.WHITE_BOLD_BRIGHT.wrap("TEST") + "]";
-    private static final String ABORTED = "[" + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("ABORTED") + "]";
-    private static final String FAILED = "[" + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED") + "]";
-    private static final String PASSED = "[" + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED") + "]";
+    private static final String ABORT = "[" + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("ABORT") + "]";
+    private static final String FAIL = "[" + AnsiColor.RED_BOLD_BRIGHT.wrap("FAIL") + "]";
+    private static final String PASS = "[" + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASS") + "]";
 
     private TestPlan testPlan;
     private PrintWriter printWriter;
@@ -144,15 +144,15 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             TestExecutionResult.Status status = testExecutionResult.getStatus();
             switch (status) {
                 case ABORTED: {
-                    stringBuilder.append(" ").append(ABORTED);
+                    stringBuilder.append(" ").append(ABORT);
                     break;
                 }
                 case FAILED: {
-                    stringBuilder.append(" ").append(FAILED);
+                    stringBuilder.append(" ").append(FAIL);
                     break;
                 }
                 case SUCCESSFUL: {
-                    stringBuilder.append(" ").append(PASSED);
+                    stringBuilder.append(" ").append(PASS);
                     break;
                 }
             }

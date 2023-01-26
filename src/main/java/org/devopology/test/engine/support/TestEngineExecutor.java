@@ -50,7 +50,7 @@ public class TestEngineExecutor {
      * @param executionRequest
      */
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.debug("execute()");
+        LOGGER.debug("execute(ExecutionRequest)");
 
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
@@ -72,7 +72,7 @@ public class TestEngineExecutor {
     }
 
     /**
-     * Method to execute a TestClassTestDescriptor
+     * Method to execute a TestEngineClassTestDescriptor
      *
      * @param testEngineClassTestDescriptor
      * @param testEngineExecutionContext
@@ -80,12 +80,15 @@ public class TestEngineExecutor {
     private void execute(
             TestEngineClassTestDescriptor testEngineClassTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
+        LOGGER.debug("execute(TestEngineClassTestDescriptor, TestEngineExecutionContext)");
+
         // If test class descriptor is part of a hierarchy (has siblings) notify listeners
         if (TestEngineUtils.hasSiblings(testEngineClassTestDescriptor)) {
             testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineClassTestDescriptor);
         }
 
         List<TestExecutionResult> testExecutionResultList = testEngineClassTestDescriptor.getTestExecutionResultList();
+        testExecutionResultList.clear();
 
         try {
             Class<?> testClass = testEngineClassTestDescriptor.getTestClass();
@@ -112,6 +115,8 @@ public class TestEngineExecutor {
         } finally {
             flush();
 
+            testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
+
             // If test class descriptor is part of a hierarchy (has siblings) notify listeners
             if (TestEngineUtils.hasSiblings(testEngineClassTestDescriptor)) {
                 if (testExecutionResultList.isEmpty()) {
@@ -123,13 +128,11 @@ public class TestEngineExecutor {
                             testExecutionResultList.get(0));
                 }
             }
-
-            testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
         }
     }
 
     /**
-     * Method to execute a TestParameterTestDescriptor
+     * Method to execute a TestEngineParameterTestDescriptor
      *
      * @param testEngineParameterTestDescriptor
      * @param testEngineExecutionContext
@@ -137,17 +140,20 @@ public class TestEngineExecutor {
     private void execute(
             TestEngineParameterTestDescriptor testEngineParameterTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
+        LOGGER.debug("execute(TestEngineParameterTestDescriptor, TestEngineParameterTestDescriptor)");
+
         testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineParameterTestDescriptor);
 
         List<TestExecutionResult> testExecutionResultList = testEngineParameterTestDescriptor.getTestExecutionResultList();
+        testExecutionResultList.clear();
 
         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
-        List<Field> testParameterfields = TestEngineUtils.getParameterFields(testClass);
+        List<Field> testParameterFields = TestEngineUtils.getParameterFields(testClass);
 
         try {
-            testParameterfields.get(0).set(testInstance, testParameter);
+            testParameterFields.get(0).set(testInstance, testParameter);
 
             for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
                 beforeAllMethod.invoke(testInstance, (Object[]) null);
@@ -213,6 +219,7 @@ public class TestEngineExecutor {
         testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineTestMethodTestDescriptor);
 
         List<TestExecutionResult> testExecutionResultList = testEngineTestMethodTestDescriptor.getTestExecutionResultList();
+        testExecutionResultList.clear();
 
         Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();

@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test
  */
 public class ParameterSupplierFieldTest2 {
 
