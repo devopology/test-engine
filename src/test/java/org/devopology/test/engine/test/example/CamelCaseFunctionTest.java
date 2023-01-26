@@ -13,7 +13,7 @@ import java.util.function.Function;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test
  *
  * Made up... in real life you wouldn't do this
  */

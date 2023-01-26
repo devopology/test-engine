@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Example test engine test... only runs from an IDE or via the test engine ConsoleRunner
+ * Example test
  */
 public class ParameterSupplierMethodTest2 {
 
