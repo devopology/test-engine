@@ -153,6 +153,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     stringBuilder.append(" ").append(PASS);
                     break;
                 }
+                default: {
+                    // DO NOTHING
+                    break;
+                }
             }
 
             if (detailedOutput) {
