@@ -18,6 +18,7 @@ package org.devopology.test.engine.support.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public final class HumanReadableTime {
@@ -106,7 +107,9 @@ public final class HumanReadableTime {
     }
 
     public static String now() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        SimpleDateFormat simpleDateFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
+
         return simpleDateFormat.format(new Date());
     }
 }
