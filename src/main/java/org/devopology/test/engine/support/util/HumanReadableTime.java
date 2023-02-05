@@ -27,14 +27,12 @@ public final class HumanReadableTime {
     }
 
     public static String toHumanReadable(long duration, boolean useShortFormat) {
-        if (duration < 0) {
-            duration = -duration;
-        }
+        long durationPositive = duration > 0 ? duration : -duration;
 
-        long hours = TimeUnit.MILLISECONDS.toHours(duration);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - (hours * 60);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - ((hours * 60 * 60) + (minutes * 60));
-        long milliseconds = duration - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
+        long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - ((hours * 60 * 60) + (minutes * 60));
+        long milliseconds = durationPositive - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 
         StringBuilder stringBuilder = new StringBuilder();
 
