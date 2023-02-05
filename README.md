@@ -1,6 +1,8 @@
 [![Build](https://github.com/devopology/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/devopology/test-engine/actions/workflows/build.yml)
-![Code Grade](https://api.codiga.io/project/35659/status/svg)
-![Code Quality](https://api.codiga.io/project/35659/score/svg)
+[![Code Grade](https://api.codiga.io/project/35659/status/svg)](https://app.codiga.io/hub/project/35659/test-engine)
+[![Code Quality](https://api.codiga.io/project/35659/score/svg)](https://app.codiga.io/hub/project/35659/test-engine)
+
+Codiga Analysis https://app.codiga.io/hub/project/35659/test-engine
 
 # Devopology Test Engine
 
