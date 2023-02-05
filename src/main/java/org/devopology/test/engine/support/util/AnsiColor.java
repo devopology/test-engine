@@ -111,7 +111,7 @@ public class AnsiColor {
         }
     }
 
-    private String escapeString;
+    private final String escapeString;
 
     /**
      * Constructor
@@ -139,10 +139,10 @@ public class AnsiColor {
      */
     @Override
     public String toString() {
-        if (!ANSI_COLOR_SUPPORTED) {
-            return "";
-        } else {
+        if (ANSI_COLOR_SUPPORTED) {
             return escapeString;
+        } else {
+            return "";
         }
     }
 
