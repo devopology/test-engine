@@ -89,7 +89,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append(INFO)
-                            .append("Test: ").append(testClass.getName())
+                            .append("Class ").append(testClass.getName())
                             .append(" (").append(testParameter).append(")")
                             .append(" ").append(TEST);
                 }),
@@ -100,7 +100,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append(INFO)
-                            .append("Method: ").append(testClass.getName())
+                            .append("Method ").append(testClass.getName())
                             .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()")
                             .append(" ").append(TEST);
                 })
@@ -128,7 +128,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append(INFO)
-                            .append("Test: ").append(testClass.getName())
+                            .append("Class ").append(testClass.getName())
                             .append(" (").append(testParameter).append(")");
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
@@ -138,7 +138,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append(INFO)
-                            .append("Method: ").append(testClass.getName())
+                            .append("Method ").append(testClass.getName())
                             .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()");
                 }));
 
