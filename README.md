@@ -61,7 +61,7 @@ Set up Maven to use the test engine
 
 - The test engine uses core JUnit 5 jars as dependencies
 
-# Command line (standalone) Usage
+# Command Line (standalone) Usage
 
 The test engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
