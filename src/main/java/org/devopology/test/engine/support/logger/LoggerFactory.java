@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class LoggerFactory {
 
-    private final static Map<String, Logger> LOGGER_MAP = new HashMap<>();
+    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
 
     /**
      * Constructor

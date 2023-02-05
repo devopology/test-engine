@@ -22,6 +22,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,14 +31,15 @@ import java.util.Objects;
  */
 public class LoggerImpl implements Logger {
 
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
-    private static int OFF = 0;
-    private static int ERROR = 100;
-    private static int WARNING = 200;
-    private static int INFO = 300;
-    private static int DEBUG = 400;
-    private static int TRACE = 500;
+    private static final int OFF = 0;
+    private static final int ERROR = 100;
+    private static final int WARNING = 200;
+    private static final int INFO = 300;
+    private static final int DEBUG = 400;
+    private static final int TRACE = 500;
 
     private static final Map<String, Integer> LOG_LEVEL_MAP;
 
@@ -51,7 +53,7 @@ public class LoggerImpl implements Logger {
         LOG_LEVEL_MAP.put("TRACE", TRACE);
     }
 
-    private String className;
+    private final String className;
     private int logLevel = INFO;
 
     /**
@@ -72,13 +74,13 @@ public class LoggerImpl implements Logger {
 
         String logLevelString = System.getProperty("devopology.test.engine.log.level");
         if (logLevelString != null) {
-            logLevelString = logLevelString.toUpperCase().trim();
+            logLevelString = logLevelString.toUpperCase(Locale.getDefault()).trim();
         }
 
         if (logLevelString == null) {
             logLevelString = System.getenv().get("DEVOPOLOGY_TEST_ENGINE_LOG_LEVEL");
             if (logLevelString != null) {
-                logLevelString = logLevelString.toUpperCase().trim();
+                logLevelString = logLevelString.toUpperCase(Locale.getDefault()).trim();
             }
         }
 
@@ -277,7 +279,7 @@ public class LoggerImpl implements Logger {
      */
     private static String createMessage(String level, String className, String message) {
         synchronized (SIMPLE_DATE_FORMAT) {
-            return String.format(
+            return java.lang.String.format(
                     "%s [%s] %-5s %s - %s",
                     SIMPLE_DATE_FORMAT.format(new Date()),
                     Thread.currentThread().getName(),
