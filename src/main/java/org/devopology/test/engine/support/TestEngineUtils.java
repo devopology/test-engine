@@ -406,15 +406,15 @@ public final class TestEngineUtils {
 
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(annotation)) {
-                int modifiers = method.getModifiers();
-                if (!Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    if (method.getParameterCount() == 0) {
+            int modifiers = method.getModifiers();
+            if (method.isAnnotationPresent(annotation)
+                    && !Modifier.isStatic(modifiers)
+                    && Modifier.isPublic(modifiers)
+                    && (method.getParameterCount() == 0)) {
                         Class<?> returnType = method.getReturnType();
                         if (Void.TYPE.isAssignableFrom(returnType)) {
                             methodList.add(method);
                         }
-                    }
                 }
             }
         }
