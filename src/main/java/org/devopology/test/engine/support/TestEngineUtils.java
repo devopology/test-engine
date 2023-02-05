@@ -157,16 +157,15 @@ public final class TestEngineUtils {
 
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(ParameterSupplier.class)) {
-                int modifiers = method.getModifiers();
-                if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    if (method.getParameterCount() == 0) {
-                        Class<?> returnType = method.getReturnType();
-                        if (Collection.class.isAssignableFrom(returnType)) {
-                            parameterSupplierMethods.add(method);
-                        }
+            int modifiers = method.getModifiers();
+            if (method.isAnnotationPresent(ParameterSupplier.class)
+                && Modifier.isStatic(modifiers)
+                && Modifier.isPublic(modifiers)
+                && (method.getParameterCount() == 0)) {
+                    Class<?> returnType = method.getReturnType();
+                    if (Collection.class.isAssignableFrom(returnType)) {
+                        parameterSupplierMethods.add(method);
                     }
-                }
             }
         }
 
