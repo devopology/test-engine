@@ -63,14 +63,18 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         }
     }
 
+    @Override
     public void dynamicTestRegistered(TestDescriptor testDescriptor) {
         summaryGeneratingListener.dynamicTestRegistered(TestIdentifier.from(testDescriptor));
     }
 
+    @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
         summaryGeneratingListener.executionSkipped(TestIdentifier.from(testDescriptor), reason);
     }
 
+    @Override
+    @SuppressWarnings("CPD-START")
     public void executionStarted(TestDescriptor testDescriptor) {
         summaryGeneratingListener.executionStarted(TestIdentifier.from(testDescriptor));
 
@@ -109,6 +113,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         }
     }
 
+    @Override
     public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
         summaryGeneratingListener.executionFinished(TestIdentifier.from(testDescriptor), testExecutionResult);
 
@@ -165,7 +170,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             }
         }
     }
+    @SuppressWarnings("CPD-END")
 
+    @Override
     public void reportingEntryPublished(TestDescriptor testDescriptor, ReportEntry entry) {
         summaryGeneratingListener.reportingEntryPublished(TestIdentifier.from(testDescriptor), entry);
     }
