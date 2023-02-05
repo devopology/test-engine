@@ -139,7 +139,7 @@ public class TestEngineDiscoverySelectorResolver {
                     LOGGER.trace("test class [%s] parameter supplier method name [%s]", testClass.getName(), method.getName());
                 }
 
-                if ((parameterSupplierFields.size() > 0) && (parameterSupplierMethods.size() > 0)) {
+                if (!parameterSupplierFields.isEmpty() && !parameterSupplierMethods.isEmpty()) {
                     // @ParameterSupplier field(s) and method(s) both found
                     throw new TestClassConfigurationException(
                             String.format(
