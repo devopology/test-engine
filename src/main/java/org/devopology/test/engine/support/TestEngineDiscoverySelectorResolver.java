@@ -77,9 +77,6 @@ public class TestEngineDiscoverySelectorResolver {
     public void resolveSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolveSelectors()");
 
-        ConfigurationParameters configurationParameters = engineDiscoveryRequest.getConfigurationParameters();
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
-
         // Test class to test method list mapping, sorted by test class name
         Map<Class<?>, List<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
 
@@ -107,6 +104,14 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace(String.format("test class [%s] @Test method [%s]", testClass.getName(), method.getName()));
             }
         }
+
+        processSelectors(engineDescriptor, testClassToMethodMap);
+    }
+
+    private void processSelectors(
+            EngineDescriptor engineDescriptor,
+            Map<Class<?>, List<Method>> testClassToMethodMap) {
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
@@ -142,7 +147,7 @@ public class TestEngineDiscoverySelectorResolver {
                                     testClass.getName()));
                 }
 
-                if ((parameterSupplierFields.size() == 0) && (parameterSupplierMethods.size() == 0)) {
+                if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
                     // No @ParameterSupplier field or method found
                     throw new TestClassConfigurationException(
                             String.format(
@@ -205,7 +210,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
 
-                if (testParameters.size() > 0) {
+                if (!testParameters.isEmpty()) {
                     // Build the test descriptor tree if we have test parameters
                     // i.e. Tests with an empty set of parameters will be ignored
                     String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
