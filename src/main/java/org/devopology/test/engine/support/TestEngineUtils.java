@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-public class TestEngineUtils {
+public final class TestEngineUtils {
 
     private static Map<Class<?>, List<Field>> parameterFieldsCache;
     private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
