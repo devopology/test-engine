@@ -94,9 +94,5 @@ public class CamelCaseFunctionTest {
         String actual = FUNCTION.apply(parameter.input);
         System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
         assertThat(actual).isEqualTo(parameter.expected);
-
-        if (parameter.input.equals("THIS") && parameter.expected.equals("this")) {
-        //    fail("Forced failure");
-        }
     }
 }
