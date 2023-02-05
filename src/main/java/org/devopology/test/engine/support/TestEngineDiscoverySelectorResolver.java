@@ -144,7 +144,8 @@ public class TestEngineDiscoverySelectorResolver {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] contains both a @ParameterSupplier field and method",
-                                    testClass.getName()));
+                                    testClass.getName()),
+                            e);
                 }
 
                 if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
@@ -168,7 +169,8 @@ public class TestEngineDiscoverySelectorResolver {
                         throw new TestClassConfigurationException(
                                 String.format(
                                         "Test class [%s] @ParameterSupplier field must return a Collection",
-                                        testClass.getName()));
+                                        testClass.getName()),
+                                e);
                     }
                 } else if (parameterSupplierMethods.size() > 1) {
                     // More than one @ParameterSupplier method found
@@ -183,7 +185,8 @@ public class TestEngineDiscoverySelectorResolver {
                         throw new TestClassConfigurationException(
                                 String.format(
                                         "Test class [%s] @ParameterSupplier method must return a Collection",
-                                        testClass.getName()));
+                                        testClass.getName()),
+                                e);
                     }
                 }
 
