@@ -23,9 +23,9 @@ import java.util.Optional;
 
 public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-    private TestSource testSource;
-    private Class<?> testClass;
-    private Object testParameter;
+    private final TestSource testSource;
+    private final Class<?> testClass;
+    private final Object testParameter;
 
     public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Object testParameter) {
         super(uniqueId, displayName);
