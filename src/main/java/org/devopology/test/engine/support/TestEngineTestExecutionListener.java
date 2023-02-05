@@ -61,7 +61,6 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
     }
 
     @Override
-    @SuppressWarnings("PMD-START")
     public void executionStarted(TestIdentifier testIdentifier) {
         if (mode != Mode.CONSOLE) {
             return;
@@ -105,7 +104,6 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
             }
         });
     }
-    @SuppressWarnings("PMD-END")
 
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
@@ -113,7 +111,6 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
     }
 
     @Override
-    @SuppressWarnings("PMD-START")
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
         if (mode != Mode.CONSOLE) {
             return;
@@ -178,7 +175,6 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
             }
         });
     }
-    @SuppressWarnings("PMD-END")
 
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
