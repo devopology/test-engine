@@ -15,7 +15,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 Add the Devopology Maven repository to your `pom.xml` file...
 
-```
+```xml
 <repositories>
     <repository>
         <id>devopology-test-engine</id>
@@ -32,7 +32,7 @@ Add the Devopology Maven repository to your `pom.xml` file...
 
 Add the Junit 5 and Devopology test engine jar dependencies...
 
-```
+```xml
 <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-api</artifactId>
@@ -67,7 +67,7 @@ The test engine jar has the ability to run as a standalone executable, provided 
 
 Example:
 
-```
+```bash
 java \
   -cp "<directory of all your dependencies>/*" \
   org.devopology.test.engine.TestEngine
