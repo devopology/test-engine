@@ -69,7 +69,7 @@ Example:
 
 ```
 java \
-  -cp <directory of all your dependencies>/* \
+  -cp "<directory of all your dependencies>/*" \
   org.devopology.test.engine.TestEngine
 ```
 
