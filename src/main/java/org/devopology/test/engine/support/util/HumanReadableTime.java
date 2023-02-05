@@ -18,23 +18,22 @@ package org.devopology.test.engine.support.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class HumanReadableTime {
+public final class HumanReadableTime {
 
     private HumanReadableTime() {
         // DO NOTHING
     }
 
     public static String toHumanReadable(long duration, boolean useShortFormat) {
-        if (duration < 0) {
-            duration = -duration;
-        }
+        long durationPositive = duration > 0 ? duration : -duration;
 
-        long hours = TimeUnit.MILLISECONDS.toHours(duration);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - (hours * 60);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - ((hours * 60 * 60) + (minutes * 60));
-        long milliseconds = duration - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
+        long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - ((hours * 60 * 60) + (minutes * 60));
+        long milliseconds = durationPositive - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -108,7 +107,9 @@ public class HumanReadableTime {
     }
 
     public static String now() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        SimpleDateFormat simpleDateFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
+
         return simpleDateFormat.format(new Date());
     }
 }

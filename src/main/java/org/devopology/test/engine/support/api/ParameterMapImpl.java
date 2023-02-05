@@ -28,19 +28,19 @@ import java.util.Objects;
 @SuppressWarnings("unchecked")
 public class ParameterMapImpl implements ParameterMap {
 
-    private String name;
-    private Map<String, Object> map;
+    private final String name;
+    private final Map<String, Object> map;
 
     public ParameterMapImpl(String name) {
         Objects.requireNonNull(name);
 
-        name = name.trim();
-        if (name.isEmpty()) {
+        String nameTrimmed = name.trim();
+        if (nameTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        this.name = name;
-        map = new LinkedHashMap<>();
+        this.name = nameTrimmed;
+        this.map = new LinkedHashMap<>();
     }
 
     @Override
@@ -52,12 +52,12 @@ public class ParameterMapImpl implements ParameterMap {
     public ParameterMap put(String key, Object object) {
         Objects.requireNonNull(key);
 
-        key = key.trim();
-        if (key.isEmpty()) {
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        map.put(key, object);
+        map.put(keyTrimmed, object);
         return this;
     }
 
@@ -65,24 +65,24 @@ public class ParameterMapImpl implements ParameterMap {
     public boolean containsKey(String key) {
         Objects.requireNonNull(key);
 
-        key = key.trim();
-        if (key.isEmpty()) {
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return map.containsKey(key);
+        return map.containsKey(keyTrimmed);
     }
 
     @Override
     public <T> T get(String key) {
         Objects.requireNonNull(key);
 
-        key = key.trim();
-        if (key.isEmpty()) {
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return (T) map.get(key);
+        return (T) map.get(keyTrimmed);
     }
 
     @Override

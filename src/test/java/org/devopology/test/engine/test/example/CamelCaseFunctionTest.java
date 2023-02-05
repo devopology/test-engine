@@ -8,6 +8,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +19,32 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Made up... in real life you wouldn't do this
  */
 public class CamelCaseFunctionTest {
+
+    private static Function<String, String> FUNCTION = new CamelCaseFunction();
+
+    @Parameter
+    public Tuple parameter;
+
+    @ParameterSupplier
+    public static Collection<Object> parameters() {
+        Collection<Object> collection = new ArrayList<>();
+
+        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("tHis", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        return collection;
+    }
+
+
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
@@ -34,9 +61,11 @@ public class CamelCaseFunctionTest {
                 String word = words[i];
 
                 if (i == 0) {
-                    word = word.isEmpty() ? word : word.toLowerCase();
+                    word = word.isEmpty() ? word : word.toLowerCase(Locale.getDefault());
                 } else {
-                    word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+                    word = word.isEmpty() ? word :
+                            (word.charAt(0) + "").toUpperCase(Locale.getDefault())
+                                    + word.substring(1).toLowerCase(Locale.getDefault());
                 }
 
                 builder.append(word);
@@ -62,38 +91,10 @@ public class CamelCaseFunctionTest {
         }
     }
 
-    @ParameterSupplier
-    public static Collection<Object> parameters() {
-        Collection<Object> collection = new ArrayList<>();
-
-        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("THIS", "this");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("tHis", "this");
-        collection.add(Named.of(tuple.input, tuple));
-
-        return collection;
-    }
-
-    @Parameter
-    public Tuple parameter;
-
-    private static Function<String, String> FUNCTION = new CamelCaseFunction();
-
     @Test
     public void test() {
         String actual = FUNCTION.apply(parameter.input);
         System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
         assertThat(actual).isEqualTo(parameter.expected);
-
-        if (parameter.input.equals("THIS") && parameter.expected.equals("this")) {
-        //    fail("Forced failure");
-        }
     }
 }

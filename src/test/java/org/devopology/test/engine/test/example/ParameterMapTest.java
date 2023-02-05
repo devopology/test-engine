@@ -15,6 +15,9 @@ import java.util.Collection;
  */
 public class ParameterMapTest {
 
+    @Parameter
+    public ParameterMap parameter;
+
     @ParameterSupplier
     public static Collection<ParameterMap> parameters() {
         Collection<ParameterMap> collection = new ArrayList<>();
@@ -25,9 +28,6 @@ public class ParameterMapTest {
 
         return collection;
     }
-
-    @Parameter
-    public ParameterMap parameter;
 
     @BeforeAll
     public void beforeAll() {

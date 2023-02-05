@@ -23,8 +23,8 @@ import java.util.Optional;
 
 public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-    private TestSource testSource;
-    private Class<?> testClass;
+    private final TestSource testSource;
+    private final Class<?> testClass;
 
     public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);

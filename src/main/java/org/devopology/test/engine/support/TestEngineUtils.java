@@ -48,7 +48,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-public class TestEngineUtils {
+@SuppressWarnings("PMD.GodClass")
+public final class TestEngineUtils {
 
     private static Map<Class<?>, List<Field>> parameterFieldsCache;
     private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
@@ -157,16 +158,15 @@ public class TestEngineUtils {
 
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(ParameterSupplier.class)) {
-                int modifiers = method.getModifiers();
-                if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    if (method.getParameterCount() == 0) {
-                        Class<?> returnType = method.getReturnType();
-                        if (Collection.class.isAssignableFrom(returnType)) {
-                            parameterSupplierMethods.add(method);
-                        }
+            int modifiers = method.getModifiers();
+            if (method.isAnnotationPresent(ParameterSupplier.class)
+                && Modifier.isStatic(modifiers)
+                && Modifier.isPublic(modifiers)
+                && (method.getParameterCount() == 0)) {
+                    Class<?> returnType = method.getReturnType();
+                    if (Collection.class.isAssignableFrom(returnType)) {
+                        parameterSupplierMethods.add(method);
                     }
-                }
             }
         }
 
@@ -406,16 +406,15 @@ public class TestEngineUtils {
 
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(annotation)) {
-                int modifiers = method.getModifiers();
-                if (!Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    if (method.getParameterCount() == 0) {
+            int modifiers = method.getModifiers();
+            if (method.isAnnotationPresent(annotation)
+                    && !Modifier.isStatic(modifiers)
+                    && Modifier.isPublic(modifiers)
+                    && (method.getParameterCount() == 0)) {
                         Class<?> returnType = method.getReturnType();
                         if (Void.TYPE.isAssignableFrom(returnType)) {
                             methodList.add(method);
                         }
-                    }
-                }
             }
         }
 

@@ -27,8 +27,8 @@ import java.util.Objects;
 
 public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest {
 
-    private EngineDiscoveryRequest engineDiscoveryRequest;
-    private ConfigurationParameters configurationParameters;
+    private final EngineDiscoveryRequest engineDiscoveryRequest;
+    private final ConfigurationParameters configurationParameters;
 
     public TestEngineEngineDiscoveryRequest(EngineDiscoveryRequest engineDiscoveryRequest, ConfigurationParameters configurationParameters) {
         Objects.requireNonNull(engineDiscoveryRequest);

@@ -22,8 +22,8 @@ import java.util.Objects;
 
 public class NamedImpl implements Named {
 
-    private String name;
-    private Object payload;
+    private final String name;
+    private final Object payload;
 
     /**
      * Constructor
@@ -34,12 +34,12 @@ public class NamedImpl implements Named {
     public NamedImpl(String name, Object payload) {
         Objects.requireNonNull(name);
 
-        name = name.trim();
-        if (name.isEmpty()) {
+        String nameTrimmed = name.trim();
+        if (nameTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        this.name = name;
+        this.name = nameTrimmed;
         this.payload = payload;
     }
 

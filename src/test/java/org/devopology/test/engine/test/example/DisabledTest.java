@@ -18,24 +18,11 @@ import java.util.Collection;
 @Disabled
 public class DisabledTest {
 
-    private static class StringParameterSupplier {
-
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
-
-            for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
-            }
-
-            return collection;
-        }
-    }
+    @Parameter
+    public String parameter;
 
     @ParameterSupplier
     public static Collection<String> PARAMETERS = StringParameterSupplier.values();
-
-    @Parameter
-    public String parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -65,5 +52,18 @@ public class DisabledTest {
     @AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    private static class StringParameterSupplier {
+
+        public static Collection<String> values() {
+            Collection<String> collection = new ArrayList<>();
+
+            for (int i = 0; i < 10; i++) {
+                collection.add(String.valueOf(i));
+            }
+
+            return collection;
+        }
     }
 }
