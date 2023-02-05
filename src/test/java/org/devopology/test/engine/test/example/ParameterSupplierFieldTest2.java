@@ -18,23 +18,11 @@ import java.util.List;
  */
 public class ParameterSupplierFieldTest2 {
 
-    private static class TestParameterSupplier {
-
-        public static Collection<Named> values() {
-            List<Named> list = new ArrayList<>();
-
-            list.add(Named.of("array 0", new String[] { "1", "2" }));
-            list.add(Named.of("array 1", new String[] { "1", "2", "3" }));
-
-            return list;
-        }
-    }
+    @Parameter
+    public String[] parameter;
 
     @ParameterSupplier
     public static Collection<Named> PARAMETERS = TestParameterSupplier.values();
-
-    @Parameter
-    public String[] parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -76,5 +64,17 @@ public class ParameterSupplierFieldTest2 {
         String string = stringBuilder.toString();
         string = string.substring(0, string.length() - ", ".length());
         return string;
+    }
+
+    private static class TestParameterSupplier {
+
+        public static Collection<Named> values() {
+            List<Named> list = new ArrayList<>();
+
+            list.add(Named.of("array 0", new String[] { "1", "2" }));
+            list.add(Named.of("array 1", new String[] { "1", "2", "3" }));
+
+            return list;
+        }
     }
 }
