@@ -66,7 +66,7 @@ public class ParameterSupplierFieldTest2 {
         System.out.println("afterAll()");
     }
 
-    private static String toString(String[] strings) {
+    private static String toString(String ... strings) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String string : strings) {
             stringBuilder.append(string);
