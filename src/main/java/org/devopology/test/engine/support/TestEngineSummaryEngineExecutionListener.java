@@ -74,7 +74,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
     }
 
     @Override
-    @SuppressWarnings("CPD-START")
+    @SuppressWarnings("PMD-START")
     public void executionStarted(TestDescriptor testDescriptor) {
         summaryGeneratingListener.executionStarted(TestIdentifier.from(testDescriptor));
 
@@ -170,7 +170,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             }
         }
     }
-    @SuppressWarnings("CPD-END")
+    @SuppressWarnings("PMD-END")
 
     @Override
     public void reportingEntryPublished(TestDescriptor testDescriptor, ReportEntry entry) {
