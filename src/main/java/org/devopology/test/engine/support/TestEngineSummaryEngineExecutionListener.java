@@ -46,9 +46,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
     private static final String FAIL = "[" + AnsiColor.RED_BOLD_BRIGHT.wrap("FAIL") + "]";
     private static final String PASS = "[" + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASS") + "]";
 
-    private TestPlan testPlan;
-    private PrintWriter printWriter;
-    private SummaryGeneratingListener summaryGeneratingListener;
+    private final TestPlan testPlan;
+    private final PrintWriter printWriter;
+    private final SummaryGeneratingListener summaryGeneratingListener;
     private boolean detailedOutput = true;
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan, PrintStream printWriter) {

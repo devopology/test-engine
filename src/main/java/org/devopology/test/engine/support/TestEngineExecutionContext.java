@@ -26,8 +26,8 @@ import java.util.List;
  */
 public class TestEngineExecutionContext {
 
-    private EngineExecutionListener engineExecutionListener;
-    private List<TestExecutionResult> testExecutionResultList;
+    private final EngineExecutionListener engineExecutionListener;
+    private final List<TestExecutionResult> testExecutionResultList;
     private Object testInstance;
 
     /**
