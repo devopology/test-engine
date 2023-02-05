@@ -77,21 +77,22 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     @Override
-    public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
+    public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         // Create configuration parameters which first gets the
         // discovery request parameters then merges System properties
         TestEngineConfigurationParameters configurationParameters =
-                new TestEngineConfigurationParameters(discoveryRequest.getConfigurationParameters());
+                new TestEngineConfigurationParameters(engineDiscoveryRequest.getConfigurationParameters());
 
         // Wrap the discovery request
-        discoveryRequest = new TestEngineEngineDiscoveryRequest(discoveryRequest, configurationParameters);
+        TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
+                new TestEngineEngineDiscoveryRequest(engineDiscoveryRequest, configurationParameters);
 
         // Create a EngineDescriptor as the target
         EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
         // Create a DevopologyTestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoverySelectorResolver().resolveSelectors(discoveryRequest, engineDescriptor);
+        new TestEngineDiscoverySelectorResolver().resolveSelectors(testEngineDiscoveryRequest, engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
