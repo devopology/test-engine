@@ -200,7 +200,7 @@ For each test class found {
 
 **Notes**
 
-- The type returned in the `@ParameterSupplier` `Collection` must match the type of the `@Paraneter` field
+- The type returned in the `@ParameterSupplier` `Collection` must match the type of the `@Parameter` field
 
 
 - `Named` is a special case. The `Parameter` field type should match the type of Object wrapped by the `Named` object
