@@ -8,6 +8,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,9 +35,11 @@ public class CamelCaseFunctionTest {
                 String word = words[i];
 
                 if (i == 0) {
-                    word = word.isEmpty() ? word : word.toLowerCase();
+                    word = word.isEmpty() ? word : word.toLowerCase(Locale.getDefault());
                 } else {
-                    word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+                    word = word.isEmpty() ? word :
+                            (word.charAt(0) + "").toUpperCase(Locale.getDefault())
+                                    + word.substring(1).toLowerCase(Locale.getDefault());
                 }
 
                 builder.append(word);
