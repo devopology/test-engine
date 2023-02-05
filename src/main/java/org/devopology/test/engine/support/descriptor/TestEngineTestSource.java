@@ -21,7 +21,7 @@ import org.junit.platform.engine.TestSource;
 
 public class TestEngineTestSource implements TestSource {
 
-    private TestDescriptor testDescriptor;
+    private final TestDescriptor testDescriptor;
 
     public TestEngineTestSource(TestDescriptor testDescriptor) {
         this.testDescriptor = testDescriptor;
