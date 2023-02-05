@@ -129,7 +129,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + "Scanning for tests...");
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Scanning for tests..."));
 
             Set<Path> classPathRoots = new HashSet<>();
 
@@ -195,7 +195,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             printStream.println(
                     INFO
                             + AnsiColor.WHITE_BOLD_BRIGHT.wrap(
-                            "Tests : "
+                            "TESTS : "
                                     + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount()))
                                     + ", "
                                     + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED")

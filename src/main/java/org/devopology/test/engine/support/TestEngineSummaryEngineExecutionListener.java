@@ -89,7 +89,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append(INFO)
-                            .append("Class ").append(testClass.getName())
+                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Class"))
+                            .append(" ").append(testClass.getName())
                             .append(" (").append(testParameter).append(")")
                             .append(" ").append(TEST);
                 }),
@@ -100,7 +101,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append(INFO)
-                            .append("Method ").append(testClass.getName())
+                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Method"))
+                            .append(" ").append(testClass.getName())
                             .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()")
                             .append(" ").append(TEST);
                 })
@@ -128,7 +130,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append(INFO)
-                            .append("Class ").append(testClass.getName())
+                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Class"))
+                            .append(" ").append(testClass.getName())
                             .append(" (").append(testParameter).append(")");
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
@@ -138,7 +141,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append(INFO)
-                            .append("Method ").append(testClass.getName())
+                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Method"))
+                            .append(" ").append(testClass.getName())
                             .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()");
                 }));
 
