@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class HumanReadableTime {
+public final class HumanReadableTime {
 
     private HumanReadableTime() {
         // DO NOTHING
