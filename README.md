@@ -2,8 +2,6 @@
 [![Code Grade](https://api.codiga.io/project/35659/status/svg)](https://app.codiga.io/hub/project/35659/test-engine)
 [![Code Quality](https://api.codiga.io/project/35659/score/svg)](https://app.codiga.io/hub/project/35659/test-engine)
 
-Codiga Analysis https://app.codiga.io/hub/project/35659/test-engine
-
 # Devopology Test Engine
 
 The Devopology Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
