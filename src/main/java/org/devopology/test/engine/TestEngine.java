@@ -111,121 +111,134 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
 
-        PrintStream printStream = System.out;
+        PrintStream printStream = null;
+        boolean failed = false;
 
-        String banner = "Devopology Test Engine " + TestEngineInformation.getVersion();
+        try {
+            printStream = System.out;
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (char c : banner.toCharArray()) {
-            stringBuilder.append("-");
-        }
+            String banner = "Devopology Test Engine " + TestEngineInformation.getVersion();
 
-        String separator = stringBuilder.toString();
+            StringBuilder stringBuilder = new StringBuilder();
+            for (char c : banner.toCharArray()) {
+                stringBuilder.append("-");
+            }
 
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println(INFO + "Scanning for tests...");
+            String separator = stringBuilder.toString();
 
-        Set<Path> classPathRoots = new HashSet<>();
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + "Scanning for tests...");
 
-        // Add the jar containing the test engine to the class path to search for tests
-        File file =
-                new File(
-                        TestEngine.class
-                                .getProtectionDomain().getCodeSource().getLocation().getPath());
+            Set<Path> classPathRoots = new HashSet<>();
 
-        classPathRoots.add(file.getAbsoluteFile().toPath());
+            // Add the jar containing the test engine to the class path to search for tests
+            File file =
+                    new File(
+                            TestEngine.class
+                                    .getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        // Add all jars in the class path to search for tests
-        String classPath = System.getProperty("java.class.path");
-        String[] jars = classPath.split(File.pathSeparator);
-        for (String jar : jars) {
-            classPathRoots.add(new File(jar).getAbsoluteFile().toPath());
-        }
+            classPathRoots.add(file.getAbsoluteFile().toPath());
 
-        TestEngineConfigurationParameters configurationParameters = new TestEngineConfigurationParameters();
+            // Add all jars in the class path to search for tests
+            String classPath = System.getProperty("java.class.path");
+            String[] jars = classPath.split(File.pathSeparator);
+            for (String jar : jars) {
+                classPathRoots.add(new File(jar).getAbsoluteFile().toPath());
+            }
 
-        LauncherDiscoveryRequest launcherDiscoveryRequest =
-                LauncherDiscoveryRequestBuilder.request()
-                        .selectors(DiscoverySelectors.selectClasspathRoots(classPathRoots))
-                        .filters(includeClassNamePatterns(".*"))
-                        .configurationParameters(configurationParameters.getConfigurationMap())
-                        .build();
+            TestEngineConfigurationParameters configurationParameters = new TestEngineConfigurationParameters();
 
-        TestEngine testEngine = new TestEngine();
+            LauncherDiscoveryRequest launcherDiscoveryRequest =
+                    LauncherDiscoveryRequestBuilder.request()
+                            .selectors(DiscoverySelectors.selectClasspathRoots(classPathRoots))
+                            .filters(includeClassNamePatterns(".*"))
+                            .configurationParameters(configurationParameters.getConfigurationMap())
+                            .build();
 
-        TestDescriptor testDescriptor =
-                testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+            TestEngine testEngine = new TestEngine();
 
-        TestPlan testPlan = TestEngineUtils.createTestPlan(testDescriptor, configurationParameters);
+            TestDescriptor testDescriptor =
+                    testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
 
-        TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan, System.out);
+            TestPlan testPlan = TestEngineUtils.createTestPlan(testDescriptor, configurationParameters);
 
-        testEngine.execute(
-                ExecutionRequest.create(
-                        testDescriptor,
-                        summaryEngineExecutionListener,
-                        launcherDiscoveryRequest.getConfigurationParameters()));
+            TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan, System.out);
 
-        long endTimeMilliseconds = System.currentTimeMillis();
+            testEngine.execute(
+                    ExecutionRequest.create(
+                            testDescriptor,
+                            summaryEngineExecutionListener,
+                            launcherDiscoveryRequest.getConfigurationParameters()));
 
-        TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
+            long endTimeMilliseconds = System.currentTimeMillis();
 
-        banner = "Devopology Test Engine " + TestEngineInformation.getVersion() + " Summary";
+            TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
 
-        stringBuilder = new StringBuilder();
-        for (char c : banner.toCharArray()) {
-            stringBuilder.append("-");
-        }
+            banner = "Devopology Test Engine " + TestEngineInformation.getVersion() + " Summary";
 
-        separator = stringBuilder.toString();
+            stringBuilder = new StringBuilder();
+            for (char c : banner.toCharArray()) {
+                stringBuilder.append("-");
+            }
 
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println(INFO);
+            separator = stringBuilder.toString();
 
-        //testExecutionSummary.printTo(new PrintWriter(new OutputStreamWriter(printStream, StandardCharsets.UTF_8)));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO);
 
-        printStream.println(
-                INFO
-                + AnsiColor.WHITE_BOLD_BRIGHT.wrap(
-                "Tests : "
-                + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount()))
-                + ", "
-                + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED")
-                + " : "
-                + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount()))
-                + ", "
-                + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED")
-                + " : "
-                + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()))
-                + ", "
-                + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("SKIPPED")
-                + " : "
-                + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSkippedCount()));
+            //testExecutionSummary.printTo(new PrintWriter(new OutputStreamWriter(printStream, StandardCharsets.UTF_8)));
 
-        printStream.println(INFO);
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(
+                    INFO
+                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap(
+                            "Tests : "
+                                    + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount()))
+                                    + ", "
+                                    + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED")
+                                    + " : "
+                                    + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount()))
+                            + ", "
+                            + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED")
+                            + " : "
+                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()))
+                            + ", "
+                            + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("SKIPPED")
+                            + " : "
+                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSkippedCount()));
 
-        boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
+            printStream.println(INFO);
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
 
-        if (failed) {
-            printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
-        } else {
-            printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
-        }
+            failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Total Time  : " + AnsiColor.WHITE_BOLD_BRIGHT.wrap(HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false))));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Finished At : " + HumanReadableTime.now()));
-        printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            if (failed) {
+                printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
+            } else {
+                printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
+            }
 
-        if (failed) {
-            System.exit(1);
-        } else {
-            System.exit(0);
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Total Time  : " + AnsiColor.WHITE_BOLD_BRIGHT.wrap(HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false))));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Finished At : " + HumanReadableTime.now()));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+        } finally {
+            if (printStream != null) {
+                try {
+                    printStream.close();
+                } catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+
+            if (failed) {
+                System.exit(1);
+            } else {
+                System.exit(0);
+            }
         }
     }
 }
