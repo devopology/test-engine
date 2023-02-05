@@ -64,13 +64,13 @@ public class LoggerImpl implements Logger {
     public LoggerImpl(String className) {
         Objects.requireNonNull(className);
 
-        className = className.trim();
+        String classNameTrimmed = className.trim();
 
-        if (className.isEmpty()) {
+        if (classNameTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        this.className = className;
+        this.className = classNameTrimmed;
 
         String logLevelString = System.getProperty("devopology.test.engine.log.level");
         if (logLevelString != null) {
