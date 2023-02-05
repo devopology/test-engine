@@ -60,12 +60,12 @@ public interface ParameterMap extends Metadata {
     static ParameterMap of(String name) {
         Objects.requireNonNull(name);
 
-        name = name.trim();
-        if (name.isEmpty()) {
+        String nameTrimmed = name.trim();
+        if (nameTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return new ParameterMapImpl(name);
+        return new ParameterMapImpl(nameTrimmed);
     }
 
 }
