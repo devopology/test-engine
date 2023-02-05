@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 /**
  * Class to implement a TestExecutionListener
  */
-@SuppressWarnings("PMD.Duplicate")
 public class TestEngineTestExecutionListener implements TestExecutionListener {
 
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "]";
@@ -61,8 +60,8 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
         }
     }
 
-    @SuppressWarnings("PMD.")
     @Override
+    @SuppressWarnings("CPD-START")
     public void executionStarted(TestIdentifier testIdentifier) {
         if (mode != Mode.CONSOLE) {
             return;
@@ -106,6 +105,7 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
             }
         });
     }
+    @SuppressWarnings("CPD-END")
 
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
@@ -113,6 +113,7 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
     }
 
     @Override
+    @SuppressWarnings("CPD-START")
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
         if (mode != Mode.CONSOLE) {
             return;
@@ -177,6 +178,7 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
             }
         });
     }
+    @SuppressWarnings("CPD-END")
 
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
