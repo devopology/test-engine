@@ -159,11 +159,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 }
             }
 
-            if (detailedOutput) {
-                if (stringBuilder.length() > 0) {
-                    printWriter.println(stringBuilder);
-                    printWriter.flush();
-                }
+            if (detailedOutput && (stringBuilder.length() > 0)) {
+                printWriter.println(stringBuilder);
+                printWriter.flush();
             }
         }
     }
