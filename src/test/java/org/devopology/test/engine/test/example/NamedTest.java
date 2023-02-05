@@ -15,6 +15,10 @@ import java.util.Collection;
  */
 public class NamedTest {
 
+    // The test engine automatically extracts the payload from a Named parameter
+    @Parameter
+    public String parameter;
+
     @ParameterSupplier
     public static Collection<Named> parameters() {
         Collection<Named> collection = new ArrayList<>();
@@ -26,10 +30,6 @@ public class NamedTest {
 
         return collection;
     }
-
-    // The test engine automatically extracts the payload from a Named parameter
-    @Parameter
-    public String parameter;
 
     @BeforeAll
     public void beforeAll() {

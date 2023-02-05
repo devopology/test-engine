@@ -54,18 +54,6 @@ public class ParameterSupplierFieldTest2 {
         System.out.println("afterAll()");
     }
 
-    private static String toString(String ... strings) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String string : strings) {
-            stringBuilder.append(string);
-            stringBuilder.append(", ");
-        }
-
-        String string = stringBuilder.toString();
-        string = string.substring(0, string.length() - ", ".length());
-        return string;
-    }
-
     private static class TestParameterSupplier {
 
         public static Collection<Named> values() {
@@ -76,5 +64,17 @@ public class ParameterSupplierFieldTest2 {
 
             return list;
         }
+    }
+
+    private static String toString(String ... strings) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String string : strings) {
+            stringBuilder.append(string);
+            stringBuilder.append(", ");
+        }
+
+        String string = stringBuilder.toString();
+        string = string.substring(0, string.length() - ", ".length());
+        return string;
     }
 }

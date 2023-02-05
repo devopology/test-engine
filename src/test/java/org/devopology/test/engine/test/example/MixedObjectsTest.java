@@ -22,6 +22,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
  */
 public class MixedObjectsTest {
 
+    @Parameter
+    public Object parameter;
+
     @ParameterSupplier
     public static Collection<Named> parameters() {
         Set<Named> collection = new LinkedHashSet<>();
@@ -36,30 +39,10 @@ public class MixedObjectsTest {
         return collection;
     }
 
-    @Parameter
-    public Object parameter;
-
     @BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
-
-    // Function to test... typically this would be core project code
-    private static Function<Object, String> TO_SPECIAL_NAME = object -> {
-        if (object == null) {
-            throw new NullPointerException();
-        }
-
-        if (object instanceof String) {
-            return "string/" + object;
-        } else if (object instanceof Integer) {
-            return "int/" + object;
-        } else if (object instanceof BigDecimal) {
-            return "bigDecimal/" + object;
-        } else {
-            throw new IllegalArgumentException("Unhandled type [" + object.getClass().getName() + "]");
-        }
-    };
 
     @Test
     public void test() {
@@ -84,4 +67,21 @@ public class MixedObjectsTest {
     public void afterAll() {
         System.out.println("afterAll()");
     }
+
+    // Function to test... typically this would be core project code
+    private static Function<Object, String> TO_SPECIAL_NAME = object -> {
+        if (object == null) {
+            throw new NullPointerException();
+        }
+
+        if (object instanceof String) {
+            return "string/" + object;
+        } else if (object instanceof Integer) {
+            return "int/" + object;
+        } else if (object instanceof BigDecimal) {
+            return "bigDecimal/" + object;
+        } else {
+            throw new IllegalArgumentException("Unhandled type [" + object.getClass().getName() + "]");
+        }
+    };
 }
