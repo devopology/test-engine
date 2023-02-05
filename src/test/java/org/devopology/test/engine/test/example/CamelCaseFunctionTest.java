@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CamelCaseFunctionTest {
 
+    private static Function<String, String> FUNCTION = new CamelCaseFunction();
+
     @Parameter
     public Tuple parameter;
 
@@ -42,7 +44,7 @@ public class CamelCaseFunctionTest {
         return collection;
     }
 
-    private static Function<String, String> FUNCTION = new CamelCaseFunction();
+
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
