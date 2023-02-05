@@ -100,24 +100,11 @@ import java.util.Collection;
  */
 public class ParameterSupplierFieldTest {
 
-    private static class TestParameterSupplier {
-
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
-
-            for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
-            }
-
-            return collection;
-        }
-    }
-
-    @ParameterSupplier
-    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
-
     @Parameter
     public String parameter;
+    
+    @ParameterSupplier
+    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @BeforeAll
     public void beforeAll() {
@@ -147,6 +134,19 @@ public class ParameterSupplierFieldTest {
     @AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    private static class TestParameterSupplier {
+
+        public static Collection<String> values() {
+            Collection<String> collection = new ArrayList<>();
+
+            for (int i = 0; i < 10; i++) {
+                collection.add(String.valueOf(i));
+            }
+
+            return collection;
+        }
     }
 }
 ```
