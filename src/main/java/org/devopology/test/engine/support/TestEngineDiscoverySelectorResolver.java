@@ -144,8 +144,7 @@ public class TestEngineDiscoverySelectorResolver {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] contains both a @ParameterSupplier field and method",
-                                    testClass.getName()),
-                            e);
+                                    testClass.getName()));
                 }
 
                 if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
