@@ -415,7 +415,6 @@ public final class TestEngineUtils {
                         if (Void.TYPE.isAssignableFrom(returnType)) {
                             methodList.add(method);
                         }
-                }
             }
         }
 
