@@ -81,7 +81,7 @@ Write a test...
 
 Example:
 
-```
+```java
 package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.AfterAll;
