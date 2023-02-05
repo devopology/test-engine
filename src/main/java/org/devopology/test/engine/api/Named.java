@@ -53,11 +53,11 @@ public interface Named extends Metadata, Comparable {
     static Named of(String name, Object payload) {
         Objects.requireNonNull(name);
 
-        name = name.trim();
-        if (name.isEmpty()) {
+        String nameTrimmed = name.trim();
+        if (nameTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return new NamedImpl(name, payload);
+        return new NamedImpl(nameTrimmed, payload);
     }
 }
