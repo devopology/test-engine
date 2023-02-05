@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Class to implement a LoggerFactory to create a Logger
  */
-public class LoggerFactory {
+public final class LoggerFactory {
 
     private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
 
