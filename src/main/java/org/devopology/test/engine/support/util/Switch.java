@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * Class to implement switch functionally based on an Object's class
  */
 @SuppressWarnings("unchecked")
-public class Switch {
+public final class Switch {
 
     /**
      * Constructor

@@ -14,6 +14,9 @@ import java.util.Collection;
  */
 public class ParameterSupplierMethodTest {
 
+    @Parameter
+    public String parameter;
+
     @ParameterSupplier
     public static Collection<String> parameters() {
         Collection<String> collection = new ArrayList<>();
@@ -24,9 +27,6 @@ public class ParameterSupplierMethodTest {
 
         return collection;
     }
-
-    @Parameter
-    public String parameter;
 
     @BeforeAll
     public void beforeAll() {

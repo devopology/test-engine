@@ -24,9 +24,9 @@ import java.util.Map;
 /**
  * Class to implement a LoggerFactory to create a Logger
  */
-public class LoggerFactory {
+public final class LoggerFactory {
 
-    private static Map<String, Logger> LOGGER_MAP = new HashMap<>();
+    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
 
     /**
      * Constructor
@@ -53,18 +53,16 @@ public class LoggerFactory {
      */
     public static Logger getLogger(String name) {
         synchronized (LOGGER_MAP) {
-            if (name == null) {
-                name = "UNDEFINED";
+            String nameTrimmed;
+            if ((name != null) && !name.trim().isEmpty()) {
+                nameTrimmed = name.trim();
             } else {
-                name = name.trim();
-                if (name.isEmpty()) {
-                    name = "UNDEFINED";
-                }
+                nameTrimmed = "UNDEFINED";
             }
 
-            Logger logger = LOGGER_MAP.get(name);
+            Logger logger = LOGGER_MAP.get(nameTrimmed);
             if (logger == null) {
-                logger = new LoggerImpl(name);
+                logger = new LoggerImpl(nameTrimmed);
                 LOGGER_MAP.put(name, logger);
             }
             return logger;

@@ -24,10 +24,10 @@ import java.util.Optional;
 
 public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-    private TestSource testSource;
-    private Class<?> testClass;
-    private Object testParameter;
-    private Method testMethod;
+    private final TestSource testSource;
+    private final Class<?> testClass;
+    private final Object testParameter;
+    private final Method testMethod;
 
     public TestEngineTestMethodTestDescriptor(
             UniqueId uniqueId,

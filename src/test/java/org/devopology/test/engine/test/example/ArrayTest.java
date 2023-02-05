@@ -15,6 +15,9 @@ import java.util.Collection;
  */
 public class ArrayTest {
 
+    @Parameter
+    public String[] parameter;
+
     @ParameterSupplier
     public static Collection<String[]> parameters() {
         Collection<String[]> collection = new ArrayList<>();
@@ -25,9 +28,6 @@ public class ArrayTest {
 
         return collection;
     }
-
-    @Parameter
-    public String[] parameter;
 
     @BeforeAll
     public void beforeAll() {

@@ -22,28 +22,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
  */
 public class MixedObjectsTest {
 
-    @ParameterSupplier
-    public static Collection<Named> parameters() {
-        Set<Named> collection = new LinkedHashSet<>();
-
-        collection.add(Named.of("BigDecimal", new BigDecimal("1000000000000000000000")));
-        collection.add(Named.of("Integer", 1));
-        collection.add(Named.of("Map", new HashMap<String, String>()));
-        collection.add(Named.of("String", "This is a string"));
-        collection.add(Named.of("null", null));
-        collection.add(Named.of("null2", null));
-
-        return collection;
-    }
-
-    @Parameter
-    public Object parameter;
-
-    @BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
-    }
-
     // Function to test... typically this would be core project code
     private static Function<Object, String> TO_SPECIAL_NAME = object -> {
         if (object == null) {
@@ -60,6 +38,28 @@ public class MixedObjectsTest {
             throw new IllegalArgumentException("Unhandled type [" + object.getClass().getName() + "]");
         }
     };
+
+    @Parameter
+    public Object parameter;
+
+    @ParameterSupplier
+    public static Collection<Named> parameters() {
+        Set<Named> collection = new LinkedHashSet<>();
+
+        collection.add(Named.of("BigDecimal", new BigDecimal("1000000000000000000000")));
+        collection.add(Named.of("Integer", 1));
+        collection.add(Named.of("Map", new HashMap<String, String>()));
+        collection.add(Named.of("String", "This is a string"));
+        collection.add(Named.of("null", null));
+        collection.add(Named.of("null2", null));
+
+        return collection;
+    }
+
+    @BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
+    }
 
     @Test
     public void test() {

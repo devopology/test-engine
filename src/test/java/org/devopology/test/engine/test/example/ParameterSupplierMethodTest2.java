@@ -15,6 +15,9 @@ import java.util.TreeSet;
  */
 public class ParameterSupplierMethodTest2 {
 
+    @Parameter
+    public String parameter;
+
     @ParameterSupplier
     public static Collection<String> parameters() {
         Set<String> collection = new TreeSet<>();
@@ -25,9 +28,6 @@ public class ParameterSupplierMethodTest2 {
 
         return collection;
     }
-
-    @Parameter
-    public String parameter;
 
     @BeforeAll
     public void beforeAll() {

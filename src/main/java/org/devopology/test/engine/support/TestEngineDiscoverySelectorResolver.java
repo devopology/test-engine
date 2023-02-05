@@ -77,63 +77,20 @@ public class TestEngineDiscoverySelectorResolver {
     public void resolveSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolveSelectors()");
 
-        ConfigurationParameters configurationParameters = engineDiscoveryRequest.getConfigurationParameters();
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
-
         // Test class to test method list mapping, sorted by test class name
         Map<Class<?>, List<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
 
         // For each test class that was selected, add all test methods
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
-        LOGGER.trace("ClasspathRootSelector size [%d]", discoverySelectorList.size());
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            URI uri = ((ClasspathRootSelector) discoverySelector).getClasspathRoot();
-            List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
-            for (Class<?> clazz : classList) {
-                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
-            }
-        }
+        resolveClassPathRoot(engineDiscoveryRequest, testClassToMethodMap);
 
         // For each test class that was selected, add all test methods
-        discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
-        LOGGER.debug("PackageSelector size [%d]", discoverySelectorList.size());
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            String packageName = ((PackageSelector) discoverySelector).getPackageName();
-            List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
-            for (Class<?> clazz : classList) {
-                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
-            }
-        }
+        resolvePackageSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         // For each test class selected, add all test methods
-        discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
-        LOGGER.debug("ClassSelector size [%d]", discoverySelectorList.size());
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
-            if (IS_TEST_CLASS.test(clazz)) {
-                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
-            }
-        }
+        resolveClassSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         // For each test method that was selected, add the test class and method
-        discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
-        LOGGER.debug("MethodSelector size [%d]", discoverySelectorList.size());
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            Method method = ((MethodSelector) discoverySelector).getJavaMethod();
-            Class<?> clazz = method.getDeclaringClass();
-            if (IS_TEST_METHOD.test(method)) {
-                //LOGGER.trace(String.format("test class [%s] @Test method [%s]", clazz.getName(), method.getName()));
-                List<Method> methods = testClassToMethodMap.get(clazz);
-                if (methods == null) {
-                    methods = new ArrayList<>();
-                    testClassToMethodMap.put(clazz, methods);
-                }
-                methods.add(method);
-            }
-        }
+        resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         // Sort the test methods by name (Test classes are already sorted by name)
         for (Map.Entry<Class<?>, List<Method>> mapEntry : testClassToMethodMap.entrySet()) {
@@ -147,6 +104,14 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace(String.format("test class [%s] @Test method [%s]", testClass.getName(), method.getName()));
             }
         }
+
+        processSelectors(engineDescriptor, testClassToMethodMap);
+    }
+
+    private void processSelectors(
+            EngineDescriptor engineDescriptor,
+            Map<Class<?>, List<Method>> testClassToMethodMap) {
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
@@ -174,7 +139,7 @@ public class TestEngineDiscoverySelectorResolver {
                     LOGGER.trace("test class [%s] parameter supplier method name [%s]", testClass.getName(), method.getName());
                 }
 
-                if ((parameterSupplierFields.size() > 0) && (parameterSupplierMethods.size() > 0)) {
+                if (!parameterSupplierFields.isEmpty() && !parameterSupplierMethods.isEmpty()) {
                     // @ParameterSupplier field(s) and method(s) both found
                     throw new TestClassConfigurationException(
                             String.format(
@@ -182,7 +147,7 @@ public class TestEngineDiscoverySelectorResolver {
                                     testClass.getName()));
                 }
 
-                if ((parameterSupplierFields.size() == 0) && (parameterSupplierMethods.size() == 0)) {
+                if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
                     // No @ParameterSupplier field or method found
                     throw new TestClassConfigurationException(
                             String.format(
@@ -203,7 +168,8 @@ public class TestEngineDiscoverySelectorResolver {
                         throw new TestClassConfigurationException(
                                 String.format(
                                         "Test class [%s] @ParameterSupplier field must return a Collection",
-                                        testClass.getName()));
+                                        testClass.getName()),
+                                e);
                     }
                 } else if (parameterSupplierMethods.size() > 1) {
                     // More than one @ParameterSupplier method found
@@ -218,7 +184,8 @@ public class TestEngineDiscoverySelectorResolver {
                         throw new TestClassConfigurationException(
                                 String.format(
                                         "Test class [%s] @ParameterSupplier method must return a Collection",
-                                        testClass.getName()));
+                                        testClass.getName()),
+                                e);
                     }
                 }
 
@@ -245,7 +212,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
 
-                if (testParameters.size() > 0) {
+                if (!testParameters.isEmpty()) {
                     // Build the test descriptor tree if we have test parameters
                     // i.e. Tests with an empty set of parameters will be ignored
                     String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
@@ -315,6 +282,72 @@ public class TestEngineDiscoverySelectorResolver {
             }
         } catch (Throwable t) {
             throw new TestEngineException("Exception in test engine", t);
+        }
+    }
+
+    private void resolveClassPathRoot(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
+        LOGGER.trace("ClasspathRootSelector size [%d]", discoverySelectorList.size());
+
+        for (DiscoverySelector discoverySelector : discoverySelectorList) {
+            URI uri = ((ClasspathRootSelector) discoverySelector).getClasspathRoot();
+            List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
+
+            for (Class<?> clazz : classList) {
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+            }
+        }
+    }
+
+    private void resolvePackageSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
+        LOGGER.debug("PackageSelector size [%d]", discoverySelectorList.size());
+
+        for (DiscoverySelector discoverySelector : discoverySelectorList) {
+            String packageName = ((PackageSelector) discoverySelector).getPackageName();
+            List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
+
+            for (Class<?> clazz : classList) {
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+            }
+        }
+    }
+
+    private void resolveClassSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
+        LOGGER.debug("ClassSelector size [%d]", discoverySelectorList.size());
+
+        for (DiscoverySelector discoverySelector : discoverySelectorList) {
+            Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
+
+            if (IS_TEST_CLASS.test(clazz)) {
+                //LOGGER.trace(String.format("test class [%s]", clazz.getName()));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+            }
+        }
+    }
+
+    private static void resolveMethodSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
+        LOGGER.debug("MethodSelector size [%d]", discoverySelectorList.size());
+
+        for (DiscoverySelector discoverySelector : discoverySelectorList) {
+            Method method = ((MethodSelector) discoverySelector).getJavaMethod();
+            Class<?> clazz = method.getDeclaringClass();
+
+            if (IS_TEST_METHOD.test(method)) {
+                //LOGGER.trace(String.format("test class [%s] @Test method [%s]", clazz.getName(), method.getName()));
+                List<Method> methods = testClassToMethodMap.get(clazz);
+
+                if (methods == null) {
+                    methods = new ArrayList<>();
+                    testClassToMethodMap.put(clazz, methods);
+                }
+
+                methods.add(method);
+            }
         }
     }
 }

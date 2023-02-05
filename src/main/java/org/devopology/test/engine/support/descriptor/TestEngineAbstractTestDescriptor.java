@@ -27,7 +27,7 @@ import java.util.Optional;
 
 public abstract class TestEngineAbstractTestDescriptor extends AbstractTestDescriptor {
 
-    private List<TestExecutionResult> testExecutionResultList;
+    private final List<TestExecutionResult> testExecutionResultList;
 
     protected TestEngineAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);

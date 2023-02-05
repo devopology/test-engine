@@ -16,24 +16,8 @@ import java.util.UUID;
  */
 public class ParameterMetadataTest {
 
-    // Custom parameter that has metadata
-    private static class ParameterWithMetadata implements Metadata {
-
-        private String value;
-
-        public ParameterWithMetadata(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "test value { " + value + " }";
-        }
-    }
+    @Parameter
+    public ParameterWithMetadata parameter;
 
     @ParameterSupplier
     public static Collection<ParameterWithMetadata> parameters() {
@@ -45,9 +29,6 @@ public class ParameterMetadataTest {
 
         return collection;
     }
-
-    @Parameter
-    public ParameterWithMetadata parameter;
 
     @BeforeAll
     public void beforeAll() {
@@ -69,5 +50,24 @@ public class ParameterMetadataTest {
     @AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    // Custom parameter that has metadata
+    private static class ParameterWithMetadata implements Metadata {
+
+        private final String value;
+
+        public ParameterWithMetadata(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "test value { " + value + " }";
+        }
     }
 }
