@@ -20,6 +20,30 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CamelCaseFunctionTest {
 
+    @Parameter
+    public Tuple parameter;
+
+    @ParameterSupplier
+    public static Collection<Object> parameters() {
+        Collection<Object> collection = new ArrayList<>();
+
+        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("THIS", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        tuple = new Tuple("tHis", "this");
+        collection.add(Named.of(tuple.input, tuple));
+
+        return collection;
+    }
+
+    private static Function<String, String> FUNCTION = new CamelCaseFunction();
+
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
 
@@ -64,30 +88,6 @@ public class CamelCaseFunctionTest {
             return "Tuple { " + input + " | " + expected + " }";
         }
     }
-
-    @ParameterSupplier
-    public static Collection<Object> parameters() {
-        Collection<Object> collection = new ArrayList<>();
-
-        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("THIS", "this");
-        collection.add(Named.of(tuple.input, tuple));
-
-        tuple = new Tuple("tHis", "this");
-        collection.add(Named.of(tuple.input, tuple));
-
-        return collection;
-    }
-
-    @Parameter
-    public Tuple parameter;
-
-    private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
     @Test
     public void test() {
