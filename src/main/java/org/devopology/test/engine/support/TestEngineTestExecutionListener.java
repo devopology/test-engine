@@ -164,11 +164,13 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
                             stringBuilder.append(" ").append(PASSED);
                             break;
                         }
+                        default: {
+                            // DO NOTHING
+                            break;
+                        }
                     }
 
-                    if (stringBuilder.length() > 0) {
-                        System.out.println(stringBuilder);
-                    }
+                    System.out.println(stringBuilder);
                 }
             }
         });
