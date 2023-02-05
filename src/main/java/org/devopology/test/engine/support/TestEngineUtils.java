@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
+@SuppressWarnings("PMD.GodClass")
 public final class TestEngineUtils {
 
     private static Map<Class<?>, List<Field>> parameterFieldsCache;
