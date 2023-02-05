@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 /**
  * Class to implement a TestExecutionListener
  */
+@SuppressWarnings("PMD.DUPLICATE")
 public class TestEngineTestExecutionListener implements TestExecutionListener {
 
     private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "]";
@@ -60,6 +61,7 @@ public class TestEngineTestExecutionListener implements TestExecutionListener {
         }
     }
 
+    @SuppressWarnings("PMD.")
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
         if (mode != Mode.CONSOLE) {
