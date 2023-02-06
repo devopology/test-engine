@@ -128,7 +128,7 @@ public final class TestEngineUtils {
 
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (field.isAnnotationPresent(ParameterSupplier.class)) {
+            if (field.isAnnotationPresent(ParameterSupplier.class) || field.isAnnotationPresent(Parameter.Supplier.class)) {
                 int modifiers = field.getModifiers();
                 if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
                     parameterSupplierFields.add(field);
@@ -159,7 +159,7 @@ public final class TestEngineUtils {
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
             int modifiers = method.getModifiers();
-            if (method.isAnnotationPresent(ParameterSupplier.class)
+            if ((method.isAnnotationPresent(ParameterSupplier.class) || (method.isAnnotationPresent(Parameter.Supplier.class)))
                 && Modifier.isStatic(modifiers)
                 && Modifier.isPublic(modifiers)
                 && (method.getParameterCount() == 0)) {

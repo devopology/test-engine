@@ -3,8 +3,6 @@ package org.devopology.test.engine.test.example;
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterMap;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ public class ArrayTest {
     @Parameter
     public String[] parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<String[]> parameters() {
         Collection<String[]> collection = new ArrayList<>();
 

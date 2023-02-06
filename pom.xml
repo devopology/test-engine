@@ -7,7 +7,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.10-SNAPSHOT</version>
     <name>Devopology - Test Engine</name>
 
     <properties>

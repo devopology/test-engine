@@ -4,7 +4,6 @@ import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.math.BigDecimal;
@@ -42,7 +41,7 @@ public class MixedObjectsTest {
     @Parameter
     public Object parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<Named> parameters() {
         Set<Named> collection = new LinkedHashSet<>();
 

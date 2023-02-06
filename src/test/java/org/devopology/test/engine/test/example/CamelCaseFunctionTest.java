@@ -3,7 +3,6 @@ package org.devopology.test.engine.test.example;
 import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class CamelCaseFunctionTest {
     @Parameter
     public Tuple parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<Object> parameters() {
         Collection<Object> collection = new ArrayList<>();
 

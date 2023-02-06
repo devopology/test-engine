@@ -3,7 +3,6 @@ package org.devopology.test.engine.test.example;
 import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.Collection;
@@ -18,7 +17,7 @@ public class ParameterSupplierMethodTest2 {
     @Parameter
     public String parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<String> parameters() {
         Set<String> collection = new TreeSet<>();
 

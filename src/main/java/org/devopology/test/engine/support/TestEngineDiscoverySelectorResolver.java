@@ -24,7 +24,6 @@ import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDes
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
@@ -34,7 +33,6 @@ import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -124,7 +122,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                 Collection<Object> testParameters = null;
 
-                // Try to get test parameters using a @ParameterSupplier fields and methods
+                // Try to get test parameters using a @Parameter.Supplier or @ParameterSupplier fields and methods
                 List<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
                 LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
 
