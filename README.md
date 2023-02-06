@@ -192,7 +192,7 @@ For each test class found {
 
 &nbsp;&nbsp;Execute the test instance's `@AfterAll` methods
 
-&nbsp;&nbsp;Set the test instance's `@Parameter` field to `null`
+&nbsp;&nbsp;Set the test instance `@Parameter` field to `null`
 
 &nbsp;&nbsp;}
 
