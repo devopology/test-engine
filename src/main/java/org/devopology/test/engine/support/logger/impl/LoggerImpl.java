@@ -146,7 +146,7 @@ public class LoggerImpl implements Logger {
 
     public void warning(String format, Object object) {
         if (isWarningEnabled()) {
-            info(format, new Object[]{object});
+            warning(format, new Object[]{object});
         }
     }
 
@@ -179,7 +179,7 @@ public class LoggerImpl implements Logger {
 
     public void error(String format, Object object) {
         if (isErrorEnabled()) {
-            info(format, new Object[]{object});
+            error(format, new Object[]{object});
         }
     }
 
@@ -212,7 +212,7 @@ public class LoggerImpl implements Logger {
 
     public void debug(String format, Object object) {
         if (isDebugEnabled()) {
-            info(format, new Object[]{object});
+            debug(format, new Object[]{object});
         }
     }
 
@@ -245,7 +245,7 @@ public class LoggerImpl implements Logger {
 
     public void trace(String format, Object object) {
         if (isTraceEnabled()) {
-            info(format, new Object[]{object});
+            trace(format, new Object[]{object});
         }
     }
 

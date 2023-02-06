@@ -164,39 +164,38 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 # Design
 
-The basic flow:
+The basic flow...
 
-Scan all jars for test classes that contains a test method annotated with the test engine specific version of `@Test`
-
-For each test class found {
-
-&nbsp;&nbsp;Call the `@ParameterSupplier` method to get parameters `Collection<Object>` (or `Collection` of a specific type)
-
-&nbsp;&nbsp;Create a single instance of the test class
-
-&nbsp;&nbsp;For each parameter {
-
-&nbsp;&nbsp;&nbsp;&nbsp;Set the test instance `@Parameter` field to the test parameter
-
-&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@BeforeAll` methods
-
-&nbsp;&nbsp;&nbsp;&nbsp;For each `@Test` method {
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@BeforeEach` methods
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@Test` method
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute the test instance's `@AfterEach` methods
-
-&nbsp;&nbsp;&nbsp;&nbsp;}
-
-&nbsp;&nbsp;Execute the test instance's `@AfterAll` methods
-
-&nbsp;&nbsp;Set the test instance `@Parameter` field to `null`
-
-&nbsp;&nbsp;}
-
-}
+```
+ Scan all classpath jars for classes that contains a method annotated with "@Test"
+ 
+ for (class : class list) {
+ 
+    call "@ParameterSupplier" field or method to get a parameter collection
+ 
+    create a single instance of the class
+    
+    for (parameter : parameter collection) {
+    
+        set the "@Parameter" field value
+        
+        call "@BeforeAll" methods
+        
+        for (method : class "@Test" method list) {
+        
+            call "@BeforeEach" methods
+        
+            call "@Test" method
+            
+            call "@AfterEach" methods
+        }
+        
+        call "@AfterAll" methods
+        
+        set the "@Parameter" field to null
+    }
+ }
+```
 
 **Notes**
 
