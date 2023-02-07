@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * Example test
  */
-@DisplayName("Test class with @ParameterSupplier field and display names")
+@DisplayName("Test class with @Parameter.Supplier field and display names")
 public class ParameterSupplierFieldWithDisplayNamesTest {
 
     @Parameter
