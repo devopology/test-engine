@@ -103,7 +103,7 @@ public class ParameterSupplierFieldTest {
     @Parameter
     public String parameter;
     
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @BeforeAll
