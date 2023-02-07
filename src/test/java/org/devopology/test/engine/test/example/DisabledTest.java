@@ -6,7 +6,6 @@ import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.BeforeEach;
 import org.devopology.test.engine.api.Disabled;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class DisabledTest {
     @Parameter
     public String parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<String> PARAMETERS = StringParameterSupplier.values();
 
     @BeforeAll

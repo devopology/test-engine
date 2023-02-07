@@ -23,8 +23,11 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 /**
  * Annotation for a parameter supplier
+ * <p/>
+ * Deprecated... use Parameter.Supplier
  */
 public @interface ParameterSupplier {
 

@@ -28,4 +28,12 @@ import java.lang.annotation.Target;
  */
 public @interface Parameter {
 
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    /**
+     * Annotation for a parameter supplier
+     */
+    @interface Supplier {
+
+    }
 }

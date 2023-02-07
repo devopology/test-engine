@@ -23,6 +23,8 @@ import org.devopology.test.engine.support.TestEngineExecutor;
 import org.devopology.test.engine.support.TestEngineInformation;
 import org.devopology.test.engine.support.TestEngineSummaryEngineExecutionListener;
 import org.devopology.test.engine.support.TestEngineUtils;
+import org.devopology.test.engine.support.logger.Logger;
+import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.devopology.test.engine.support.util.AnsiColor;
 import org.devopology.test.engine.support.util.HumanReadableTime;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -39,9 +41,10 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
@@ -49,6 +52,8 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
  * Class to implement a TestEngine
  */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
     private static final String ENGINE_ID = "devopology-test-engine";
     private static final String GROUP_ID = "org.devopology";
@@ -117,7 +122,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             printStream = System.out;
 
-            String banner = "Devopology Test Engine " + TestEngineInformation.getVersion();
+            String banner = "Devopology Test Engine " + VERSION;
 
             StringBuilder stringBuilder = new StringBuilder();
             for (char c : banner.toCharArray()) {
@@ -129,9 +134,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
             printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Scanning for tests..."));
+            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Scanning all classpath jars for tests..."));
 
-            Set<Path> classPathRoots = new HashSet<>();
+            Set<Path> classPathRoots =
+                    new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
 
             // Add the jar containing the test engine to the class path to search for tests
             File file =
@@ -146,6 +152,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             String[] jars = classPath.split(File.pathSeparator);
             for (String jar : jars) {
                 classPathRoots.add(new File(jar).getAbsoluteFile().toPath());
+            }
+
+            for (Path path : classPathRoots) {
+                LOGGER.trace("jar [%s]", path.toAbsolutePath());
             }
 
             TestEngineConfigurationParameters configurationParameters = new TestEngineConfigurationParameters();
@@ -176,7 +186,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
 
-            banner = "Devopology Test Engine " + TestEngineInformation.getVersion() + " Summary";
+            banner = "Devopology Test Engine " + VERSION + " Summary";
 
             stringBuilder = new StringBuilder();
             for (char c : banner.toCharArray()) {

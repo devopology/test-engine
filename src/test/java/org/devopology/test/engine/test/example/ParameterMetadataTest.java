@@ -4,7 +4,6 @@ import org.devopology.test.engine.api.AfterAll;
 import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class ParameterMetadataTest {
     @Parameter
     public ParameterWithMetadata parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<ParameterWithMetadata> parameters() {
         Collection<ParameterWithMetadata> collection = new ArrayList<>();
 

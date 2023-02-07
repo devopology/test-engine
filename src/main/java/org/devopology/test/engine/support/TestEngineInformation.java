@@ -25,7 +25,7 @@ import java.util.Properties;
  */
 public class TestEngineInformation {
 
-    private static final String RESOURCE_PATH = "/devopology-test-engine.properties";
+    private static final String RESOURCE_PATH = "/test-engine.properties";
 
     /**
      * Method to get the TestEngine version

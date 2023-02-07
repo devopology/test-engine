@@ -6,7 +6,6 @@ import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.BeforeEach;
 import org.devopology.test.engine.api.DisplayName;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class ParameterSupplierFieldWithDisplayNamesTest {
     @Parameter
     public String parameter;
 
-    @ParameterSupplier
+    @Parameter.Supplier
     public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @BeforeAll
