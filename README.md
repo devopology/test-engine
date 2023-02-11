@@ -51,7 +51,7 @@ Add the Junit 5 and Devopology test engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.10</version>
+    <version>0.0.11</version>
 </dependency>
 ```
 
@@ -94,6 +94,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -104,7 +105,7 @@ public class ParameterSupplierFieldTest {
     public String parameter;
     
     @Parameter.Supplier
-    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
+    public static Stream<String> PARAMETERS = TestParameterSupplier.stream();
 
     @BeforeAll
     public void beforeAll() {
@@ -138,14 +139,14 @@ public class ParameterSupplierFieldTest {
 
     private static class TestParameterSupplier {
 
-        public static Collection<String> values() {
+        public static Stream<String> values() {
             Collection<String> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
                 collection.add(String.valueOf(i));
             }
 
-            return collection;
+            return collection.stream();
         }
     }
 }
@@ -171,7 +172,7 @@ The basic flow...
  
  for (class : class list) {
  
-    call "@ParameterSupplier" field or method to get a parameter collection
+    call "@Parameter.Supplier" field or method to get a parameter collection
  
     create a single instance of the class
     
@@ -199,7 +200,7 @@ The basic flow...
 
 **Notes**
 
-- The type returned in the `@ParameterSupplier` `Collection` must match the type of the `@Parameter` field
+- The type returned in the `@Parameter.Supplier` `Collection` must match the type of the `@Parameter` field
 
 
 - `Named` is a special case. The `Parameter` field type should match the type of Object wrapped by the `Named` instance

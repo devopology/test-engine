@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +26,7 @@ public class CamelCaseFunctionTest {
     public Tuple parameter;
 
     @Parameter.Supplier
-    public static Collection<Object> parameters() {
+    public static Stream<Object> parameters() {
         Collection<Object> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
@@ -40,7 +41,7 @@ public class CamelCaseFunctionTest {
         tuple = new Tuple("tHis", "this");
         collection.add(Named.of(tuple.input, tuple));
 
-        return collection;
+        return collection.stream();
     }
 
 

@@ -10,6 +10,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -21,7 +22,7 @@ public class DisabledTest {
     public String parameter;
 
     @Parameter.Supplier
-    public static Collection<String> PARAMETERS = StringParameterSupplier.values();
+    public static Stream<String> PARAMETERS = StringParameterSupplier.values();
 
     @BeforeAll
     public void beforeAll() {
@@ -55,14 +56,14 @@ public class DisabledTest {
 
     private static class StringParameterSupplier {
 
-        public static Collection<String> values() {
+        public static Stream<String> values() {
             Collection<String> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
                 collection.add(String.valueOf(i));
             }
 
-            return collection;
+            return collection.stream();
         }
     }
 }

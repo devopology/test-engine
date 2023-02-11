@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 /**
  * Class to implement methods to get test class fields / methods, caching the information
@@ -113,7 +114,7 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @ParameterSupplier fields sorted alphabetically
+     * Method to get a List of @Parameter.Supplier fields sorted alphabetically
      *
      * @param clazz
      * @return
@@ -143,7 +144,7 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @ParameterSupplier fields sorted alphabetically
+     * Method to get a List of @Parameter.Supplier fields sorted alphabetically
      *
      * @param clazz
      * @return
@@ -164,7 +165,7 @@ public final class TestEngineUtils {
                 && Modifier.isPublic(modifiers)
                 && (method.getParameterCount() == 0)) {
                     Class<?> returnType = method.getReturnType();
-                    if (Collection.class.isAssignableFrom(returnType)) {
+                    if (Collection.class.isAssignableFrom(returnType) || Stream.class.isAssignableFrom(returnType)) {
                         parameterSupplierMethods.add(method);
                     }
             }
