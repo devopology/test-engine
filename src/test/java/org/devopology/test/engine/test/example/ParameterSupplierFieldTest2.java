@@ -9,7 +9,6 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 

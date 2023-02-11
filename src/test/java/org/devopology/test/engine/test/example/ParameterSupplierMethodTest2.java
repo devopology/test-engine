@@ -5,7 +5,6 @@ import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.Test;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;

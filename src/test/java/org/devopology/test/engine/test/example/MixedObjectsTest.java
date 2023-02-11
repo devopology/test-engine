@@ -7,7 +7,6 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
