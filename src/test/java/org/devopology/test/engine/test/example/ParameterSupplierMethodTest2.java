@@ -8,6 +8,7 @@ import org.devopology.test.engine.api.Test;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -18,14 +19,14 @@ public class ParameterSupplierMethodTest2 {
     public String parameter;
 
     @Parameter.Supplier
-    public static Collection<String> parameters() {
+    public static Stream<String> parameters() {
         Set<String> collection = new TreeSet<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(String.valueOf(i));
         }
 
-        return collection;
+        return collection.stream();
     }
 
     @BeforeAll

@@ -8,6 +8,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -19,7 +20,7 @@ public class NamedTest {
     public String parameter;
 
     @Parameter.Supplier
-    public static Collection<Named> parameters() {
+    public static Stream<Named> parameters() {
         Collection<Named> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -27,7 +28,7 @@ public class NamedTest {
             collection.add(Named.of("[" + i + "] " + value, String.valueOf(value)));
         }
 
-        return collection;
+        return collection.stream();
     }
 
     @BeforeAll

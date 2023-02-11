@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class to implement a code to discover tests
@@ -136,50 +138,60 @@ public class TestEngineDiscoverySelectorResolver {
                 }
 
                 if (!parameterSupplierFields.isEmpty() && !parameterSupplierMethods.isEmpty()) {
-                    // @ParameterSupplier field(s) and method(s) both found
+                    // @Parameter.Supplier field(s) and method(s) both found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains both a @ParameterSupplier field and method",
+                                    "Test class [%s] contains both a @Parameter.Supplier field and @Parameter.Supplier method",
                                     testClass.getName()));
                 }
 
                 if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
-                    // No @ParameterSupplier field or method found
+                    // No @Parameter.Supplier field or method found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] requires either @ParameterSupplier field or method",
+                                    "Test class [%s] requires either @Parameter.Supplier field or method",
                                     testClass.getName()));
                 }
 
                 if (parameterSupplierFields.size() > 1) {
-                    // More than one @ParameterSupplier field found
+                    // More than one @Parameter.Supplier field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @ParameterSupplier field",
+                                    "Test class [%s] contains more than one @Parameter.Supplier field",
                                     testClass.getName()));
                 } else if (parameterSupplierFields.size() == 1) {
                     try {
-                        testParameters = (Collection<Object>) parameterSupplierFields.get(0).get(null);
+                        Object parameterSupplierValue = parameterSupplierFields.get(0).get(null);
+                        if (parameterSupplierValue instanceof Stream) {
+                            testParameters = ((Stream<Object>) parameterSupplierValue).collect(Collectors.toList());
+                        } else {
+                            testParameters = (Collection<Object>) parameterSupplierValue;
+                        }
                     } catch (ClassCastException e) {
                         throw new TestClassConfigurationException(
                                 String.format(
-                                        "Test class [%s] @ParameterSupplier field must return a Collection",
+                                        "Test class [%s] @Parameter.Supplier field must return a Stream or Collection",
                                         testClass.getName()),
                                 e);
                     }
                 } else if (parameterSupplierMethods.size() > 1) {
-                    // More than one @ParameterSupplier method found
+                    // More than one @Parameter.Supplier method found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @ParameterSupplier method",
+                                    "Test class [%s] contains more than one @Parameter.Supplier method",
                                     testClass.getName()));
                 } else {
                     try {
-                        testParameters = (Collection<Object>) parameterSupplierMethods.get(0).invoke(null, (Object[]) null);
+                        Object parameterSupplierValue = parameterSupplierMethods.get(0).invoke(null, (Object[]) null);
+                        if (parameterSupplierValue instanceof Stream) {
+                            testParameters = ((Stream<Object>) parameterSupplierValue).collect(Collectors.toList());
+                        } else {
+                            testParameters = (Collection<Object>) parameterSupplierValue;
+                        }
                     } catch (ClassCastException e) {
                         throw new TestClassConfigurationException(
                                 String.format(
-                                        "Test class [%s] @ParameterSupplier method must return a Collection",
+                                        "Test class [%s] @Parameter.Supplier method must return a Stream or Collection",
                                         testClass.getName()),
                                 e);
                     }

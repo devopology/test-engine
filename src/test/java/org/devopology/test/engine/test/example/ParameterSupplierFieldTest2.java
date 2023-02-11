@@ -11,6 +11,7 @@ import org.devopology.test.engine.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -21,7 +22,7 @@ public class ParameterSupplierFieldTest2 {
     public String[] parameter;
 
     @Parameter.Supplier
-    public static Collection<Named> PARAMETERS = TestParameterSupplier.values();
+    public static Stream<Named> PARAMETERS = TestParameterSupplier.values();
 
     @BeforeAll
     public void beforeAll() {
@@ -55,13 +56,13 @@ public class ParameterSupplierFieldTest2 {
 
     private static class TestParameterSupplier {
 
-        public static Collection<Named> values() {
+        public static Stream<Named> values() {
             List<Named> list = new ArrayList<>();
 
             list.add(Named.of("array 0", new String[] { "1", "2" }));
             list.add(Named.of("array 1", new String[] { "1", "2", "3" }));
 
-            return list;
+            return list.stream();
         }
     }
 

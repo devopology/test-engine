@@ -7,6 +7,7 @@ import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -17,14 +18,14 @@ public class ParameterSupplierMethodTest {
     public String parameter;
 
     @Parameter.Supplier
-    public static Collection<String> parameters() {
+    public static Stream<String> parameters() {
         Collection<String> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(String.valueOf(i));
         }
 
-        return collection;
+        return collection.stream();
     }
 
     @BeforeAll

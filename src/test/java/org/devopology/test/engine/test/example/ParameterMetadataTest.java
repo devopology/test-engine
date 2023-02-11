@@ -9,6 +9,7 @@ import org.devopology.test.engine.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -19,14 +20,14 @@ public class ParameterMetadataTest {
     public ParameterWithMetadata parameter;
 
     @Parameter.Supplier
-    public static Collection<ParameterWithMetadata> parameters() {
+    public static Stream<ParameterWithMetadata> parameters() {
         Collection<ParameterWithMetadata> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(new ParameterWithMetadata(String.valueOf(UUID.randomUUID())));
         }
 
-        return collection;
+        return collection.stream();
     }
 
     @BeforeAll
