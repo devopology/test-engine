@@ -18,11 +18,7 @@ package org.devopology.test.engine.support;
 
 import org.junit.platform.engine.ConfigurationParameters;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 
 /**

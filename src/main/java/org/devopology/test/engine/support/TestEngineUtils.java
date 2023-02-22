@@ -16,16 +16,7 @@
 
 package org.devopology.test.engine.support;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
-import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
-import org.devopology.test.engine.api.Disabled;
-import org.devopology.test.engine.api.DisplayName;
-import org.devopology.test.engine.api.Metadata;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.*;
 import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
@@ -35,13 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;

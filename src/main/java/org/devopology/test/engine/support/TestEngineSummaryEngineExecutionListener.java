@@ -16,10 +16,12 @@
 
 package org.devopology.test.engine.support;
 
+import org.devopology.test.engine.TestEngine;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
-import org.devopology.test.engine.support.util.AnsiColor;
+import org.devopology.test.engine.support.logger.Logger;
+import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -40,11 +42,12 @@ import java.util.Optional;
 
 public class TestEngineSummaryEngineExecutionListener implements EngineExecutionListener {
 
-    private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
-    private static final String TEST = "[" + AnsiColor.WHITE_BOLD_BRIGHT.wrap("TEST") + "]";
-    private static final String ABORT = "[" + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("ABORT") + "]";
-    private static final String FAIL = "[" + AnsiColor.RED_BOLD_BRIGHT.wrap("FAIL") + "]";
-    private static final String PASS = "[" + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASS") + "]";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
+
+    private static final String TEST = "[TEST]";
+    private static final String ABORT = "[ABORT]";
+    private static final String FAIL = "[FAIL]";
+    private static final String PASS = "[PASS]";
 
     private final TestPlan testPlan;
     private final PrintWriter printWriter;
@@ -88,11 +91,12 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Class<?> testClass = testClassTestDescriptor.getTestClass();
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
-                            .append(INFO)
-                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Class"))
-                            .append(" ").append(testClass.getName())
-                            .append(" (").append(testParameter).append(")")
-                            .append(" ").append(TEST);
+                            .append("[")
+                            .append(testParameter)
+                            .append("] - ")
+                            .append(testClass.getName())
+                            .append(" ")
+                            .append(TEST);
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
@@ -100,17 +104,19 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
-                            .append(INFO)
-                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Method"))
-                            .append(" ").append(testClass.getName())
-                            .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()")
-                            .append(" ").append(TEST);
+                            .append("[")
+                            .append(testParameter)
+                            .append("] - ")
+                            .append(testClass.getName())
+                            .append(" ")
+                            .append(testMethod.getName())
+                            .append("() ")
+                            .append(TEST);
                 })
         );
 
         if (detailedOutput && (stringBuilder.length() > 0)) {
-            printWriter.println(stringBuilder);
-            printWriter.flush();
+            LOGGER.infoRaw(stringBuilder.toString());
         }
     }
 
@@ -129,10 +135,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Class<?> testClass = testClassTestDescriptor.getTestClass();
                     Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
-                            .append(INFO)
-                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Class"))
-                            .append(" ").append(testClass.getName())
-                            .append(" (").append(testParameter).append(")");
+                            .append("[")
+                            .append(testParameter)
+                            .append("] - ")
+                            .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
@@ -140,25 +146,29 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
-                            .append(INFO)
-                            .append(AnsiColor.WHITE_BOLD_BRIGHT.wrap("Method"))
-                            .append(" ").append(testClass.getName())
-                            .append(" (").append(testParameter).append(") ").append(testMethod.getName()).append("()");
+                            .append("[")
+                            .append(testParameter)
+                            .append("] - ")
+                            .append(testClass.getName())
+                            .append(" ")
+                            .append(testMethod.getName())
+                            .append("()");
                 }));
 
         if (stringBuilder.length() > 0) {
+            stringBuilder.append(" ");
             TestExecutionResult.Status status = testExecutionResult.getStatus();
             switch (status) {
                 case ABORTED: {
-                    stringBuilder.append(" ").append(ABORT);
+                    stringBuilder.append(ABORT);
                     break;
                 }
                 case FAILED: {
-                    stringBuilder.append(" ").append(FAIL);
+                    stringBuilder.append(FAIL);
                     break;
                 }
                 case SUCCESSFUL: {
-                    stringBuilder.append(" ").append(PASS);
+                    stringBuilder.append(PASS);
                     break;
                 }
                 default: {
@@ -168,8 +178,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             }
 
             if (detailedOutput && (stringBuilder.length() > 0)) {
-                printWriter.println(stringBuilder);
-                printWriter.flush();
+                LOGGER.infoRaw(stringBuilder.toString());
             }
         }
     }
