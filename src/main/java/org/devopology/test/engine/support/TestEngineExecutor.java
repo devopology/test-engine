@@ -34,8 +34,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Method to execute an ExecutionRequest
@@ -43,6 +48,14 @@ import java.util.Set;
 public class TestEngineExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineExecutor.class);
+
+    private final int threadCount;
+    private final ExecutorService executorService;
+
+    public TestEngineExecutor(int threadCount) {
+        this.threadCount = threadCount;
+        this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
+    }
 
     /**
      * Method to execute the ExecutionRequest
@@ -55,7 +68,7 @@ public class TestEngineExecutor {
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
         TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
-        List<TestExecutionResult> testExecutionResultList = new ArrayList<>();
+        List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
 
         logTestHierarchy(rootTestDescriptor, 0);
 
@@ -63,11 +76,30 @@ public class TestEngineExecutor {
                 new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
 
         if (rootTestDescriptor instanceof EngineDescriptor) {
+            CountDownLatch countDownLatch = new CountDownLatch(rootTestDescriptor.getChildren().size());
+
             for (TestDescriptor testDescriptor : rootTestDescriptor.getChildren()) {
-                execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext);
+                executorService.submit(() -> {
+                    TestEngineExecutionContext testEngineExecutionContext1 =
+                            new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
+
+                    execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext1, countDownLatch);
+                });
+            }
+
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                LOGGER.error("Exception waiting for tests", e);
             }
         } else if (rootTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            execute((TestEngineClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext);
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            execute((TestEngineClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext, countDownLatch);
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                LOGGER.error("Exception waiting for tests", e);
+            }
         }
     }
 
@@ -79,7 +111,8 @@ public class TestEngineExecutor {
      */
     private void execute(
             TestEngineClassTestDescriptor testEngineClassTestDescriptor,
-            TestEngineExecutionContext testEngineExecutionContext) {
+            TestEngineExecutionContext testEngineExecutionContext,
+            CountDownLatch countDownLatch) {
         LOGGER.debug("execute(TestEngineClassTestDescriptor, TestEngineExecutionContext)");
 
         // If test class descriptor is part of a hierarchy (has siblings) notify listeners
@@ -129,6 +162,8 @@ public class TestEngineExecutor {
                 }
             }
         }
+
+        countDownLatch.countDown();
     }
 
     /**
@@ -345,5 +380,24 @@ public class TestEngineExecutor {
     private static void flush() {
         System.err.flush();
         System.out.flush();
+    }
+
+    private static class NamedThreadFactory implements ThreadFactory {
+
+        private int threadId = 1;
+
+        @Override
+        public Thread newThread(Runnable r) {
+            String threadName;
+            synchronized (this) {
+                threadName = "test-engine-" + this.threadId;
+                this.threadId++;
+            }
+
+            Thread thread = new Thread(r);
+            thread.setName(threadName);
+            thread.setDaemon(true);
+            return thread;
+        }
     }
 }

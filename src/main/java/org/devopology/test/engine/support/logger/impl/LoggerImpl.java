@@ -20,11 +20,7 @@ import org.devopology.test.engine.support.logger.Logger;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Class to implement logger
@@ -121,6 +117,25 @@ public class LoggerImpl implements Logger {
         if (isInfoEnabled()) {
             Objects.requireNonNull(format);
             log(System.out, createMessage("INFO", className, String.format(format, objects)));
+        }
+    }
+
+    public void infoRaw(String message) {
+        if (isInfoEnabled()) {
+            log(System.out, createMessageRaw("INFO", message));
+        }
+    }
+
+    public void infoRaw(String format, Object object) {
+        if (isInfoEnabled()) {
+            infoRaw(format, new Object[]{object});
+        }
+    }
+
+    public void infoRaw(String format, Object ... objects) {
+        if (isInfoEnabled()) {
+            Objects.requireNonNull(format);
+            log(System.out, createMessageRaw("INFO", String.format(format, objects)));
         }
     }
 
@@ -285,6 +300,24 @@ public class LoggerImpl implements Logger {
                     Thread.currentThread().getName(),
                     level,
                     className,
+                    message);
+        }
+    }
+
+    /**
+     * Method to create a log message
+     *
+     * @param level
+     * @param message
+     * @return
+     */
+    private static String createMessageRaw(String level, String message) {
+        synchronized (SIMPLE_DATE_FORMAT) {
+            return java.lang.String.format(
+                    "%s [%s] %-5s %s",
+                    SIMPLE_DATE_FORMAT.format(new Date()),
+                    Thread.currentThread().getName(),
+                    level,
                     message);
         }
     }

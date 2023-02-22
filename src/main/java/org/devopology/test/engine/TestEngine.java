@@ -16,16 +16,9 @@
 
 package org.devopology.test.engine;
 
-import org.devopology.test.engine.support.TestEngineConfigurationParameters;
-import org.devopology.test.engine.support.TestEngineDiscoverySelectorResolver;
-import org.devopology.test.engine.support.TestEngineEngineDiscoveryRequest;
-import org.devopology.test.engine.support.TestEngineExecutor;
-import org.devopology.test.engine.support.TestEngineInformation;
-import org.devopology.test.engine.support.TestEngineSummaryEngineExecutionListener;
-import org.devopology.test.engine.support.TestEngineUtils;
+import org.devopology.test.engine.support.*;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
-import org.devopology.test.engine.support.util.AnsiColor;
 import org.devopology.test.engine.support.util.HumanReadableTime;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
@@ -59,7 +52,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private static final String GROUP_ID = "org.devopology";
     private static final String ARTIFACT_ID = "test-engine";
     private static final String VERSION = TestEngineInformation.getVersion();
-    private static final String INFO = "[" + AnsiColor.BLUE_BOLD.wrap("INFO") + "] ";
 
     @Override
     public String getId() {
@@ -105,7 +97,24 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        new TestEngineExecutor().execute(executionRequest);
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        int threadCount = availableProcessors;
+        String value = System.getProperty("devopology.test.engine.thread.count");
+        if (value != null) {
+            try {
+                threadCount = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                LOGGER.warning("Invalid thread count", e);
+            }
+        }
+
+        if (threadCount < 0) {
+            threadCount = availableProcessors;
+        }
+
+        LOGGER.infoRaw(String.format("thread count [%d]", threadCount));
+
+        new TestEngineExecutor(threadCount).execute(executionRequest);
     }
 
     /**
@@ -125,16 +134,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             String banner = "Devopology Test Engine " + VERSION;
 
             StringBuilder stringBuilder = new StringBuilder();
-            for (char c : banner.toCharArray()) {
-                stringBuilder.append("-");
-            }
+            stringBuilder.append("-".repeat(banner.toCharArray().length));
 
             String separator = stringBuilder.toString();
 
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Scanning all classpath jars for tests..."));
+            LOGGER.infoRaw(separator);
+            LOGGER.infoRaw(banner);
+            LOGGER.infoRaw(separator);
+            LOGGER.infoRaw("Scanning all classpath jars for tests...");
 
             Set<Path> classPathRoots =
                     new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
@@ -189,52 +196,48 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             banner = "Devopology Test Engine " + VERSION + " Summary";
 
             stringBuilder = new StringBuilder();
-            for (char c : banner.toCharArray()) {
-                stringBuilder.append("-");
-            }
+            stringBuilder.append("-".repeat(banner.toCharArray().length));
 
             separator = stringBuilder.toString();
 
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(banner));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO);
+            LOGGER.infoRaw(separator);
+            LOGGER.infoRaw(banner);
+            LOGGER.infoRaw(separator);
+            LOGGER.infoRaw("");
 
             //testExecutionSummary.printTo(new PrintWriter(new OutputStreamWriter(printStream, StandardCharsets.UTF_8)));
 
-            printStream.println(
-                    INFO
-                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap(
+            LOGGER.infoRaw(
                             "TESTS : "
-                                    + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount()))
+                                    + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
                                     + ", "
-                                    + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED")
+                                    + "PASSED"
                                     + " : "
-                                    + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount()))
+                                    + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
                             + ", "
-                            + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED")
+                            + "FAILED"
                             + " : "
-                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap((testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()))
+                            + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
                             + ", "
-                            + AnsiColor.YELLOW_BOLD_BRIGHT.wrap("SKIPPED")
+                            + "SKIPPED"
                             + " : "
-                            + AnsiColor.WHITE_BOLD_BRIGHT.wrap(testExecutionSummary.getTestsSkippedCount()));
+                            + testExecutionSummary.getTestsSkippedCount());
 
-            printStream.println(INFO);
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            LOGGER.infoRaw("");
+            LOGGER.infoRaw(separator);
 
             failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
             if (failed) {
-                printStream.println(INFO + AnsiColor.RED_BOLD_BRIGHT.wrap("FAILED"));
+                LOGGER.infoRaw("FAILED");
             } else {
-                printStream.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.wrap("PASSED"));
+                LOGGER.infoRaw("PASSED");
             }
 
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Total Time  : " + AnsiColor.WHITE_BOLD_BRIGHT.wrap(HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false))));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap("Finished At : " + HumanReadableTime.now()));
-            printStream.println(INFO + AnsiColor.WHITE_BOLD_BRIGHT.wrap(separator));
+            LOGGER.infoRaw(separator);
+            LOGGER.infoRaw("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
+            LOGGER.infoRaw("Finished At : " + HumanReadableTime.now());
+            LOGGER.infoRaw(separator);
         } finally {
             if (printStream != null) {
                 try {
