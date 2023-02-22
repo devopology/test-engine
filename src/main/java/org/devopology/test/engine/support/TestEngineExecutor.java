@@ -49,8 +49,8 @@ public class TestEngineExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineExecutor.class);
 
-    private int threadCount;
-    private ExecutorService executorService;
+    private final int threadCount;
+    private final ExecutorService executorService;
 
     public TestEngineExecutor(int threadCount) {
         this.threadCount = threadCount;
