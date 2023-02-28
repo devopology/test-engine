@@ -30,7 +30,7 @@ Add the Devopology Maven repository to your `pom.xml` file...
 </repositories>
 ```
 
-Add the Junit 5 and Devopology test engine jar dependencies...
+Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 ```xml
 <dependency>
@@ -51,7 +51,7 @@ Add the Junit 5 and Devopology test engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.12</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -84,12 +84,14 @@ Example:
 ```java
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
-import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
+import org.devopology.test.engine.api.AfterAllTests;
+import org.devopology.test.engine.api.AfterClass;
+import org.devopology.test.engine.api.AfterEachTest;
+import org.devopology.test.engine.api.BeforeAllTests;
+import org.devopology.test.engine.api.BeforeTests;
+import org.devopology.test.engine.api.BeforeClass;
+import org.devopology.test.engine.api.BeforeEachTest;
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
 import org.devopology.test.engine.api.Test;
 
 import java.util.ArrayList;
@@ -103,18 +105,23 @@ public class ParameterSupplierFieldTest {
 
     @Parameter
     public String parameter;
-    
+
     @Parameter.Supplier
     public static Stream<String> PARAMETERS = TestParameterSupplier.stream();
 
-    @BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
+    @BeforeClass
+    public static void beforeClass() {
+        System.out.println("beforeClass()");
     }
 
-    @BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
+    @BeforeAllTests
+    public void beforeAllTests() {
+        System.out.println("beforeAllTests()");
+    }
+
+    @BeforeEachTest
+    public void beforeEachTest() {
+        System.out.println("beforeEachTest()");
     }
 
     @Test
@@ -127,14 +134,19 @@ public class ParameterSupplierFieldTest {
         System.out.println("test2(" + parameter + ")");
     }
 
-    @AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
+    @AfterEachTest
+    public void afterEachTest() {
+        System.out.println("afterEachTest()");
     }
 
-    @AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
+    @AfterAllTests
+    public void afterAllTests() {
+        System.out.println("afterAllTests()");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        System.out.println("afterClass()");
     }
 
     private static class TestParameterSupplier {
@@ -160,7 +172,6 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 - While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports.
 
-
 ---
 
 # Design
@@ -168,32 +179,41 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 The basic flow...
 
 ```
- Scan all classpath jars for classes that contains a method annotated with "@Test"
+ Scan all classpath jars for test classes that contains a method annotated with "@Test"
  
- for (class : class list) {
+ for each test class in the test class list) {
  
-    call "@Parameter.Supplier" field or method to get a parameter collection
- 
-    create a single instance of the class
+    for each test class, create a thread
     
-    for (parameter : parameter collection) {
+    thread {
     
-        set the "@Parameter" field value
+        call "@Parameter.Supplier" field or method to get a parameter collection
+    
+        execute "@BeforeClass" methods 
+     
+        create a single instance of the test class
         
-        call "@BeforeAll" methods
+        for each parameter in the parameter collection) {
         
-        for (method : class "@Test" method list) {
-        
-            call "@BeforeEach" methods
-        
-            call "@Test" method
+            set the "@Parameter" field value
             
-            call "@AfterEach" methods
+            execute "@BeforeAllTests" methods
+            
+            for (method : class "@Test" method list) {
+            
+                execute "@BeforeEachTest" methods
+            
+                execute "@Test" method
+                
+                execute "@AfterEachTest" methods
+            }
+            
+            execute "@AfterAllTests" methods
+            
+            set the "@Parameter" field to null
         }
         
-        call "@AfterAll" methods
-        
-        set the "@Parameter" field to null
+        execute "@AfterClass" methods
     }
  }
 ```

@@ -26,6 +26,6 @@ import java.lang.annotation.Target;
 /**
  * Annotation for an after each method
  */
-public @interface AfterEach {
+public @interface AfterEachTest {
 
 }

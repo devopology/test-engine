@@ -21,26 +21,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Annotation container for a parameter fields/methods
- */
-public @interface Parameter {
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+/**
+ * Annotation for a before class method
+ */
+public @interface After {
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter injection
-     */
-    @interface Inject {
+    @interface Instantiate {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
-    @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter supplier
-     */
-    @interface Supplier {
+    @interface Parameterized {
 
+        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Test {
+
+        }
+    }
+
+    @interface Each {
+
+        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Test {
+
+        }
     }
 }

@@ -21,11 +21,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-/**
- * Annotation for a before all method
- */
-public @interface BeforeAll {
 
+/**
+ * Annotation for a before class method
+ */
+public @interface Before {
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Instantiate {
+
+    }
+
+    @interface Parameterized {
+
+        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Test {
+
+        }
+    }
+
+    @interface Each {
+
+        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Test {
+
+        }
+    }
 }

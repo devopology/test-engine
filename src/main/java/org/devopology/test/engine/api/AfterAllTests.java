@@ -21,26 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
 /**
- * Annotation container for a parameter fields/methods
+ * Annotation for an after all method
  */
-public @interface Parameter {
+public @interface AfterAllTests {
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
-    @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter injection
-     */
-    @interface Inject {
-
-    }
-
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
-    @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter supplier
-     */
-    @interface Supplier {
-
-    }
 }

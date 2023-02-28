@@ -26,6 +26,6 @@ import java.lang.annotation.Target;
 /**
  * Annotation for a before each method
  */
-public @interface BeforeEach {
+public @interface BeforeEachTest {
 
 }

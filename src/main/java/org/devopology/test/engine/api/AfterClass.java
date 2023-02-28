@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.devopology.test.engine.support.descriptor;
+package org.devopology.test.engine.api;
 
-import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.TestSource;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class TestEngineTestSource implements TestSource {
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+/**
+ * Annotation for a after all method
+ */
+public @interface AfterClass {
 
-    private final TestDescriptor testDescriptor;
-
-    public TestEngineTestSource(TestDescriptor testDescriptor) {
-        this.testDescriptor = testDescriptor;
-    }
-
-    public TestDescriptor getTestDescriptor() {
-        return testDescriptor;
-    }
 }

@@ -44,8 +44,6 @@ public class CamelCaseFunctionTest {
         return collection.stream();
     }
 
-
-
     // Based on https://www.baeldung.com/java-string-to-camel-case
     private static class CamelCaseFunction implements Function<String, String> {
 

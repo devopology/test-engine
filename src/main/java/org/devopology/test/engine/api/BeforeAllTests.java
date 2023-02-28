@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 /**
- * Annotation for an after all method
+ * Annotation for a before all method
  */
-public @interface AfterAll {
+public @interface BeforeAllTests {
 
 }

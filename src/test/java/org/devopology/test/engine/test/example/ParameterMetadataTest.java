@@ -1,7 +1,7 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.BeforeAll;
+import org.devopology.test.engine.api.AfterAllTests;
+import org.devopology.test.engine.api.BeforeAllTests;
 import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.Test;
@@ -30,9 +30,9 @@ public class ParameterMetadataTest {
         return collection.stream();
     }
 
-    @BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
+    @BeforeAllTests
+    public void beforeAllTests() {
+        System.out.println("beforeAllTests()");
     }
 
     @Test
@@ -47,9 +47,9 @@ public class ParameterMetadataTest {
         System.out.println("test2(" + value + ")");
     }
 
-    @AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
+    @AfterAllTests
+    public void afterAllTests() {
+        System.out.println("afterAllTests()");
     }
 
     // Custom parameter that has metadata

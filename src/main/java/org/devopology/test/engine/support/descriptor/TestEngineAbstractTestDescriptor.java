@@ -17,13 +17,11 @@
 package org.devopology.test.engine.support.descriptor;
 
 import org.junit.platform.engine.TestExecutionResult;
-import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class TestEngineAbstractTestDescriptor extends AbstractTestDescriptor {
 
@@ -34,21 +32,7 @@ public abstract class TestEngineAbstractTestDescriptor extends AbstractTestDescr
         this.testExecutionResultList = new ArrayList<>();
     }
 
-    public abstract Optional<TestSource> getSource();
-
     public List<TestExecutionResult> getTestExecutionResultList() {
         return testExecutionResultList;
     }
-
-    /*
-    public Optional<TestExecutionResult> getFirstTestExecutionResultFailure() {
-        for (TestExecutionResult testExecutionResult : testExecutionResultList) {
-            if (testExecutionResult.getStatus() == TestExecutionResult.Status.FAILED) {
-                return Optional.of(testExecutionResult);
-            }
-        }
-
-        return Optional.empty();
-    }
-    */
 }

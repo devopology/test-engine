@@ -16,15 +16,12 @@
 
 package org.devopology.test.engine.support.descriptor;
 
-import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-    private final TestSource testSource;
     private final Class<?> testClass;
     private final Object testParameter;
     private final Method testMethod;
@@ -36,7 +33,6 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
             Object testParameter,
             Method testMethod) {
         super(uniqueId, displayName);
-        this.testSource = new TestEngineTestSource(this);
         this.testClass = testClass;
         this.testParameter = testParameter;
         this.testMethod = testMethod;
@@ -45,11 +41,6 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
     @Override
     public Type getType() {
         return Type.TEST;
-    }
-
-    @Override
-    public Optional<TestSource> getSource() {
-        return Optional.of(testSource);
     }
 
     public Class<?> getTestClass() {

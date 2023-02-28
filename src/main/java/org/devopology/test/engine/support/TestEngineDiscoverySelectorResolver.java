@@ -36,7 +36,14 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -190,28 +197,28 @@ public class TestEngineDiscoverySelectorResolver {
                     }
                 }
 
-                // Validate that we have a @Parameter field
-                List<Field> parameterFields = TestEngineUtils.getParameterFields(testClass);
-                Field parameterField;
+                // Validate that we have a @Parameter.Inject field
+                List<Field> parameterInjectFields = TestEngineUtils.getParameterInjectFields(testClass);
+                Field parameterInjectField;
 
-                if (parameterFields.size() > 1) {
+                if (parameterInjectFields.size() > 1) {
                     // More than one @Parameter field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @Parameter field",
+                                    "Test class [%s] contains more than one @Parameter.Inject field",
                                     testClass.getName()));
-                } else if (parameterFields.size() == 1) {
-                    parameterField = parameterFields.get(0);
+                } else if (parameterInjectFields.size() == 1) {
+                    parameterInjectField = parameterInjectFields.get(0);
                 } else {
-                    // No @Parameter field found
+                    // No @Parameter.Inject field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] public (non-static) @Parameter field required",
+                                    "Test class [%s] public (non-static) @Parameter.Inject field required",
                                     testClass.getName()));
                 }
 
-                LOGGER.trace("test class @Parameter field [%s]", parameterField.getName());
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
+                LOGGER.trace("test class @Parameter.Inject field [%s]", parameterInjectField.getName());
 
                 if (!testParameters.isEmpty()) {
                     // Build the test descriptor tree if we have test parameters

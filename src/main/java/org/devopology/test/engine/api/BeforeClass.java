@@ -21,14 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@Deprecated
 /**
- * Annotation for a parameter supplier
- * <p/>
- * Deprecated... use Parameter.Supplier
+ * Annotation for a before class method
  */
-public @interface ParameterSupplier {
+public @interface BeforeClass {
 
 }

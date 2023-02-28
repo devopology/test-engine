@@ -16,7 +16,13 @@
 
 package org.devopology.test.engine;
 
-import org.devopology.test.engine.support.*;
+import org.devopology.test.engine.support.TestEngineConfigurationParameters;
+import org.devopology.test.engine.support.TestEngineDiscoverySelectorResolver;
+import org.devopology.test.engine.support.TestEngineEngineDiscoveryRequest;
+import org.devopology.test.engine.support.TestEngineExecutor;
+import org.devopology.test.engine.support.TestEngineInformation;
+import org.devopology.test.engine.support.TestEngineSummaryEngineExecutionListener;
+import org.devopology.test.engine.support.TestEngineUtils;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.devopology.test.engine.support.util.HumanReadableTime;
@@ -112,7 +118,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             threadCount = availableProcessors;
         }
 
-        LOGGER.infoRaw(String.format("thread count [%d]", threadCount));
+        //LOGGER.infoRaw(String.format("thread count [%d]", threadCount));
 
         new TestEngineExecutor(threadCount).execute(executionRequest);
     }
@@ -204,9 +210,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.infoRaw(banner);
             LOGGER.infoRaw(separator);
             LOGGER.infoRaw("");
-
-            //testExecutionSummary.printTo(new PrintWriter(new OutputStreamWriter(printStream, StandardCharsets.UTF_8)));
-
             LOGGER.infoRaw(
                             "TESTS : "
                                     + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())

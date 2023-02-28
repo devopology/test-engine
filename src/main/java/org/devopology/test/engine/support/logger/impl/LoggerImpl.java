@@ -20,7 +20,11 @@ import org.devopology.test.engine.support.logger.Logger;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class to implement logger
@@ -36,6 +40,7 @@ public class LoggerImpl implements Logger {
     private static final int INFO = 300;
     private static final int DEBUG = 400;
     private static final int TRACE = 500;
+    private static final int ALL = Integer.MAX_VALUE;
 
     private static final Map<String, Integer> LOG_LEVEL_MAP;
 
@@ -47,6 +52,7 @@ public class LoggerImpl implements Logger {
         LOG_LEVEL_MAP.put("INFO", INFO);
         LOG_LEVEL_MAP.put("DEBUG", DEBUG);
         LOG_LEVEL_MAP.put("TRACE", TRACE);
+        LOG_LEVEL_MAP.put("ALL", ALL);
     }
 
     private final String className;
