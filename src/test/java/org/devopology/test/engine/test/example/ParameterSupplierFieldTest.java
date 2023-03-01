@@ -17,6 +17,11 @@ public class ParameterSupplierFieldTest {
     @TestEngine.ParameterSupplier
     public static Stream<String> PARAMETERS = TestParameterSupplier.values();
 
+    @TestEngine.BeforeClass
+    public static void beforeClas() {
+        System.out.println("beforeClass()");
+    }
+
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
@@ -45,6 +50,11 @@ public class ParameterSupplierFieldTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    @TestEngine.AfterClass
+    public static void afterClass() {
+        System.out.println("afterClass()");
     }
 
     private static class TestParameterSupplier {
