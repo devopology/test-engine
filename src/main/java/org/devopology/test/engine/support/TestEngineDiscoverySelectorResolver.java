@@ -95,11 +95,10 @@ public class TestEngineDiscoverySelectorResolver {
             Collections.sort(mapEntry.getValue(), Comparator.comparing(Method::getName));
         }
 
-        //DEBUG code to print test class / test method selection / ordering
         for (Class<?> testClass : testClassToMethodMap.keySet()) {
             List<Method> testMethodList = testClassToMethodMap.get(testClass);
             for (Method method : testMethodList) {
-                LOGGER.trace(String.format("test class [%s] @Test method [%s]", testClass.getName(), method.getName()));
+                LOGGER.trace("test class [%s] @TestEngine.Test method [%s]", testClass.getName(), method.getName());
             }
         }
 
@@ -109,10 +108,13 @@ public class TestEngineDiscoverySelectorResolver {
     private void processSelectors(
             EngineDescriptor engineDescriptor,
             Map<Class<?>, List<Method>> testClassToMethodMap) {
+        LOGGER.trace("processSelectors()");
         UniqueId uniqueId = engineDescriptor.getUniqueId();
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
+                LOGGER.trace("test class [%s]", testClass.getName());
+
                 if (TestEngineUtils.isDisabled(testClass)) {
                     LOGGER.trace("test class [%s] is disabled", testClass.getName());
                     continue;
@@ -122,7 +124,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                 Collection<Object> testParameters = null;
 
-                // Try to get test parameters using a @Parameter.Supplier or @ParameterSupplier fields and methods
+                // Try to get test parameters using a @TestEngine.ParameterSupplier or @TestEngine.ParameterSupplier fields and methods
                 List<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
                 LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
 
@@ -138,26 +140,26 @@ public class TestEngineDiscoverySelectorResolver {
                 }
 
                 if (!parameterSupplierFields.isEmpty() && !parameterSupplierMethods.isEmpty()) {
-                    // @Parameter.Supplier field(s) and method(s) both found
+                    // @TestEngine.ParameterSupplier field(s) and method(s) both found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains both a @Parameter.Supplier field and @Parameter.Supplier method",
+                                    "Test class [%s] contains both a @TestEngine.ParameterSupplier field and @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 }
 
                 if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
-                    // No @Parameter.Supplier field or method found
+                    // No @TestEngine.ParameterSupplier field or method found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] requires either @Parameter.Supplier field or method",
+                                    "Test class [%s] requires either @TestEngine.ParameterSupplier field or method",
                                     testClass.getName()));
                 }
 
                 if (parameterSupplierFields.size() > 1) {
-                    // More than one @Parameter.Supplier field found
+                    // More than one @TestEngine.ParameterSupplier field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @Parameter.Supplier field",
+                                    "Test class [%s] contains more than one @TestEngine.ParameterSupplier field",
                                     testClass.getName()));
                 } else if (parameterSupplierFields.size() == 1) {
                     try {
@@ -170,15 +172,15 @@ public class TestEngineDiscoverySelectorResolver {
                     } catch (ClassCastException e) {
                         throw new TestClassConfigurationException(
                                 String.format(
-                                        "Test class [%s] @Parameter.Supplier field must return a Stream or Collection",
+                                        "Test class [%s] @TestEngine.ParameterSupplier field must return a Stream or Collection",
                                         testClass.getName()),
                                 e);
                     }
                 } else if (parameterSupplierMethods.size() > 1) {
-                    // More than one @Parameter.Supplier method found
+                    // More than one @TestEngine.ParameterSupplier method found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @Parameter.Supplier method",
+                                    "Test class [%s] contains more than one @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 } else {
                     try {
@@ -191,34 +193,34 @@ public class TestEngineDiscoverySelectorResolver {
                     } catch (ClassCastException e) {
                         throw new TestClassConfigurationException(
                                 String.format(
-                                        "Test class [%s] @Parameter.Supplier method must return a Stream or Collection",
+                                        "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream or Collection",
                                         testClass.getName()),
                                 e);
                     }
                 }
 
-                // Validate that we have a @Parameter.Inject field
+                // Validate that we have a @TestEngine.Parameter field
                 List<Field> parameterInjectFields = TestEngineUtils.getParameterInjectFields(testClass);
                 Field parameterInjectField;
 
                 if (parameterInjectFields.size() > 1) {
-                    // More than one @Parameter field found
+                    // More than one @TestEngine.ParameterInject  field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @Parameter.Inject field",
+                                    "Test class [%s] contains more than one @TestEngine.ParameterInject field",
                                     testClass.getName()));
                 } else if (parameterInjectFields.size() == 1) {
                     parameterInjectField = parameterInjectFields.get(0);
                 } else {
-                    // No @Parameter.Inject field found
+                    // No @TestEngine.ParameterInject  field found
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] public (non-static) @Parameter.Inject field required",
+                                    "Test class [%s] public (non-static) @TestEngine.ParameterInject field required",
                                     testClass.getName()));
                 }
 
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
-                LOGGER.trace("test class @Parameter.Inject field [%s]", parameterInjectField.getName());
+                LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());
 
                 if (!testParameters.isEmpty()) {
                     // Build the test descriptor tree if we have test parameters
@@ -306,7 +308,7 @@ public class TestEngineDiscoverySelectorResolver {
             List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
 
             for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+                LOGGER.trace("  class [%s]", clazz.getName());
                 testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
             }
         }
@@ -323,7 +325,7 @@ public class TestEngineDiscoverySelectorResolver {
             List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
 
             for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
+                LOGGER.trace("  test class [%s]", clazz.getName());
                 testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
             }
         }
@@ -339,8 +341,10 @@ public class TestEngineDiscoverySelectorResolver {
             Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
 
             if (IS_TEST_CLASS.test(clazz)) {
-                LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
+                LOGGER.trace("  test class [%s]", clazz.getName());
                 testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+            } else {
+                LOGGER.trace("  skipping [%s]", clazz.getName());
             }
         }
     }
@@ -356,7 +360,7 @@ public class TestEngineDiscoverySelectorResolver {
             Class<?> clazz = method.getDeclaringClass();
 
             if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("  test class [%s] @Test method [%s]", clazz.getName(), method.getName()));
+                LOGGER.trace("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName());
                 List<Method> methods = testClassToMethodMap.get(clazz);
 
                 if (methods == null) {

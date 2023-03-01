@@ -35,13 +35,13 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BeforeEachParameter {
+    @interface BeforeAll {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BeforeEachTest {
+    @interface BeforeEach {
 
     }
 
@@ -54,13 +54,13 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface AfterEachTest {
+    @interface AfterEach {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface AfterEachParameter {
+    @interface AfterAll {
 
     }
 

@@ -1,10 +1,7 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAllTests;
-import org.devopology.test.engine.api.BeforeAllTests;
 import org.devopology.test.engine.api.Metadata;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,10 +13,10 @@ import java.util.stream.Stream;
  */
 public class ParameterMetadataTest {
 
-    @Parameter
+    @TestEngine.ParameterInject
     public ParameterWithMetadata parameter;
 
-    @Parameter.Supplier
+    @TestEngine.ParameterSupplier
     public static Stream<ParameterWithMetadata> parameters() {
         Collection<ParameterWithMetadata> collection = new ArrayList<>();
 
@@ -30,26 +27,26 @@ public class ParameterMetadataTest {
         return collection.stream();
     }
 
-    @BeforeAllTests
-    public void beforeAllTests() {
-        System.out.println("beforeAllTests()");
+    @TestEngine.BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
     }
 
-    @Test
+    @TestEngine.Test
     public void test1() {
         String value = parameter.getValue();
         System.out.println("test1(" + value + ")");
     }
 
-    @Test
+    @TestEngine.Test
     public void test2() {
         String value = parameter.getValue();
         System.out.println("test2(" + value + ")");
     }
 
-    @AfterAllTests
-    public void afterAllTests() {
-        System.out.println("afterAllTests()");
+    @TestEngine.AfterAll
+    public void afterAll() {
+        System.out.println("afterAll()");
     }
 
     // Custom parameter that has metadata

@@ -47,12 +47,12 @@ public final class TestEngineUtils {
     private static Map<Class<?>, List<Field>> parameterInjectFieldCache;
     private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
     private static Map<Class<?>, List<Method>> parameterSupplierMethodsCache;
-    private static Map<Class<?>, List<Method>> beforeAllTestsMethodListCache;
+    private static Map<Class<?>, List<Method>> beforeAllMethodListCache;
     private static Map<Class<?>, List<Method>> beforeClassMethodCache;
-    private static Map<Class<?>, List<Method>> beforeEachTestMethodListCache;
+    private static Map<Class<?>, List<Method>> beforeEachMethodListCache;
     private static Map<Class<?>, List<Method>> testMethodListCache;
-    private static Map<Class<?>, List<Method>> afterEachTestMethodListCache;
-    private static Map<Class<?>, List<Method>> afterAllTestsMethodListCache;
+    private static Map<Class<?>, List<Method>> afterEachMethodListCache;
+    private static Map<Class<?>, List<Method>> afterAllMethodListCache;
     private static Map<Class<?>, List<Method>> afterClassMethodCache;
     private static Map<Class<?>, String> classDisplayNameCache;
     private static Map<Method, String> methodDisplayNameCache;
@@ -62,11 +62,11 @@ public final class TestEngineUtils {
         parameterSupplierFieldsCache = new HashMap<>();
         parameterSupplierMethodsCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
-        beforeAllTestsMethodListCache = new HashMap<>();
-        beforeEachTestMethodListCache = new HashMap<>();
+        beforeAllMethodListCache = new HashMap<>();
+        beforeEachMethodListCache = new HashMap<>();
         testMethodListCache = new HashMap<>();
-        afterEachTestMethodListCache = new HashMap<>();
-        afterAllTestsMethodListCache = new HashMap<>();
+        afterEachMethodListCache = new HashMap<>();
+        afterAllMethodListCache = new HashMap<>();
         afterClassMethodCache = new HashMap<>();
         classDisplayNameCache = new HashMap<>();
         methodDisplayNameCache = new HashMap<>();
@@ -193,36 +193,36 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @BeforeAllTests methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeAll methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getBeforeAllTestsMethods(Class<?> clazz) {
-        List<Method> methodList = beforeAllTestsMethodListCache.get(clazz);
+    public static List<Method> getBeforeAllMethods(Class<?> clazz) {
+        List<Method> methodList = beforeAllMethodListCache.get(clazz);
         if (methodList != null) {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.BeforeEachParameter.class);
-        beforeAllTestsMethodListCache.put(clazz, methodList);
+        methodList = getDeclaredMethods(clazz, TestEngine.BeforeAll.class);
+        beforeAllMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @BeforeEachTest methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeEach methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getBeforeEachTestMethods(Class<?> clazz) {
-        List<Method> methodList = beforeEachTestMethodListCache.get(clazz);
+    public static List<Method> getBeforeEachMethods(Class<?> clazz) {
+        List<Method> methodList = beforeEachMethodListCache.get(clazz);
         if (methodList != null) {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.BeforeEachTest.class);
-        beforeEachTestMethodListCache.put(clazz, methodList);
+        methodList = getDeclaredMethods(clazz, TestEngine.BeforeEach.class);
+        beforeEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
@@ -244,41 +244,41 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @AfterEachTest methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterEach methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getAfterEachTestMethods(Class<?> clazz) {
-        List<Method> methodList = afterEachTestMethodListCache.get(clazz);
+    public static List<Method> getAfterEachMethods(Class<?> clazz) {
+        List<Method> methodList = afterEachMethodListCache.get(clazz);
         if (methodList != null) {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.AfterEachTest.class);
-        afterEachTestMethodListCache.put(clazz, methodList);
+        methodList = getDeclaredMethods(clazz, TestEngine.AfterEach.class);
+        afterEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @AfterAllTests methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterAll methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getAfterAllTestsMethods(Class<?> clazz) {
-        List<Method> methodList = afterAllTestsMethodListCache.get(clazz);
+    public static List<Method> getAfterAllMethods(Class<?> clazz) {
+        List<Method> methodList = afterAllMethodListCache.get(clazz);
         if (methodList != null) {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.AfterEachParameter.class);
-        afterAllTestsMethodListCache.put(clazz, methodList);
+        methodList = getDeclaredMethods(clazz, TestEngine.AfterAll.class);
+        afterAllMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @PostTest methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterClass methods sorted alphabetically
      *
      * @param clazz
      * @return

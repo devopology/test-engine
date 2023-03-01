@@ -2,8 +2,7 @@ package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Named;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,10 +21,10 @@ public class CamelCaseFunctionTest {
 
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
-    @Parameter
+    @TestEngine.ParameterInject
     public Tuple parameter;
 
-    @Parameter.Supplier
+    @TestEngine.ParameterSupplier
     public static Stream<Object> parameters() {
         Collection<Object> collection = new ArrayList<>();
 
@@ -42,6 +41,13 @@ public class CamelCaseFunctionTest {
         collection.add(Named.of(tuple.input, tuple));
 
         return collection.stream();
+    }
+
+    @TestEngine.Test
+    public void test() {
+        String actual = FUNCTION.apply(parameter.input);
+        System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
+        assertThat(actual).isEqualTo(parameter.expected);
     }
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
@@ -87,12 +93,5 @@ public class CamelCaseFunctionTest {
         public String getDisplayName() {
             return "Tuple { " + input + " | " + expected + " }";
         }
-    }
-
-    @Test
-    public void test() {
-        String actual = FUNCTION.apply(parameter.input);
-        System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
-        assertThat(actual).isEqualTo(parameter.expected);
     }
 }

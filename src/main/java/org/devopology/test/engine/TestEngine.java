@@ -37,7 +37,9 @@ import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -103,6 +105,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        if (executionRequest.getRootTestDescriptor().getChildren().size() < 1) {
+            return;
+        }
+
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         int threadCount = availableProcessors;
         String value = System.getProperty("devopology.test.engine.thread.count");
@@ -184,6 +190,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestDescriptor testDescriptor =
                     testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+
+            if (testDescriptor.getChildren().size() == 0) {
+                LOGGER.error("No tests were found");
+                System.exit(-1);
+            }
 
             TestPlan testPlan = TestEngineUtils.createTestPlan(testDescriptor, configurationParameters);
 

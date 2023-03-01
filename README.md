@@ -84,15 +84,7 @@ Example:
 ```java
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAllTests;
-import org.devopology.test.engine.api.AfterClass;
-import org.devopology.test.engine.api.AfterEachTest;
-import org.devopology.test.engine.api.BeforeAllTests;
-import org.devopology.test.engine.api.BeforeTests;
-import org.devopology.test.engine.api.BeforeClass;
-import org.devopology.test.engine.api.BeforeEachTest;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,50 +95,40 @@ import java.util.stream.Stream;
  */
 public class ParameterSupplierFieldTest {
 
-    @Parameter
+    @TestEngine.ParameterInject
     public String parameter;
 
-    @Parameter.Supplier
-    public static Stream<String> PARAMETERS = TestParameterSupplier.stream();
+    @TestEngine.ParameterSupplier
+    public static Stream<String> PARAMETERS = TestParameterSupplier.values();
 
-    @BeforeClass
-    public static void beforeClass() {
-        System.out.println("beforeClass()");
+    @TestEngine.BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
     }
 
-    @BeforeAllTests
-    public void beforeAllTests() {
-        System.out.println("beforeAllTests()");
+    @TestEngine.BeforeEach
+    public void beforeEach() {
+        System.out.println("beforeEach()");
     }
 
-    @BeforeEachTest
-    public void beforeEachTest() {
-        System.out.println("beforeEachTest()");
-    }
-
-    @Test
+    @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter + ")");
     }
 
-    @Test
+    @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + parameter + ")");
     }
 
-    @AfterEachTest
-    public void afterEachTest() {
-        System.out.println("afterEachTest()");
+    @TestEngine.AfterEach
+    public void afterEach() {
+        System.out.println("afterEach()");
     }
 
-    @AfterAllTests
-    public void afterAllTests() {
-        System.out.println("afterAllTests()");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        System.out.println("afterClass()");
+    @TestEngine.AfterAll
+    public void afterAll() {
+        System.out.println("afterAll()");
     }
 
     private static class TestParameterSupplier {
@@ -162,6 +144,7 @@ public class ParameterSupplierFieldTest {
         }
     }
 }
+
 ```
 
 Other test examples
@@ -187,40 +170,40 @@ The basic flow...
     
     thread {
     
-        call "@Parameter.Supplier" field or method to get a parameter collection
+        call "@TestEngine.ParameterSupplier" field or method to get a parameter collection
     
-        execute "@BeforeClass" methods 
+        execute "@TestEngine.BeforeClass" methods 
      
         create a single instance of the test class
         
         for each parameter in the parameter collection) {
         
-            set the "@Parameter" field value
+            set the "@TestEngine.ParameterInject" field value
             
-            execute "@BeforeAllTests" methods
+            execute "@TestEngine.BeforeAll" methods
             
             for (method : class "@Test" method list) {
             
-                execute "@BeforeEachTest" methods
+                execute "@TestEngine.BeforeEach" methods
             
-                execute "@Test" method
+                execute "@TestEngine.Test" method
                 
-                execute "@AfterEachTest" methods
+                execute "@TestEngine.AfterEach" methods
             }
             
-            execute "@AfterAllTests" methods
+            execute "@TestEngine.AfterAll" methods
             
-            set the "@Parameter" field to null
+            set the "@TestEngine.ParameterInject" field to null
         }
         
-        execute "@AfterClass" methods
+        execute "@TestEngine.AfterClass" methods
     }
  }
 ```
 
 **Notes**
 
-- The type returned in the `@Parameter.Supplier` `Collection` must match the type of the `@Parameter` field
+- The type returned in the `@TestEngine.ParameterSupplier` `Collection` must match the type of the `@TestEngine.ParameterInject` field
 
 
-- `Named` is a special case. The `Parameter` field type should match the type of Object wrapped by the `Named` instance
+- `Named` is a special case. The `@TestEngine.ParameterInject` field type should match the type of Object wrapped by the `Named` instance
