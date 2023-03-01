@@ -16,7 +16,11 @@
 
 package org.devopology.test.engine.support;
 
-import org.junit.platform.engine.*;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.DiscoveryFilter;
+import org.junit.platform.engine.DiscoverySelector;
+import org.junit.platform.engine.EngineDiscoveryListener;
+import org.junit.platform.engine.EngineDiscoveryRequest;
 
 import java.util.List;
 import java.util.Objects;

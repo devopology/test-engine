@@ -30,7 +30,7 @@ Add the Devopology Maven repository to your `pom.xml` file...
 </repositories>
 ```
 
-Add the Junit 5 and Devopology test engine jar dependencies...
+Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 ```xml
 <dependency>
@@ -51,7 +51,7 @@ Add the Junit 5 and Devopology test engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>0.0.12</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -84,13 +84,7 @@ Example:
 ```java
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
-import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.ParameterSupplier;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,38 +95,38 @@ import java.util.stream.Stream;
  */
 public class ParameterSupplierFieldTest {
 
-    @Parameter
+    @TestEngine.ParameterInject
     public String parameter;
-    
-    @Parameter.Supplier
-    public static Stream<String> PARAMETERS = TestParameterSupplier.stream();
 
-    @BeforeAll
+    @TestEngine.ParameterSupplier
+    public static Stream<String> PARAMETERS = TestParameterSupplier.values();
+
+    @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
-    @BeforeEach
+    @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
     }
 
-    @Test
+    @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter + ")");
     }
 
-    @Test
+    @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + parameter + ")");
     }
 
-    @AfterEach
+    @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
     }
 
-    @AfterAll
+    @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
     }
@@ -150,6 +144,7 @@ public class ParameterSupplierFieldTest {
         }
     }
 }
+
 ```
 
 Other test examples
@@ -160,7 +155,6 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 - While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports.
 
-
 ---
 
 # Design
@@ -168,39 +162,48 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 The basic flow...
 
 ```
- Scan all classpath jars for classes that contains a method annotated with "@Test"
+ Scan all classpath jars for test classes that contains a method annotated with "@Test"
  
- for (class : class list) {
+ for each test class in the test class list) {
  
-    call "@Parameter.Supplier" field or method to get a parameter collection
- 
-    create a single instance of the class
+    for each test class, create a thread
     
-    for (parameter : parameter collection) {
+    thread {
     
-        set the "@Parameter" field value
+        call "@TestEngine.ParameterSupplier" field or method to get a parameter collection
+    
+        execute "@TestEngine.BeforeClass" methods 
+     
+        create a single instance of the test class
         
-        call "@BeforeAll" methods
+        for each parameter in the parameter collection) {
         
-        for (method : class "@Test" method list) {
-        
-            call "@BeforeEach" methods
-        
-            call "@Test" method
+            set the "@TestEngine.ParameterInject" field value
             
-            call "@AfterEach" methods
+            execute "@TestEngine.BeforeAll" methods
+            
+            for (method : class "@Test" method list) {
+            
+                execute "@TestEngine.BeforeEach" methods
+            
+                execute "@TestEngine.Test" method
+                
+                execute "@TestEngine.AfterEach" methods
+            }
+            
+            execute "@TestEngine.AfterAll" methods
+            
+            set the "@TestEngine.ParameterInject" field to null
         }
         
-        call "@AfterAll" methods
-        
-        set the "@Parameter" field to null
+        execute "@TestEngine.AfterClass" methods
     }
  }
 ```
 
 **Notes**
 
-- The type returned in the `@Parameter.Supplier` `Collection` must match the type of the `@Parameter` field
+- The type returned in the `@TestEngine.ParameterSupplier` `Collection` must match the type of the `@TestEngine.ParameterInject` field
 
 
-- `Named` is a special case. The `Parameter` field type should match the type of Object wrapped by the `Named` instance
+- `Named` is a special case. The `@TestEngine.ParameterInject` field type should match the type of Object wrapped by the `Named` instance

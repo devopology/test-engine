@@ -1,12 +1,6 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.AfterEach;
-import org.devopology.test.engine.api.BeforeAll;
-import org.devopology.test.engine.api.BeforeEach;
-import org.devopology.test.engine.api.DisplayName;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,43 +9,40 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@DisplayName("Test class with @Parameter.Supplier field and display names")
 public class ParameterSupplierFieldWithDisplayNamesTest {
 
-    @Parameter
+    @TestEngine.ParameterInject
     public String parameter;
 
-    @Parameter.Supplier
+    @TestEngine.ParameterSupplier
     public static Stream<String> PARAMETERS = TestParameterSupplier.values();
 
-    @BeforeAll
+    @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
-    @BeforeEach
+    @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
     }
 
-    @Test
-    @DisplayName("Test 1")
+    @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter + ")");
     }
 
-    @Test
-    @DisplayName("Test 2")
+    @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + parameter + ")");
     }
 
-    @AfterEach
+    @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
     }
 
-    @AfterAll
+    @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
     }

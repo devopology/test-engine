@@ -23,12 +23,10 @@ import java.util.Optional;
 
 public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-    private final TestSource testSource;
     private final Class<?> testClass;
 
     public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
-        this.testSource = new TestEngineTestSource(this);
         this.testClass = testClass;
     }
 
@@ -39,7 +37,7 @@ public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescrip
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(testSource);
+        return Optional.empty();
     }
 
     public Class<?> getTestClass() {

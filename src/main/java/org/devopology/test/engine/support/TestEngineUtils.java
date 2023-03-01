@@ -16,7 +16,8 @@
 
 package org.devopology.test.engine.support;
 
-import org.devopology.test.engine.api.*;
+import org.devopology.test.engine.api.Metadata;
+import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
@@ -26,7 +27,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -37,26 +44,30 @@ import java.util.stream.Stream;
 @SuppressWarnings("PMD.GodClass")
 public final class TestEngineUtils {
 
-    private static Map<Class<?>, List<Field>> parameterFieldsCache;
+    private static Map<Class<?>, List<Field>> parameterInjectFieldCache;
     private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
     private static Map<Class<?>, List<Method>> parameterSupplierMethodsCache;
     private static Map<Class<?>, List<Method>> beforeAllMethodListCache;
+    private static Map<Class<?>, List<Method>> beforeClassMethodCache;
     private static Map<Class<?>, List<Method>> beforeEachMethodListCache;
     private static Map<Class<?>, List<Method>> testMethodListCache;
     private static Map<Class<?>, List<Method>> afterEachMethodListCache;
     private static Map<Class<?>, List<Method>> afterAllMethodListCache;
+    private static Map<Class<?>, List<Method>> afterClassMethodCache;
     private static Map<Class<?>, String> classDisplayNameCache;
     private static Map<Method, String> methodDisplayNameCache;
 
     static {
-        parameterFieldsCache = new HashMap<>();
+        parameterInjectFieldCache = new HashMap<>();
         parameterSupplierFieldsCache = new HashMap<>();
         parameterSupplierMethodsCache = new HashMap<>();
+        beforeClassMethodCache = new HashMap<>();
         beforeAllMethodListCache = new HashMap<>();
         beforeEachMethodListCache = new HashMap<>();
         testMethodListCache = new HashMap<>();
         afterEachMethodListCache = new HashMap<>();
         afterAllMethodListCache = new HashMap<>();
+        afterClassMethodCache = new HashMap<>();
         classDisplayNameCache = new HashMap<>();
         methodDisplayNameCache = new HashMap<>();
     }
@@ -69,33 +80,51 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @Parameter fields sorted alphabetically
+     * Method to get a List of @PreTest methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Field> getParameterFields(Class<?> clazz) {
-        List<Field> parameterFields = parameterFieldsCache.get(clazz);
-        if (parameterFields != null) {
-            return parameterFields;
+    public static List<Method> getBeforeClassMethods(Class<?> clazz) {
+        List<Method> methodList = beforeClassMethodCache.get(clazz);
+        if (methodList != null) {
+            return methodList;
         }
 
-        parameterFields = new ArrayList<>();
+        methodList = getStaticDeclaredMethods(clazz, TestEngine.BeforeClass.class);
+        beforeClassMethodCache.put(clazz, methodList);
+        return methodList;
+    }
+
+    /**
+     * Method to get a List of @Parameter.Inject fields sorted alphabetically
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Field> getParameterInjectFields(Class<?> clazz) {
+        List<Field> parameterInjectFields = parameterInjectFieldCache.get(clazz);
+        if (parameterInjectFields != null) {
+            return parameterInjectFields;
+        }
+
+        parameterInjectFields = new ArrayList<>();
         
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (field.isAnnotationPresent(Parameter.class)) {
+            if (field.isAnnotationPresent(TestEngine.ParameterInject.class)) {
                 int modifiers = field.getModifiers();
-                if (!Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    parameterFields.add(field);
+                if (!Modifier.isStatic(modifiers)) {
+                    field.setAccessible(true);
+                    parameterInjectFields.add(field);
                 }
             }
         }
 
-        parameterFields.sort(Comparator.comparing(Field::getName));        
-        parameterFieldsCache.put(clazz, parameterFields);
+        parameterInjectFields.sort(Comparator.comparing(Field::getName));
+        parameterInjectFieldCache.put(clazz, parameterInjectFields);
 
-        return parameterFields;
+        return parameterInjectFields;
     }
 
     /**
@@ -114,9 +143,10 @@ public final class TestEngineUtils {
 
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            if (field.isAnnotationPresent(ParameterSupplier.class) || field.isAnnotationPresent(Parameter.Supplier.class)) {
+            if (field.isAnnotationPresent(TestEngine.ParameterSupplier.class)) {
                 int modifiers = field.getModifiers();
-                if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
+                if (Modifier.isStatic(modifiers)) {
+                    field.setAccessible(true);
                     parameterSupplierFields.add(field);
                 }
             }
@@ -145,12 +175,12 @@ public final class TestEngineUtils {
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
             int modifiers = method.getModifiers();
-            if ((method.isAnnotationPresent(ParameterSupplier.class) || (method.isAnnotationPresent(Parameter.Supplier.class)))
+            if (method.isAnnotationPresent(TestEngine.ParameterSupplier.class)
                 && Modifier.isStatic(modifiers)
-                && Modifier.isPublic(modifiers)
                 && (method.getParameterCount() == 0)) {
                     Class<?> returnType = method.getReturnType();
                     if (Collection.class.isAssignableFrom(returnType) || Stream.class.isAssignableFrom(returnType)) {
+                        method.setAccessible(true);
                         parameterSupplierMethods.add(method);
                     }
             }
@@ -163,7 +193,7 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @BeforeAll methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeAll methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -174,13 +204,13 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, BeforeAll.class);
+        methodList = getDeclaredMethods(clazz, TestEngine.BeforeAll.class);
         beforeAllMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @BeforeEach methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeEach methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -191,7 +221,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, BeforeEach.class);
+        methodList = getDeclaredMethods(clazz, TestEngine.BeforeEach.class);
         beforeEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -208,13 +238,13 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, Test.class);
+        methodList = getDeclaredMethods(clazz, TestEngine.Test.class);
         testMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @AfterEach methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterEach methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -225,13 +255,13 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, AfterEach.class);
+        methodList = getDeclaredMethods(clazz, TestEngine.AfterEach.class);
         afterEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
 
     /**
-     * Method to get a List of @AfterAll methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterAll methods sorted alphabetically
      *
      * @param clazz
      * @return
@@ -242,8 +272,25 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, AfterAll.class);
+        methodList = getDeclaredMethods(clazz, TestEngine.AfterAll.class);
         afterAllMethodListCache.put(clazz, methodList);
+        return methodList;
+    }
+
+    /**
+     * Method to get a List of @TestEngine.AfterClass methods sorted alphabetically
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Method> getAfterClassMethods(Class<?> clazz) {
+        List<Method> methodList = afterClassMethodCache.get(clazz);
+        if (methodList != null) {
+            return methodList;
+        }
+
+        methodList = getStaticDeclaredMethods(clazz, TestEngine.AfterClass.class);
+        afterClassMethodCache.put(clazz, methodList);
         return methodList;
     }
 
@@ -254,7 +301,7 @@ public final class TestEngineUtils {
      * @return
      */
     public static boolean isDisabled(Class<?> clazz) {
-        return clazz.isAnnotationPresent(Disabled.class);
+        return clazz.isAnnotationPresent(TestEngine.Disabled.class);
     }
 
     /**
@@ -264,7 +311,7 @@ public final class TestEngineUtils {
      * @return
      */
     public static boolean isDisabled(Method method) {
-        return method.isAnnotationPresent(Disabled.class);
+        return method.isAnnotationPresent(TestEngine.Disabled.class);
     }
 
     /**
@@ -279,9 +326,9 @@ public final class TestEngineUtils {
             return displayName;
         }
 
-        if (clazz.isAnnotationPresent(DisplayName.class)) {
+        if (clazz.isAnnotationPresent(TestEngine.DisplayName.class)) {
             try {
-                Annotation annotation = clazz.getAnnotation(DisplayName.class);
+                Annotation annotation = clazz.getAnnotation(TestEngine.DisplayName.class);
                 Class<? extends Annotation> type = annotation.annotationType();
                 Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
                 displayName = valueMethod.invoke(annotation, (Object[]) null).toString();
@@ -310,9 +357,9 @@ public final class TestEngineUtils {
             return displayName;
         }
 
-        if (method.isAnnotationPresent(DisplayName.class)) {
+        if (method.isAnnotationPresent(TestEngine.DisplayName.class)) {
             try {
-                Annotation annotation = method.getAnnotation(DisplayName.class);
+                Annotation annotation = method.getAnnotation(TestEngine.DisplayName.class);
                 Class<? extends Annotation> type = annotation.annotationType();
                 Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
                 displayName = valueMethod.invoke(annotation, (Object[]) null).toString();
@@ -378,6 +425,35 @@ public final class TestEngineUtils {
                 testDescriptor1 -> atomicBoolean.set(testDescriptor1.getChildren().size() > 1));
 
         return atomicBoolean.get();
+    }
+
+    /**
+     * Class to get a List of static methods with a specific annotation sorted alphabetically
+     *
+     * @param clazz
+     * @param annotation
+     * @return
+     */
+    private static List<Method> getStaticDeclaredMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+        List<Method> methodList = new ArrayList<>();
+
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            int modifiers = method.getModifiers();
+            if (method.isAnnotationPresent(annotation)
+                    && Modifier.isStatic(modifiers)
+                    && Modifier.isPublic(modifiers)
+                    && (method.getParameterCount() == 0)) {
+                Class<?> returnType = method.getReturnType();
+                if (Void.TYPE.isAssignableFrom(returnType)) {
+                    methodList.add(method);
+                }
+            }
+        }
+
+        methodList.sort(Comparator.comparing(Method::getName));
+
+        return methodList;
     }
 
     /**

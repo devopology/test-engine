@@ -1,10 +1,7 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.AfterAll;
-import org.devopology.test.engine.api.BeforeAll;
 import org.devopology.test.engine.api.Named;
-import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.Test;
+import org.devopology.test.engine.api.TestEngine;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -38,10 +35,10 @@ public class MixedObjectsTest {
         }
     };
 
-    @Parameter
+    @TestEngine.ParameterInject
     public Object parameter;
 
-    @Parameter.Supplier
+    @TestEngine.ParameterSupplier
     public static Stream<Named> parameters() {
         Set<Named> collection = new LinkedHashSet<>();
 
@@ -55,12 +52,12 @@ public class MixedObjectsTest {
         return collection.stream();
     }
 
-    @BeforeAll
+    @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
-    @Test
+    @TestEngine.Test
     public void test() {
         System.out.println("[" + parameter + "]");
 
@@ -79,7 +76,7 @@ public class MixedObjectsTest {
         System.out.println("[" + parameter + "] PASSED");
     }
 
-    @AfterAll
+    @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
     }
