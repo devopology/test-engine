@@ -6,6 +6,8 @@
 
 The Devopology Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
 
+**v1.0.0 is NOT backward compatible with v0.0.z versions**
+
 ## Why ?
 
 Currently, JUnit 5 does not support parameterized tests at the test class level
