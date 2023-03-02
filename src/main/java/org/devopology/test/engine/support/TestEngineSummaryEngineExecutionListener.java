@@ -89,10 +89,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
                     TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testClassTestDescriptor.getTestClass();
-                    Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append("[")
-                            .append(testParameter)
+                            .append(testDescriptor.getDisplayName())
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
@@ -101,11 +100,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                    Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append("[")
-                            .append(testParameter)
+                            .append(testDescriptor.getDisplayName())
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
@@ -133,21 +131,19 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
                     TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testClassTestDescriptor.getTestClass();
-                    Object testParameter = testClassTestDescriptor.getTestParameter();
                     stringBuilder
                             .append("[")
-                            .append(testParameter)
+                            .append(testDescriptor.getDisplayName())
                             .append("] - ")
                             .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                    Object testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
                     stringBuilder
                             .append("[")
-                            .append(testParameter)
+                            .append(testDescriptor.getDisplayName())
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
