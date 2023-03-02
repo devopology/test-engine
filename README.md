@@ -48,8 +48,6 @@ Contributions to the Test Engine are both welcomed and appreciated.
 
 # State Machine Flow
 
----
-
 Basic flow...
 
 ```
