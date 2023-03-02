@@ -4,20 +4,14 @@
 
 # Devopology Test Engine
 
----
-
 The Devopology Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
 
 ## Why ?
-
----
 
 Currently, JUnit 5 does not support parameterized tests at the test class level
 - https://github.com/junit-team/junit5/issues/878
 
 ## Latest Releases
-
----
 
 - General Availability (GA): [Test Engine v1.0.0](https://github.com/devopology/test-engine/releases/tag/v1.0.0) (2023-02-28)
 
@@ -30,13 +24,9 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Getting Help
 
----
-
 Github discussions is the current mechanism
 
 ## Contributing
-
----
 
 Contributions to the Test Engine are both welcomed and appreciated.
 
@@ -116,8 +106,6 @@ Basic flow...
 
 ## Maven Usage
 
----
-
 Add the Devopology Maven repository to your `pom.xml` file...
 
 ```xml
@@ -168,8 +156,6 @@ Set up Maven to use the test engine
 
 ## Command Line (standalone) Usage
 
----
-
 The test engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
 Example:
@@ -181,7 +167,6 @@ java \
 ```
 
 The test engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
-
 
 Write a test...
 
@@ -270,11 +255,7 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 - While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports
 
----
-
 # Building
-
----
 
 You need Java 11 or greater to build
 
