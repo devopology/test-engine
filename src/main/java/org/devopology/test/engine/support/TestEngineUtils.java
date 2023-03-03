@@ -91,7 +91,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getStaticDeclaredMethods(clazz, TestEngine.BeforeClass.class);
+        methodList = getStaticMethods(clazz, TestEngine.BeforeClass.class);
         beforeClassMethodCache.put(clazz, methodList);
         return methodList;
     }
@@ -110,7 +110,7 @@ public final class TestEngineUtils {
 
         parameterInjectFields = new ArrayList<>();
         
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = clazz.getFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(TestEngine.ParameterInject.class)) {
                 int modifiers = field.getModifiers();
@@ -141,7 +141,7 @@ public final class TestEngineUtils {
 
         parameterSupplierFields = new ArrayList<>();
 
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = clazz.getFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(TestEngine.ParameterSupplier.class)) {
                 int modifiers = field.getModifiers();
@@ -172,7 +172,7 @@ public final class TestEngineUtils {
 
         parameterSupplierMethods = new ArrayList<>();
 
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             int modifiers = method.getModifiers();
             if (method.isAnnotationPresent(TestEngine.ParameterSupplier.class)
@@ -204,7 +204,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.BeforeAll.class);
+        methodList = getMethods(clazz, TestEngine.BeforeAll.class);
         beforeAllMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -221,7 +221,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.BeforeEach.class);
+        methodList = getMethods(clazz, TestEngine.BeforeEach.class);
         beforeEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -238,7 +238,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.Test.class);
+        methodList = getMethods(clazz, TestEngine.Test.class);
         testMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -255,7 +255,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.AfterEach.class);
+        methodList = getMethods(clazz, TestEngine.AfterEach.class);
         afterEachMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -272,7 +272,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getDeclaredMethods(clazz, TestEngine.AfterAll.class);
+        methodList = getMethods(clazz, TestEngine.AfterAll.class);
         afterAllMethodListCache.put(clazz, methodList);
         return methodList;
     }
@@ -289,7 +289,7 @@ public final class TestEngineUtils {
             return methodList;
         }
 
-        methodList = getStaticDeclaredMethods(clazz, TestEngine.AfterClass.class);
+        methodList = getStaticMethods(clazz, TestEngine.AfterClass.class);
         afterClassMethodCache.put(clazz, methodList);
         return methodList;
     }
@@ -414,30 +414,16 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to determine if a TestDescriptor has siblings
-     *
-     * @param testDescriptor
-     * @return
-     */
-    public static boolean hasSiblings(TestDescriptor testDescriptor) {
-        AtomicBoolean atomicBoolean = new AtomicBoolean();
-        testDescriptor.getParent().ifPresent(
-                testDescriptor1 -> atomicBoolean.set(testDescriptor1.getChildren().size() > 1));
-
-        return atomicBoolean.get();
-    }
-
-    /**
      * Class to get a List of static methods with a specific annotation sorted alphabetically
      *
      * @param clazz
      * @param annotation
      * @return
      */
-    private static List<Method> getStaticDeclaredMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+    private static List<Method> getStaticMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
         List<Method> methodList = new ArrayList<>();
 
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             int modifiers = method.getModifiers();
             if (method.isAnnotationPresent(annotation)
@@ -463,10 +449,10 @@ public final class TestEngineUtils {
      * @param annotation
      * @return
      */
-    private static List<Method> getDeclaredMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+    private static List<Method> getMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
         List<Method> methodList = new ArrayList<>();
 
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             int modifiers = method.getModifiers();
             if (method.isAnnotationPresent(annotation)

@@ -35,6 +35,7 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +60,10 @@ public class TestEngineDiscoverySelectorResolver {
     /**
      * Predicate to determine if a class is a test class (has @Test methods)
      */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> !TestEngineUtils.getTestMethods(clazz).isEmpty();
+    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
+        int modifiers = clazz.getModifiers();
+        return !Modifier.isAbstract(modifiers) && !TestEngineUtils.getTestMethods(clazz).isEmpty();
+    };
 
     /**
      * Predicate to determine if a method is a test method (declared class has @Test methods)
