@@ -35,7 +35,7 @@ Contributions to the Test Engine are both welcomed and appreciated.
 
 | Annotation                      | Scope            | Required | Static | Examples                                                                                      |
 |---------------------------------|------------------|----------|--------|-----------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Stream<String> PARAMETERS;` <br/> `public static Stream<String> parameters();` |
+| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
 | `@TestEngine.ParameterInject`   | field            | yes      | no     | `private String value;` <br/> `public String value;`                                          |
 | `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                           |
 | `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                    |
@@ -177,7 +177,6 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -188,7 +187,7 @@ public class ParameterSupplierFieldTest {
     public String parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<String> PARAMETERS = TestParameterSupplier.values();
+    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @TestEngine.BeforeClass
     public static void beforeClas() {
@@ -232,14 +231,14 @@ public class ParameterSupplierFieldTest {
 
     private static class TestParameterSupplier {
 
-        public static Stream<String> values() {
+        public static Collection<String> values() {
             Collection<String> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
                 collection.add(String.valueOf(i));
             }
 
-            return collection.stream();
+            return collection;
         }
     }
 }
