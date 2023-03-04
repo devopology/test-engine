@@ -1,16 +1,10 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.TestEngine;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -21,14 +15,17 @@ public class ArrayTest {
     public String[] parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<String[]> parameters() {
-        Collection<String[]> collection = new ArrayList<>();
+    public static Collection<Named> parameters() {
+        Collection<Named> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(new String[] { java.lang.String.valueOf(i), java.lang.String.valueOf(i * 2) });
+            collection.add(
+                    Named.of(
+                            "Array [" + i + "]",
+                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeClass

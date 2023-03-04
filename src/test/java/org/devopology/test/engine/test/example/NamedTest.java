@@ -5,7 +5,6 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -17,7 +16,7 @@ public class NamedTest {
     public String parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Named> parameters() {
+    public static Collection<Named> parameters() {
         Collection<Named> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -25,7 +24,7 @@ public class NamedTest {
             collection.add(Named.of("[" + i + "] " + value, String.valueOf(value)));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeAll

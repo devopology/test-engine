@@ -33,17 +33,17 @@ Contributions to the Test Engine are both welcomed and appreciated.
 ## Common Annotations
 
 
-| Annotation                      | Scope            | Required | Static | Examples                                                                                      |
-|---------------------------------|------------------|----------|--------|-----------------------------------------------------------------------------------------------|
+| Annotation                      | Scope            | Required | Static | Examples                                                                                              |
+|---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
-| `@TestEngine.ParameterInject`   | field            | yes      | no     | `private String value;` <br/> `public String value;`                                          |
-| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                           |
-| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                    |
-| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                   |
-| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                         |
-| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                    |
-| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                     |
-| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                            |
+| `@TestEngine.ParameterInject`   | field            | yes      | no     | `private String value;` <br/> `public String value;`                                                  |
+| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                   |
+| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                            |
+| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                           |
+| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                                 |
+| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                            |
+| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                             |
+| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                    |
 
 
 # State Machine Flow
@@ -142,7 +142,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 

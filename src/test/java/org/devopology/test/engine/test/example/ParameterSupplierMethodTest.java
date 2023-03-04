@@ -4,7 +4,6 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -15,14 +14,14 @@ public class ParameterSupplierMethodTest {
     public String parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<String> parameters() {
+    public static Collection<String> parameters() {
         Collection<String> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(String.valueOf(i));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeAll

@@ -34,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,25 @@ public class TestEngineExecutor {
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
         TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
+
+        // Special case if only a single class it selected from IntelliJ
+        if (rootTestDescriptor.getChildren().size() == 1) {
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+
+            List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
+
+            TestEngineExecutionContext testEngineExecutionContext =
+                    new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
+
+            TestDescriptor testDescriptor = rootTestDescriptor.getChildren().stream().findFirst().get();
+
+            logTestHierarchy(testDescriptor, 0);
+
+            execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext, countDownLatch);
+
+            return;
+        }
+
         engineExecutionListener.executionStarted(rootTestDescriptor);
 
         List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
@@ -79,6 +99,7 @@ public class TestEngineExecutor {
             CountDownLatch countDownLatch = new CountDownLatch(rootTestDescriptor.getChildren().size());
 
             if (countDownLatch.getCount() > 1) {
+                // More than one test class, run each test class in a thread
                 for (TestDescriptor testDescriptor : rootTestDescriptor.getChildren()) {
                     executorService.submit(() -> {
                         try {
@@ -98,26 +119,11 @@ public class TestEngineExecutor {
                     LOGGER.error("Exception waiting for tests", e);
                 }
             } else {
+                // Only one test class, run in the main thread
                 execute((TestEngineClassTestDescriptor) rootTestDescriptor.getChildren().stream().findFirst().get(), testEngineExecutionContext, countDownLatch);
                 flush();
             }
         }
-        /*
-        else if (rootTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            System.out.println("Before execute((TestEngineClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext, countDownLatch);");
-
-            CountDownLatch countDownLatch = new CountDownLatch(1);
-            execute((TestEngineClassTestDescriptor) rootTestDescriptor, testEngineExecutionContext, countDownLatch);
-
-            try {
-                countDownLatch.await();
-            } catch (InterruptedException e) {
-                LOGGER.error("Exception waiting for tests", e);
-            }
-        }
-        */
-
-//        testEngineExecutionContext.getTestExecutionResultList()
 
         engineExecutionListener.executionFinished(rootTestDescriptor, TestExecutionResult.successful());
         flush();
@@ -182,17 +188,14 @@ public class TestEngineExecutor {
 
             testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
 
-            // If test class descriptor is part of a hierarchy (has siblings) notify listeners
-            //if (TestEngineUtils.hasSiblings(testEngineClassTestDescriptor)) {
-                if (testExecutionResultList.isEmpty()) {
-                    testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                            testEngineClassTestDescriptor, TestExecutionResult.successful());
-                } else {
-                    testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                            testEngineClassTestDescriptor,
-                            testExecutionResultList.get(0));
-                }
-            //}
+            if (testExecutionResultList.isEmpty()) {
+                testEngineExecutionContext.getEngineExecutionListener().executionFinished(
+                        testEngineClassTestDescriptor, TestExecutionResult.successful());
+            } else {
+                testEngineExecutionContext.getEngineExecutionListener().executionFinished(
+                        testEngineClassTestDescriptor,
+                        testExecutionResultList.get(0));
+            }
         }
 
         countDownLatch.countDown();
@@ -218,10 +221,10 @@ public class TestEngineExecutor {
         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
-        List<Field> testParameterFields = TestEngineUtils.getParameterInjectFields(testClass);
+        Collection<Field> testParameterFields = TestEngineUtils.getParameterInjectFields(testClass);
 
         try {
-            testParameterFields.get(0).set(testInstance, testParameter);
+            testParameterFields.stream().findFirst().get().set(testInstance, testParameter);
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
             for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
@@ -376,7 +379,7 @@ public class TestEngineExecutor {
                         testMethodTestDescriptor ->
                                 stringBuilder
                                         .append("method -> ")
-                                        .append(testMethodTestDescriptor.getDisplayName())
+                                        .append(testMethodTestDescriptor.getTestMethod().getName())
                                         .append("()")),
                 Switch.switchCase(
                         TestEngineParameterTestDescriptor.class,
@@ -389,13 +392,13 @@ public class TestEngineExecutor {
                         testClassTestDescriptor ->
                                 stringBuilder
                                         .append("class -> ")
-                                        .append(testDescriptor.getDisplayName())),
+                                        .append(testClassTestDescriptor.getTestClass().getName())),
                 Switch.switchCase(
                         EngineDescriptor.class,
                         engineDescriptor ->
                                 stringBuilder
                                         .append("engine -> ")
-                                        .append(testDescriptor.getDisplayName())));
+                                        .append(engineDescriptor.getDisplayName())));
 
         LOGGER.trace(stringBuilder.toString());
 

@@ -16,10 +16,7 @@
 
 package org.devopology.test.engine.support.descriptor;
 
-import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
-
-import java.util.Optional;
 
 public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
 
@@ -35,11 +32,6 @@ public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDes
     @Override
     public Type getType() {
         return Type.TEST;
-    }
-
-    @Override
-    public Optional<TestSource> getSource() {
-        return Optional.empty();
     }
 
     public Class<?> getTestClass() {

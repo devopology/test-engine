@@ -6,7 +6,6 @@ import org.devopology.test.engine.api.TestEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -17,14 +16,14 @@ public class ParameterMetadataTest {
     public ParameterWithMetadata parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<ParameterWithMetadata> parameters() {
+    public static Collection<ParameterWithMetadata> parameters() {
         Collection<ParameterWithMetadata> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(new ParameterWithMetadata(String.valueOf(UUID.randomUUID())));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeAll

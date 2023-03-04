@@ -26,3 +26,6 @@ hs_err_pid*
 **/target/*
 **/.idea/*
 **/repository/*
+
+dependency-reduced-pom.xml
+patch.sh
