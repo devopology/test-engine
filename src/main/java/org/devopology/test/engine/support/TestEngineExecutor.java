@@ -34,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -220,10 +221,10 @@ public class TestEngineExecutor {
         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
-        List<Field> testParameterFields = TestEngineUtils.getParameterInjectFields(testClass);
+        Collection<Field> testParameterFields = TestEngineUtils.getParameterInjectFields(testClass);
 
         try {
-            testParameterFields.get(0).set(testInstance, testParameter);
+            testParameterFields.stream().findFirst().get().set(testInstance, testParameter);
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
             for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {

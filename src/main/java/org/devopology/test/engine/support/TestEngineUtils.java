@@ -18,6 +18,8 @@ package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.TestEngine;
+import org.devopology.test.engine.support.logger.Logger;
+import org.devopology.test.engine.support.logger.LoggerFactory;
 import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
@@ -32,10 +34,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -44,29 +48,33 @@ import java.util.stream.Stream;
 @SuppressWarnings("PMD.GodClass")
 public final class TestEngineUtils {
 
-    private static Map<Class<?>, List<Field>> parameterInjectFieldCache;
-    private static Map<Class<?>, List<Field>> parameterSupplierFieldsCache;
-    private static Map<Class<?>, List<Method>> parameterSupplierMethodsCache;
-    private static Map<Class<?>, List<Method>> beforeAllMethodListCache;
-    private static Map<Class<?>, List<Method>> beforeClassMethodCache;
-    private static Map<Class<?>, List<Method>> beforeEachMethodListCache;
-    private static Map<Class<?>, List<Method>> testMethodListCache;
-    private static Map<Class<?>, List<Method>> afterEachMethodListCache;
-    private static Map<Class<?>, List<Method>> afterAllMethodListCache;
-    private static Map<Class<?>, List<Method>> afterClassMethodCache;
-    private static Map<Class<?>, String> classDisplayNameCache;
-    private static Map<Method, String> methodDisplayNameCache;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineUtils.class);
+
+    private enum Scope { STATIC, NON_STATIC }
+
+    private static final Map<Class<?>, Collection<Field>> parameterInjectFieldCache;
+    private static final Map<Class<?>, Collection<Field>> parameterSupplierFieldsCache;
+    private static final Map<Class<?>, Collection<Method>> parameterSupplierMethodsCache;
+    private static final Map<Class<?>, Collection<Method>> beforeAllMethodCache;
+    private static final Map<Class<?>, Collection<Method>> beforeClassMethodCache;
+    private static final Map<Class<?>, Collection<Method>> beforeEachMethodCache;
+    private static final Map<Class<?>, Collection<Method>> testMethodCache;
+    private static final Map<Class<?>, Collection<Method>> afterEachMethodCache;
+    private static final Map<Class<?>, Collection<Method>> afterAllMethodCache;
+    private static final Map<Class<?>, Collection<Method>> afterClassMethodCache;
+    private static final Map<Class<?>, String> classDisplayNameCache;
+    private static final Map<Method, String> methodDisplayNameCache;
 
     static {
         parameterInjectFieldCache = new HashMap<>();
         parameterSupplierFieldsCache = new HashMap<>();
         parameterSupplierMethodsCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
-        beforeAllMethodListCache = new HashMap<>();
-        beforeEachMethodListCache = new HashMap<>();
-        testMethodListCache = new HashMap<>();
-        afterEachMethodListCache = new HashMap<>();
-        afterAllMethodListCache = new HashMap<>();
+        beforeAllMethodCache = new HashMap<>();
+        beforeEachMethodCache = new HashMap<>();
+        testMethodCache = new HashMap<>();
+        afterEachMethodCache = new HashMap<>();
+        afterAllMethodCache = new HashMap<>();
         afterClassMethodCache = new HashMap<>();
         classDisplayNameCache = new HashMap<>();
         methodDisplayNameCache = new HashMap<>();
@@ -80,61 +88,230 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a List of @PreTest methods sorted alphabetically
+     * Method to get a Collection of Fields for a Class and super Classes
      *
-     * @param clazz
+     * @param baseClass
      * @return
      */
-    public static List<Method> getBeforeClassMethods(Class<?> clazz) {
-        List<Method> methodList = beforeClassMethodCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    private static Collection<Field> getAllFields(
+            Class<?> baseClass,
+            Class<? extends Annotation> annotation,
+            Scope scope) {
+        LOGGER.trace(
+                "getAllFields(%s, %s, %s)",
+                baseClass.getName(),
+                annotation.getName(),
+                scope);
 
-        methodList = getStaticMethods(clazz, TestEngine.BeforeClass.class);
-        beforeClassMethodCache.put(clazz, methodList);
+        Map<String, Field> fieldMap = new HashMap<>();
+        resolveFields(baseClass, annotation, scope, fieldMap);
+        List<Field> fieldList = new LinkedList<>(fieldMap.values());
+        fieldList.sort(Comparator.comparing(Field::getName));
+
+        return fieldList;
+    }
+
+    /**
+     * Method to recursively resolve Fields
+     *
+     * @param clazz
+     * @param annotation
+     * @param scope
+     * @param fieldMap
+     */
+    private static void resolveFields(
+            Class<?> clazz,
+            Class<? extends Annotation> annotation,
+            Scope scope,
+            Map<String, Field> fieldMap) {
+        LOGGER.trace(
+                "resolveFields(%s, %s, %s)",
+                clazz.getName(),
+                annotation.getName(),
+                scope);
+
+        Stream.of(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(annotation))
+                .filter(field -> {
+                    int modifiers = field.getModifiers();
+                    return Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers);
+                })
+                .filter(field -> {
+                    int modifiers = field.getModifiers();
+                    switch (scope) {
+                        case STATIC: {
+                            return Modifier.isStatic(modifiers);
+                        }
+                        default: {
+                            return !Modifier.isStatic(modifiers);
+                        }
+                    }
+                }).forEach(field -> {
+                    if (fieldMap.putIfAbsent(field.getName(), field) == null) {
+                        LOGGER.trace("    add field [%s]", field.getName());
+                        field.setAccessible(true);
+                    }
+                });
+
+        Class<?> declaringClass = clazz.getSuperclass();
+        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+            resolveFields(declaringClass, annotation, scope, fieldMap);
+        }
+    }
+
+    /**
+     * Method to get a Collection of all methods from a Class and super Classes
+     *
+     * @param baseClass
+     * @return
+     */
+    private static Collection<Method> getAllMethods(
+            Class<?> baseClass,
+            Class<? extends Annotation> annotation,
+            Scope scope,
+            Class<?> returnType,
+            int parameterCount) {
+        LOGGER.trace(
+                "getAllMethods(%s, %s, %s, %s, %d)",
+                baseClass.getName(),
+                annotation.getName(),
+                scope,
+                returnType.getName(),
+                parameterCount);
+
+        Map<String, Method> methodMap = new HashMap<>();
+        resolveMethods(baseClass, annotation, scope, returnType, parameterCount, methodMap);
+        List<Method> methodList = new LinkedList<>(methodMap.values());
+        methodList.sort(Comparator.comparing(Method::getName));
+
         return methodList;
     }
 
     /**
-     * Method to get a List of @Parameter.Inject fields sorted alphabetically
+     * Method to recursively resolve Methods
      *
      * @param clazz
-     * @return
+     * @param annotation
+     * @param scope
+     * @param returnType
+     * @param parameterCount
+     * @param methodMap
      */
-    public static List<Field> getParameterInjectFields(Class<?> clazz) {
-        List<Field> parameterInjectFields = parameterInjectFieldCache.get(clazz);
-        if (parameterInjectFields != null) {
-            return parameterInjectFields;
+    private static void resolveMethods(
+            Class<?> clazz,
+            Class<? extends Annotation> annotation,
+            Scope scope,
+            Class<?> returnType,
+            int parameterCount,
+            Map<String, Method> methodMap) {
+        LOGGER.trace(
+                "resolveMethods(%s, %s, %s, %s, %d)",
+                clazz.getName(),
+                annotation.getName(),
+                scope,
+                returnType.getName(),
+                parameterCount);
+
+        Stream.of(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(annotation))
+                .filter(method -> {
+                    int modifiers = method.getModifiers();
+                    return Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers);
+                })
+                .filter(method -> {
+                    int modifiers = method.getModifiers();
+                    switch (scope) {
+                        case STATIC: {
+                            return Modifier.isStatic(modifiers);
+                        }
+                        default: {
+                            return !Modifier.isStatic(modifiers);
+                        }
+                    }
+                })
+                .filter(method -> method.getParameterCount() == parameterCount)
+                .filter(method -> {
+                    // TODO understand why void is special
+                    if (returnType == Void.class) {
+                        return method.getReturnType().getName().equals("void");
+                    } else {
+                        return method.getReturnType().equals(returnType);
+                    }
+                })
+                .forEach(method -> {
+                    if (methodMap.putIfAbsent(method.getName(), method) == null) {
+                        method.setAccessible(true);
+                    }
+                });
+
+        Class<?> declaringClass = clazz.getSuperclass();
+        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+            resolveMethods(declaringClass, annotation, scope, returnType, parameterCount, methodMap);
         }
-
-        parameterInjectFields = new ArrayList<>();
-        
-        Field[] fields = clazz.getFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(TestEngine.ParameterInject.class)) {
-                int modifiers = field.getModifiers();
-                if (!Modifier.isStatic(modifiers)) {
-                    field.setAccessible(true);
-                    parameterInjectFields.add(field);
-                }
-            }
-        }
-
-        parameterInjectFields.sort(Comparator.comparing(Field::getName));
-        parameterInjectFieldCache.put(clazz, parameterInjectFields);
-
-        return parameterInjectFields;
     }
 
     /**
-     * Method to get a List of @Parameter.Supplier fields sorted alphabetically
+     * Method to get a Collection of @TestEngine.BeforeClass Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Field> getParameterSupplierFields(Class<?> clazz) {
-        List<Field> parameterSupplierFields = parameterSupplierFieldsCache.get(clazz);
+    public static Collection<Method> getBeforeClassMethods(Class<?> clazz) {
+        synchronized (beforeClassMethodCache) {
+            LOGGER.trace("getBeforeClassMethods(%s)", clazz.getName());
+
+            if (beforeClassMethodCache.containsKey(clazz)) {
+                return beforeClassMethodCache.get(clazz);
+            }
+
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.BeforeClass.class,
+                            Scope.STATIC,
+                            Void.class,
+                            0);
+
+            beforeClassMethodCache.put(clazz, methods);
+
+            return methods;
+        }
+    }
+
+    /**
+     * Method to get a Collection of @TestEngine.ParameterInject Fields sorted alphabetically
+     *
+     * @param clazz
+     * @return
+     */
+    public static Collection<Field> getParameterInjectFields(Class<?> clazz) {
+        synchronized (parameterInjectFieldCache) {
+            LOGGER.trace("getParameterInjectFields(%s)", clazz.getName());
+
+            if (parameterInjectFieldCache.containsKey(clazz)) {
+                return parameterInjectFieldCache.get(clazz);
+            }
+
+            Collection<Field> fields =
+                    getAllFields(
+                            clazz,
+                            TestEngine.ParameterInject.class,
+                            Scope.NON_STATIC);
+
+            parameterInjectFieldCache.put(clazz, fields);
+
+            return fields;
+        }
+    }
+
+    /**
+     * Method to get a Collection of @TestEngine.ParameterSupplier Fields sorted alphabetically
+     *
+     * @param clazz
+     * @return
+     */
+    public static Collection<Field> getParameterSupplierFields(Class<?> clazz) {
+        Collection<Field> parameterSupplierFields = parameterSupplierFieldsCache.get(clazz);
         if (parameterSupplierFields != null) {
             return parameterSupplierFields;
         }
@@ -152,146 +329,197 @@ public final class TestEngineUtils {
             }
         }
 
-        parameterSupplierFields.sort(Comparator.comparing(Field::getName));
         parameterSupplierFieldsCache.put(clazz, parameterSupplierFields);
 
         return parameterSupplierFields;
     }
 
     /**
-     * Method to get a List of @Parameter.Supplier fields sorted alphabetically
+     * Method to get a Collection of @TestEngine.ParameterSupplier Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getParameterSupplierMethods(Class<?> clazz) {
-        List<Method> parameterSupplierMethods = parameterSupplierMethodsCache.get(clazz);
-        if (parameterSupplierMethods != null) {
-            return parameterSupplierMethods;
-        }
+    public static Collection<Method> getParameterSupplierMethods(Class<?> clazz) {
+        synchronized (parameterSupplierMethodsCache) {
+            LOGGER.trace("getParameterSupplierMethods(%s)", clazz.getName());
 
-        parameterSupplierMethods = new ArrayList<>();
-
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
-            int modifiers = method.getModifiers();
-            if (method.isAnnotationPresent(TestEngine.ParameterSupplier.class)
-                && Modifier.isStatic(modifiers)
-                && (method.getParameterCount() == 0)) {
-                    Class<?> returnType = method.getReturnType();
-                    if (Collection.class.isAssignableFrom(returnType) || Stream.class.isAssignableFrom(returnType)) {
-                        method.setAccessible(true);
-                        parameterSupplierMethods.add(method);
-                    }
+            if (parameterSupplierMethodsCache.containsKey(clazz)) {
+                return parameterSupplierMethodsCache.get(clazz);
             }
+
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.ParameterSupplier.class,
+                            Scope.STATIC,
+                            Collection.class,
+                            0);
+
+            parameterSupplierMethodsCache.put(clazz, methods);
+
+            return methods;
         }
-
-        parameterSupplierMethods.sort(Comparator.comparing(Method::getName));
-        parameterSupplierMethodsCache.put(clazz, parameterSupplierMethods);
-
-        return parameterSupplierMethods;
     }
 
     /**
-     * Method to get a List of @TestEngine.BeforeAll methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.BeforeAll Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getBeforeAllMethods(Class<?> clazz) {
-        List<Method> methodList = beforeAllMethodListCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getBeforeAllMethods(Class<?> clazz) {
+        synchronized (beforeAllMethodCache) {
+            if (beforeAllMethodCache.containsKey(clazz)) {
+                return beforeAllMethodCache.get(clazz);
+            }
 
-        methodList = getMethods(clazz, TestEngine.BeforeAll.class);
-        beforeAllMethodListCache.put(clazz, methodList);
-        return methodList;
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.BeforeAll.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            0);
+
+            beforeAllMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
-     * Method to get a List of @TestEngine.BeforeEach methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.BeforeEach Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getBeforeEachMethods(Class<?> clazz) {
-        List<Method> methodList = beforeEachMethodListCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getBeforeEachMethods(Class<?> clazz) {
+        synchronized (beforeEachMethodCache) {
+            if (beforeEachMethodCache.containsKey(clazz)) {
+                return beforeEachMethodCache.get(clazz);
+            }
 
-        methodList = getMethods(clazz, TestEngine.BeforeEach.class);
-        beforeEachMethodListCache.put(clazz, methodList);
-        return methodList;
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.BeforeEach.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            0);
+
+            beforeEachMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
-     * Method to get a List of @Test methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.Test Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getTestMethods(Class<?> clazz) {
-        List<Method> methodList = testMethodListCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getTestMethods(Class<?> clazz) {
+        synchronized (testMethodCache) {
+            LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
-        methodList = getMethods(clazz, TestEngine.Test.class);
-        testMethodListCache.put(clazz, methodList);
-        return methodList;
+            if (testMethodCache.containsKey(clazz)) {
+                return testMethodCache.get(clazz);
+            }
+
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.Test.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            0);
+
+            testMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
-     * Method to get a List of @TestEngine.AfterEach methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.AfterEach Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getAfterEachMethods(Class<?> clazz) {
-        List<Method> methodList = afterEachMethodListCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getAfterEachMethods(Class<?> clazz) {
+        synchronized (afterEachMethodCache) {
+            if (afterEachMethodCache.containsKey(clazz)) {
+                return afterEachMethodCache.get(clazz);
+            }
 
-        methodList = getMethods(clazz, TestEngine.AfterEach.class);
-        afterEachMethodListCache.put(clazz, methodList);
-        return methodList;
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.AfterEach.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            0);
+
+            testMethodCache.put(clazz, methods);
+
+            afterEachMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
-     * Method to get a List of @TestEngine.AfterAll methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.AfterAll Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getAfterAllMethods(Class<?> clazz) {
-        List<Method> methodList = afterAllMethodListCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getAfterAllMethods(Class<?> clazz) {
+        synchronized (afterAllMethodCache) {
+            if (afterAllMethodCache.containsKey(clazz)) {
+                return afterAllMethodCache.get(clazz);
+            }
 
-        methodList = getMethods(clazz, TestEngine.AfterAll.class);
-        afterAllMethodListCache.put(clazz, methodList);
-        return methodList;
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.AfterAll.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            0);
+
+            afterAllMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
-     * Method to get a List of @TestEngine.AfterClass methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.AfterClass Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static List<Method> getAfterClassMethods(Class<?> clazz) {
-        List<Method> methodList = afterClassMethodCache.get(clazz);
-        if (methodList != null) {
-            return methodList;
-        }
+    public static Collection<Method> getAfterClassMethods(Class<?> clazz) {
+        synchronized (afterClassMethodCache) {
+            if (afterClassMethodCache.containsKey(clazz)) {
+                return afterClassMethodCache.get(clazz);
+            }
 
-        methodList = getStaticMethods(clazz, TestEngine.AfterClass.class);
-        afterClassMethodCache.put(clazz, methodList);
-        return methodList;
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.AfterClass.class,
+                            Scope.STATIC,
+                            Void.class,
+                            0);
+
+            afterClassMethodCache.put(clazz, methods);
+
+            return methods;
+        }
     }
 
     /**
@@ -305,7 +533,7 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get whether a test method is disabled
+     * Method to get whether a test Method is disabled
      *
      * @param method
      * @return
@@ -409,65 +637,14 @@ public final class TestEngineUtils {
         return displayName;
     }
 
+    /**
+     * Method to create a TestPlan from a TestDescriptor
+     *
+     * @param testDescriptor
+     * @param configurationParameters
+     * @return
+     */
     public static TestPlan createTestPlan(TestDescriptor testDescriptor, ConfigurationParameters configurationParameters) {
         return TestPlan.from(Collections.singleton(testDescriptor), configurationParameters);
-    }
-
-    /**
-     * Class to get a List of static methods with a specific annotation sorted alphabetically
-     *
-     * @param clazz
-     * @param annotation
-     * @return
-     */
-    private static List<Method> getStaticMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
-        List<Method> methodList = new ArrayList<>();
-
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
-            int modifiers = method.getModifiers();
-            if (method.isAnnotationPresent(annotation)
-                    && Modifier.isStatic(modifiers)
-                    && Modifier.isPublic(modifiers)
-                    && (method.getParameterCount() == 0)) {
-                Class<?> returnType = method.getReturnType();
-                if (Void.TYPE.isAssignableFrom(returnType)) {
-                    methodList.add(method);
-                }
-            }
-        }
-
-        methodList.sort(Comparator.comparing(Method::getName));
-
-        return methodList;
-    }
-
-    /**
-     * Class to get a List of methods with a specific annotation sorted alphabetically
-     *
-     * @param clazz
-     * @param annotation
-     * @return
-     */
-    private static List<Method> getMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
-        List<Method> methodList = new ArrayList<>();
-
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
-            int modifiers = method.getModifiers();
-            if (method.isAnnotationPresent(annotation)
-                    && !Modifier.isStatic(modifiers)
-                    && Modifier.isPublic(modifiers)
-                    && (method.getParameterCount() == 0)) {
-                        Class<?> returnType = method.getReturnType();
-                        if (Void.TYPE.isAssignableFrom(returnType)) {
-                            methodList.add(method);
-                        }
-            }
-        }
-
-        methodList.sort(Comparator.comparing(Method::getName));
-
-        return methodList;
     }
 }

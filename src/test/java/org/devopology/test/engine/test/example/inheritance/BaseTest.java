@@ -5,28 +5,21 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
-// Disable the test class since it's only used as a base
-// for other test classes and isn't meant to be run directly
-@TestEngine.Disabled
-public class BaseTest {
+public abstract class BaseTest {
 
     @TestEngine.ParameterInject
-    public String[] parameter;
+    protected int parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Named> parameters() {
+    protected static Collection<Named> parameters() {
         Collection<Named> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(
-                    Named.of(
-                            "Array [" + i + "]",
-                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+            collection.add(Named.of("Array [" + i + "]", i));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeClass

@@ -4,11 +4,11 @@ import org.devopology.test.engine.api.Named;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -39,7 +39,7 @@ public class MixedObjectsTest {
     public Object parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Named> parameters() {
+    public static Collection<Named> parameters() {
         Set<Named> collection = new LinkedHashSet<>();
 
         collection.add(Named.of("BigDecimal", new BigDecimal("1000000000000000000000")));
@@ -49,7 +49,7 @@ public class MixedObjectsTest {
         collection.add(Named.of("null", null));
         collection.add(Named.of("null2", null));
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeAll

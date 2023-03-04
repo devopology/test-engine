@@ -4,7 +4,6 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -15,7 +14,7 @@ public class ParameterSupplierFieldWithDisplayNamesTest {
     public String parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<String> PARAMETERS = TestParameterSupplier.values();
+    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
 
     @TestEngine.BeforeAll
     public void beforeAll() {
@@ -49,14 +48,14 @@ public class ParameterSupplierFieldWithDisplayNamesTest {
 
     private static class TestParameterSupplier {
 
-        public static Stream<String> values() {
+        public static Collection<String> values() {
             Collection<String> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
                 collection.add(String.valueOf(i));
             }
 
-            return collection.stream();
+            return collection;
         }
     }
 }

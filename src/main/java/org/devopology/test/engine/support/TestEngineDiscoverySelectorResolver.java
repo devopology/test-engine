@@ -39,15 +39,12 @@ import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Class to implement a code to discover tests
@@ -81,7 +78,7 @@ public class TestEngineDiscoverySelectorResolver {
         LOGGER.trace("resolveSelectors()");
 
         // Test class to test method list mapping, sorted by test class name
-        Map<Class<?>, List<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
+        Map<Class<?>, Collection<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
 
         // For each test class that was selected, add all test methods
         resolveClasspathRoot(engineDiscoveryRequest, testClassToMethodMap);
@@ -95,8 +92,9 @@ public class TestEngineDiscoverySelectorResolver {
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
+        /*
         // Sort the test methods by name (Test classes are already sorted by name)
-        for (Map.Entry<Class<?>, List<Method>> mapEntry : testClassToMethodMap.entrySet()) {
+        for (Map.Entry<Class<?>, Collection<Method> mapEntry : testClassToMethodMap.entrySet()) {
             Collections.sort(mapEntry.getValue(), Comparator.comparing(Method::getName));
         }
 
@@ -106,11 +104,12 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class [%s] @TestEngine.Test method [%s]", testClass.getName(), method.getName());
             }
         }
+        */
 
         processSelectors(engineDescriptor, testClassToMethodMap);
     }
 
-    private void resolveClasspathRoot(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+    private void resolveClasspathRoot(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("resolveClasspathRoot()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
@@ -129,7 +128,7 @@ public class TestEngineDiscoverySelectorResolver {
         }
     }
 
-    private void resolvePackageSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+    private void resolvePackageSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("resolvePackageSelector()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
@@ -146,7 +145,7 @@ public class TestEngineDiscoverySelectorResolver {
         }
     }
 
-    private void resolveClassSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+    private void resolveClassSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("resolveClassSelector()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
@@ -164,7 +163,7 @@ public class TestEngineDiscoverySelectorResolver {
         }
     }
 
-    private void resolveMethodSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, List<Method>> testClassToMethodMap) {
+    private void resolveMethodSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("resolveMethodSelector()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
@@ -176,8 +175,7 @@ public class TestEngineDiscoverySelectorResolver {
 
             if (IS_TEST_METHOD.test(method)) {
                 LOGGER.trace("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName());
-                List<Method> methods = testClassToMethodMap.get(clazz);
-
+                Collection<Method> methods = testClassToMethodMap.get(clazz);
                 if (methods == null) {
                     methods = new ArrayList<>();
                     testClassToMethodMap.put(clazz, methods);
@@ -190,7 +188,7 @@ public class TestEngineDiscoverySelectorResolver {
 
     private void processSelectors(
             EngineDescriptor engineDescriptor,
-            Map<Class<?>, List<Method>> testClassToMethodMap) {
+            Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("processSelectors()");
         UniqueId uniqueId = engineDescriptor.getUniqueId();
 
@@ -205,102 +203,43 @@ public class TestEngineDiscoverySelectorResolver {
 
                 LOGGER.trace("processing test class [%s]", testClass.getName());
 
-                Collection<Object> testParameters = null;
-
                 // Try to get test parameters using a @TestEngine.ParameterSupplier or @TestEngine.ParameterSupplier fields and methods
-                List<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
-                LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
-
-                for (Field field : parameterSupplierFields) {
-                    LOGGER.trace("test class [%s] parameter supplier field name [%s]", testClass.getName(), field.getName());
-                }
-
-                List<Method> parameterSupplierMethods = TestEngineUtils.getParameterSupplierMethods(testClass);
+                Collection<Method> parameterSupplierMethods = TestEngineUtils.getParameterSupplierMethods(testClass);
                 LOGGER.trace("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size());
 
-                for (Method method : parameterSupplierMethods) {
-                    LOGGER.trace("test class [%s] parameter supplier method name [%s]", testClass.getName(), method.getName());
-                }
+                Collection<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
+                LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
 
-                if (!parameterSupplierFields.isEmpty() && !parameterSupplierMethods.isEmpty()) {
-                    // @TestEngine.ParameterSupplier field(s) and method(s) both found
+                if ((parameterSupplierFields.size() + parameterSupplierMethods.size()) != 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains both a @TestEngine.ParameterSupplier field and @TestEngine.ParameterSupplier method",
+                                    "Test class [%s] must define either one @TestEngine.ParameterSupplier field or one @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 }
 
-                if (parameterSupplierFields.isEmpty() && parameterSupplierMethods.isEmpty()) {
-                    // No @TestEngine.ParameterSupplier field or method found
-                    throw new TestClassConfigurationException(
-                            String.format(
-                                    "Test class [%s] requires either @TestEngine.ParameterSupplier field or method",
-                                    testClass.getName()));
-                }
+                Collection<Object> testParameters;
 
-                if (parameterSupplierFields.size() > 1) {
-                    // More than one @TestEngine.ParameterSupplier field found
-                    throw new TestClassConfigurationException(
-                            String.format(
-                                    "Test class [%s] contains more than one @TestEngine.ParameterSupplier field",
-                                    testClass.getName()));
-                } else if (parameterSupplierFields.size() == 1) {
-                    try {
-                        Object parameterSupplierValue = parameterSupplierFields.get(0).get(null);
-                        if (parameterSupplierValue instanceof Stream) {
-                            testParameters = ((Stream<Object>) parameterSupplierValue).collect(Collectors.toList());
-                        } else {
-                            testParameters = (Collection<Object>) parameterSupplierValue;
-                        }
-                    } catch (ClassCastException e) {
-                        throw new TestClassConfigurationException(
-                                String.format(
-                                        "Test class [%s] @TestEngine.ParameterSupplier field must return a Stream or Collection",
-                                        testClass.getName()),
-                                e);
+                try {
+                    if (parameterSupplierMethods.size() == 1) {
+                        testParameters = (Collection<Object>) parameterSupplierMethods.stream().findFirst().get().invoke(null, (Object[]) null);
+                    } else {
+                        testParameters = (Collection<Object>) parameterSupplierFields.stream().findFirst().get().get(null);
                     }
-                } else if (parameterSupplierMethods.size() > 1) {
-                    // More than one @TestEngine.ParameterSupplier method found
-                    throw new TestClassConfigurationException(
-                            String.format(
-                                    "Test class [%s] contains more than one @TestEngine.ParameterSupplier method",
-                                    testClass.getName()));
-                } else {
-                    try {
-                        Object parameterSupplierValue = parameterSupplierMethods.get(0).invoke(null, (Object[]) null);
-                        if (parameterSupplierValue instanceof Stream) {
-                            testParameters = ((Stream<Object>) parameterSupplierValue).collect(Collectors.toList());
-                        } else {
-                            testParameters = (Collection<Object>) parameterSupplierValue;
-                        }
-                    } catch (ClassCastException e) {
-                        throw new TestClassConfigurationException(
-                                String.format(
-                                        "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream or Collection",
-                                        testClass.getName()),
-                                e);
-                    }
+                } catch (ClassCastException e) {
+                    throw new RuntimeException(e);
                 }
 
                 // Validate that we have a @TestEngine.Parameter field
-                List<Field> parameterInjectFields = TestEngineUtils.getParameterInjectFields(testClass);
-                Field parameterInjectField;
+                Collection<Field> parameterInjectFields = TestEngineUtils.getParameterInjectFields(testClass);
 
-                if (parameterInjectFields.size() > 1) {
-                    // More than one @TestEngine.ParameterInject  field found
+                if (parameterInjectFields.size() != 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] contains more than one @TestEngine.ParameterInject field",
-                                    testClass.getName()));
-                } else if (parameterInjectFields.size() == 1) {
-                    parameterInjectField = parameterInjectFields.get(0);
-                } else {
-                    // No @TestEngine.ParameterInject  field found
-                    throw new TestClassConfigurationException(
-                            String.format(
-                                    "Test class [%s] public (non-static) @TestEngine.ParameterInject field required",
+                                    "Test class [%s] must define one @TestEngine.ParameterInject field",
                                     testClass.getName()));
                 }
+
+                Field parameterInjectField = parameterInjectFields.stream().findFirst().get();
 
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
                 LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());

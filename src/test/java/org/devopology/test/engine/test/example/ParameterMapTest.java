@@ -5,7 +5,6 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Example test
@@ -16,14 +15,14 @@ public class ParameterMapTest {
     public ParameterMap parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<ParameterMap> parameters() {
+    public static Collection<ParameterMap> parameters() {
         Collection<ParameterMap> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(ParameterMap.of("parameter map [" + i + "]").put("value", String.valueOf(i)));
         }
 
-        return collection.stream();
+        return collection;
     }
 
     @TestEngine.BeforeAll
