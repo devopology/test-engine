@@ -142,7 +142,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 

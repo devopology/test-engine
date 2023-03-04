@@ -250,7 +250,7 @@ public class TestEngineDiscoverySelectorResolver {
                                     "Test class [%s] @TestEngine.ParameterSupplier collection is empty",
                                     testClass.getName()));
                 }
-                
+
                 // Build the test descriptor tree if we have test parameters
                 // i.e. Tests with an empty set of parameters will be ignored
                 String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
