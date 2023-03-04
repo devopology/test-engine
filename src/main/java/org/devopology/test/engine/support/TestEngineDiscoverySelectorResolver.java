@@ -244,72 +244,77 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
                 LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());
 
-                if (!testParameters.isEmpty()) {
-                    // Build the test descriptor tree if we have test parameters
-                    // i.e. Tests with an empty set of parameters will be ignored
-                    String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
+                if (testParameters.size() == 0) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] @TestEngine.ParameterSupplier collection is empty",
+                                    testClass.getName()));
+                }
+                
+                // Build the test descriptor tree if we have test parameters
+                // i.e. Tests with an empty set of parameters will be ignored
+                String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
-                    TestEngineClassTestDescriptor testClassTestDescriptor =
-                            new TestEngineClassTestDescriptor(
-                                    uniqueId.append("/", testClass.getName()),
-                                    testClassDisplayName,
-                                    testClass);
+                TestEngineClassTestDescriptor testClassTestDescriptor =
+                        new TestEngineClassTestDescriptor(
+                                uniqueId.append("/", testClass.getName()),
+                                testClassDisplayName,
+                                testClass);
 
-                    List<Object> testParameterList = new ArrayList<>(testParameters);
-                    for (int i = 0; i < testParameterList.size(); i++) {
-                        // Build the test descriptor for each test class / test parameter
-                        Object testParameter = testParameterList.get(i);
-                        String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
+                List<Object> testParameterList = new ArrayList<>(testParameters);
+                for (int i = 0; i < testParameterList.size(); i++) {
+                    // Build the test descriptor for each test class / test parameter
+                    Object testParameter = testParameterList.get(i);
+                    String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
 
-                        if (testParameter instanceof Named) {
-                            testParameter = ((Named) testParameter).getPayload();
+                    if (testParameter instanceof Named) {
+                        testParameter = ((Named) testParameter).getPayload();
+                    }
+
+                    if (Arrays.isArray(testParameter)) {
+                        testParameterDisplayName = "Array [" + i + "]";
+                    }
+
+                    String testParameterUniqueName = testParameter + "/" + UUID.randomUUID();
+
+                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
+                            new TestEngineParameterTestDescriptor(
+                                    uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
+                                    testParameterDisplayName,
+                                    testClass,
+                                    testParameter);
+
+                    for (Method testMethod : testClassToMethodMap.get(testClass)) {
+                        if (TestEngineUtils.isDisabled(testMethod)) {
+                            LOGGER.trace(
+                                    "test class [%s] test method [%s] is disabled",
+                                    testClass.getName(),
+                                    testMethod.getName());
+                            continue;
                         }
 
-                        if (Arrays.isArray(testParameter)) {
-                            testParameterDisplayName = "Array [" + i + "]";
-                        }
+                        // Build the test descriptor for each test class / test parameter / test method
+                        String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
+                        String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
 
-                        String testParameterUniqueName = testParameter + "/" + UUID.randomUUID();
-
-                        TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
-                                new TestEngineParameterTestDescriptor(
-                                        uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
-                                        testParameterDisplayName,
+                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
+                                new TestEngineTestMethodTestDescriptor(
+                                        uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
+                                        testMethodDisplayName,
                                         testClass,
-                                        testParameter);
+                                        testParameter,
+                                        testMethod);
 
-                        for (Method testMethod : testClassToMethodMap.get(testClass)) {
-                            if (TestEngineUtils.isDisabled(testMethod)) {
-                                LOGGER.trace(
-                                        "test class [%s] test method [%s] is disabled",
-                                        testClass.getName(),
-                                        testMethod.getName());
-                                continue;
-                            }
-
-                            // Build the test descriptor for each test class / test parameter / test method
-                            String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
-                            String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
-
-                            TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
-                                    new TestEngineTestMethodTestDescriptor(
-                                            uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
-                                            testMethodDisplayName,
-                                            testClass,
-                                            testParameter,
-                                            testMethod);
-
-                            testEngineParameterTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
-                        }
-
-                        if (testEngineParameterTestDescriptor.getChildren().size() > 0) {
-                            testClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-                        }
+                        testEngineParameterTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
                     }
 
-                    if (testClassTestDescriptor.getChildren().size() > 0) {
-                        engineDescriptor.addChild(testClassTestDescriptor);
+                    if (testEngineParameterTestDescriptor.getChildren().size() > 0) {
+                        testClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
                     }
+                }
+
+                if (testClassTestDescriptor.getChildren().size() > 0) {
+                    engineDescriptor.addChild(testClassTestDescriptor);
                 }
             }
         } catch (Throwable t) {
