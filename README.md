@@ -36,7 +36,7 @@ Contributions to the Test Engine are both welcomed and appreciated.
 | Annotation                      | Scope            | Required | Static | Examples                                                                                              |
 |---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
-| `@TestEngine.ParameterInject`   | field            | yes      | no     | `private String value;` <br/> `public String value;`                                                  |
+| `@TestEngine.ParameterInject`   | field            | yes      | no     | `public String value;` <br/> `protected String value;`                                                |
 | `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                   |
 | `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                            |
 | `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                           |
