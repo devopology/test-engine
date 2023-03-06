@@ -13,7 +13,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v1.0.1](https://github.com/devopology/test-engine/releases/tag/v1.0.1) (2023-03-04)
+- General Availability (GA): [Devopology Test Engine v1.0.1](https://github.com/devopology/test-engine/releases/tag/v1.0.1) (2023-03-04)
 
 **Notes**
 
@@ -28,7 +28,7 @@ Github discussions is the current mechanism
 
 ## Contributing
 
-Contributions to the Test Engine are both welcomed and appreciated.
+Contributions to the Devopology Test Engine are both welcomed and appreciated.
 
 ## Common Annotations
 
@@ -150,11 +150,11 @@ Set up Maven to use the test engine
 
 **Notes**
 
-- The Test Engine uses core JUnit 5 jars as dependencies
+- The Devopology Test Engine uses core JUnit 5 jars as dependencies
 
 ## Command Line (standalone) Usage
 
-The Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+The Devopology Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
 Example:
 
@@ -164,7 +164,7 @@ java \
   org.devopology.test.engine.TestEngine
 ```
 
-The Test Engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
+The Devopology Test Engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
 
 Write a test...
 
@@ -250,7 +250,7 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 **Notes**
 
-- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the Test Engine. Use the correct imports
+- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the Devopology Test Engine. Use the correct imports
 
 # Building
 
