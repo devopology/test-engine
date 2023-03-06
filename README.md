@@ -150,11 +150,11 @@ Set up Maven to use the test engine
 
 **Notes**
 
-- The test engine uses core JUnit 5 jars as dependencies
+- The Test Engine uses core JUnit 5 jars as dependencies
 
 ## Command Line (standalone) Usage
 
-The test engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+The Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
 Example:
 
@@ -164,7 +164,7 @@ java \
   org.devopology.test.engine.TestEngine
 ```
 
-The test engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
+The Test Engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
 
 Write a test...
 
@@ -250,7 +250,7 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 **Notes**
 
-- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the test engine. Use the correct imports
+- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the Test Engine. Use the correct imports
 
 # Building
 
