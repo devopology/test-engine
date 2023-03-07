@@ -46,6 +46,10 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 | `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                    |
 
 
+**NOTES**
+
+- Methods are sorted / executed in alphabetical order based on a `String.compareTo` comparison of method names
+
 # State Machine Flow
 
 Basic flow...
