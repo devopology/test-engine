@@ -249,7 +249,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
                 LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());
 
-                if (testParameters.size() == 0) {
+                if (testParameters.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] @TestEngine.ParameterSupplier collection is empty",
