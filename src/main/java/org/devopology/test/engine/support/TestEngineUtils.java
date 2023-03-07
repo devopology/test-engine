@@ -136,13 +136,10 @@ public final class TestEngineUtils {
                 })
                 .filter(field -> {
                     int modifiers = field.getModifiers();
-                    switch (scope) {
-                        case STATIC: {
-                            return Modifier.isStatic(modifiers);
-                        }
-                        default: {
-                            return !Modifier.isStatic(modifiers);
-                        }
+                    if (scope == Scope.STATIC) {
+                        return Modifier.isStatic(modifiers);
+                    } else {
+                        return !Modifier.isStatic(modifiers);
                     }
                 }).forEach(field -> {
                     if (fieldMap.putIfAbsent(field.getName(), field) == null) {
