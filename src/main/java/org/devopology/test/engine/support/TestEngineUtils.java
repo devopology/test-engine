@@ -215,13 +215,11 @@ public final class TestEngineUtils {
                 })
                 .filter(method -> {
                     int modifiers = method.getModifiers();
-                    switch (scope) {
-                        case STATIC: {
-                            return Modifier.isStatic(modifiers);
-                        }
-                        default: {
-                            return !Modifier.isStatic(modifiers);
-                        }
+                    if (scope == Scope.STATIC) {
+                        return Modifier.isStatic(modifiers);
+                    }
+                    else {
+                        return !Modifier.isStatic(modifiers);
                     }
                 })
                 .filter(method -> method.getParameterCount() == parameterCount)
@@ -620,15 +618,11 @@ public final class TestEngineUtils {
             return "null";
         }
 
-        String displayName;
+        String displayName = null;
 
-        AtomicReference<String> result = new AtomicReference<>();
-
-        Switch.switchType(
-                object,
-                Switch.switchCase(Metadata.class, metadata -> result.set(metadata.getDisplayName())));
-
-        displayName = result.get();
+        if (object instanceof Metadata) {
+            displayName = ((Metadata) object).getDisplayName();
+        }
 
         if (displayName == null) {
             displayName = object.toString();
