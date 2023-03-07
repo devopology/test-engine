@@ -521,6 +521,16 @@ public final class TestEngineUtils {
     }
 
     /**
+     * Method to get whether a test class is a base class
+     *
+     * @param clazz
+     * @return
+     */
+    public static boolean isBaseClass(Class<?> clazz) {
+        return clazz.isAnnotationPresent(TestEngine.BaseClass.class);
+    }
+
+    /**
      * Method to get whether a test class is disabled
      *
      * @param clazz

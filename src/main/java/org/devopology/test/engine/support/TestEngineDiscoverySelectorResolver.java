@@ -55,7 +55,7 @@ public class TestEngineDiscoverySelectorResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoverySelectorResolver.class);
 
     /**
-     * Predicate to determine if a class is a test class (has @Test methods)
+     * Predicate to determine if a class is a test class (has @TestEngine.Test methods)
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
         int modifiers = clazz.getModifiers();
@@ -69,7 +69,7 @@ public class TestEngineDiscoverySelectorResolver {
             method -> TestEngineUtils.getTestMethods(method.getDeclaringClass()).contains(method);
 
     /**
-     * Method to resolve tests, adding them to the EngineDescriptor
+     * Method to resolve test classes / methods, adding them to the EngineDescriptor
      *
      * @param engineDiscoveryRequest
      * @param engineDescriptor
@@ -195,6 +195,11 @@ public class TestEngineDiscoverySelectorResolver {
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
                 LOGGER.trace("test class [%s]", testClass.getName());
+
+                if (TestEngineUtils.isBaseClass(testClass)) {
+                    LOGGER.trace("test class [%s] is a base class not meant for execution", testClass.getName());
+                    continue;
+                }
 
                 if (TestEngineUtils.isDisabled(testClass)) {
                     LOGGER.trace("test class [%s] is disabled", testClass.getName());

@@ -6,7 +6,8 @@ import org.devopology.test.engine.api.TestEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class BaseTest {
+@TestEngine.BaseClass
+public class BaseTest {
 
     @TestEngine.ParameterInject
     protected int parameter;

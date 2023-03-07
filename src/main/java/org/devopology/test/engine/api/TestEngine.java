@@ -79,6 +79,15 @@ public @interface TestEngine {
 
     }
 
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    /**
+     * Annotation to mark a test class as a base class (don't execute)
+     */
+    @interface BaseClass {
+
+    }
+
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
     /**
