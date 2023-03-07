@@ -23,6 +23,11 @@ public abstract class BaseTest {
     }
 
     @TestEngine.BeforeClass
+    protected static void _beforeClass() {
+        System.out.println("_beforeClass()");
+    }
+
+    @TestEngine.BeforeClass
     protected static void beforeClass() {
         System.out.println("beforeClass()");
     }
@@ -45,5 +50,10 @@ public abstract class BaseTest {
     @TestEngine.AfterClass
     protected static void afterClass() {
         System.out.println("afterClass()");
+    }
+
+    @TestEngine.AfterClass
+    protected static void afterClass_() {
+        System.out.println("afterClass_()");
     }
 }
