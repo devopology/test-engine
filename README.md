@@ -32,7 +32,6 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 
 ## Common Annotations
 
-
 | Annotation                      | Scope            | Required | Static | Examples                                                                                              |
 |---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
@@ -49,6 +48,14 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 **NOTES**
 
 - Methods are sorted / executed in alphabetical order based on a `String.compareTo` comparison of method names
+
+## Additional Annotations
+
+
+| Annotation              | Scope | Required | Usage                                                             |
+|-------------------------|-------|----------|-------------------------------------------------------------------|
+| `@TestEngine.BaseClass` | class | no       | Marks a test class as being a base class (skips direct execution) |
+
 
 # State Machine Flow
 
