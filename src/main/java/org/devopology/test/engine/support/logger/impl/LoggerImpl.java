@@ -29,6 +29,7 @@ import java.util.Objects;
 /**
  * Class to implement logger
  */
+@SuppressWarnings("PMD.GodClass")
 public class LoggerImpl implements Logger {
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
