@@ -87,11 +87,13 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testClassTestDescriptor.getTestClass();
+                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                    Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
+                    Object parameter = testEngineParameterTestDescriptor.getTestParameter();
+                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
                     stringBuilder
                             .append("[")
-                            .append(testDescriptor.getDisplayName())
+                            .append(parameterDisplayName)
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
@@ -101,9 +103,11 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
+                    Object parameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
                     stringBuilder
                             .append("[")
-                            .append(testDescriptor.getDisplayName())
+                            .append(parameterDisplayName)
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
@@ -129,11 +133,13 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testClassTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testClassTestDescriptor.getTestClass();
+                    TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                    Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
+                    Object parameter = testengineParameterTestDescriptor.getTestParameter();
+                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
                     stringBuilder
                             .append("[")
-                            .append(testDescriptor.getDisplayName())
+                            .append(parameterDisplayName)
                             .append("] - ")
                             .append(testClass.getName());
                 }),
@@ -141,9 +147,11 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
+                    Object parameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
                     stringBuilder
                             .append("[")
-                            .append(testDescriptor.getDisplayName())
+                            .append(parameterDisplayName)
                             .append("] - ")
                             .append(testClass.getName())
                             .append(" ")
