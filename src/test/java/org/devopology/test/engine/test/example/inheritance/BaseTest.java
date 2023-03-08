@@ -6,7 +6,8 @@ import org.devopology.test.engine.api.TestEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class BaseTest {
+@TestEngine.BaseClass
+public class BaseTest {
 
     @TestEngine.ParameterInject
     protected int parameter;
@@ -20,6 +21,11 @@ public abstract class BaseTest {
         }
 
         return collection;
+    }
+
+    @TestEngine.BeforeClass
+    protected static void _beforeClass() {
+        System.out.println("_beforeClass()");
     }
 
     @TestEngine.BeforeClass
@@ -45,5 +51,10 @@ public abstract class BaseTest {
     @TestEngine.AfterClass
     protected static void afterClass() {
         System.out.println("afterClass()");
+    }
+
+    @TestEngine.AfterClass
+    protected static void afterClass_() {
+        System.out.println("afterClass_()");
     }
 }

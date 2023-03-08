@@ -55,7 +55,7 @@ public class TestEngineDiscoverySelectorResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoverySelectorResolver.class);
 
     /**
-     * Predicate to determine if a class is a test class (has @Test methods)
+     * Predicate to determine if a class is a test class (has @TestEngine.Test methods)
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
         int modifiers = clazz.getModifiers();
@@ -69,7 +69,7 @@ public class TestEngineDiscoverySelectorResolver {
             method -> TestEngineUtils.getTestMethods(method.getDeclaringClass()).contains(method);
 
     /**
-     * Method to resolve tests, adding them to the EngineDescriptor
+     * Method to resolve test classes / methods, adding them to the EngineDescriptor
      *
      * @param engineDiscoveryRequest
      * @param engineDescriptor
@@ -91,20 +91,6 @@ public class TestEngineDiscoverySelectorResolver {
 
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
-
-        /*
-        // Sort the test methods by name (Test classes are already sorted by name)
-        for (Map.Entry<Class<?>, Collection<Method> mapEntry : testClassToMethodMap.entrySet()) {
-            Collections.sort(mapEntry.getValue(), Comparator.comparing(Method::getName));
-        }
-
-        for (Class<?> testClass : testClassToMethodMap.keySet()) {
-            List<Method> testMethodList = testClassToMethodMap.get(testClass);
-            for (Method method : testMethodList) {
-                LOGGER.trace("test class [%s] @TestEngine.Test method [%s]", testClass.getName(), method.getName());
-            }
-        }
-        */
 
         processSelectors(engineDescriptor, testClassToMethodMap);
     }
@@ -196,6 +182,11 @@ public class TestEngineDiscoverySelectorResolver {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
                 LOGGER.trace("test class [%s]", testClass.getName());
 
+                if (TestEngineUtils.isBaseClass(testClass)) {
+                    LOGGER.trace("test class [%s] is a base class not meant for execution", testClass.getName());
+                    continue;
+                }
+
                 if (TestEngineUtils.isDisabled(testClass)) {
                     LOGGER.trace("test class [%s] is disabled", testClass.getName());
                     continue;
@@ -244,7 +235,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
                 LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());
 
-                if (testParameters.size() == 0) {
+                if (testParameters.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] @TestEngine.ParameterSupplier collection is empty",
