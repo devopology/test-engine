@@ -42,7 +42,7 @@ public class NamedTest {
         System.out.println("test2(" + parameter + ")");
     }
 
-    @TestEngine.Test
+    @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
     }

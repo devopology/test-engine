@@ -20,7 +20,6 @@ import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
-import org.devopology.test.engine.support.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.launcher.TestPlan;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 /**
@@ -88,21 +86,21 @@ public final class TestEngineUtils {
     /**
      * Method to get a Collection of Fields for a Class and super Classes
      *
-     * @param baseClass
+     * @param clazz
      * @return
      */
     private static Collection<Field> getAllFields(
-            Class<?> baseClass,
+            Class<?> clazz,
             Class<? extends Annotation> annotation,
             Scope scope) {
         LOGGER.trace(
                 "getAllFields(%s, %s, %s)",
-                baseClass.getName(),
+                clazz.getName(),
                 annotation.getName(),
                 scope);
 
         Map<String, Field> fieldMap = new HashMap<>();
-        resolveFields(baseClass, annotation, scope, fieldMap);
+        resolveFields(clazz, annotation, scope, fieldMap);
         List<Field> fieldList = new LinkedList<>(fieldMap.values());
         fieldList.sort(Comparator.comparing(Field::getName));
 
@@ -157,25 +155,25 @@ public final class TestEngineUtils {
     /**
      * Method to get a Collection of all methods from a Class and super Classes
      *
-     * @param baseClass
+     * @param clazz
      * @return
      */
     private static Collection<Method> getAllMethods(
-            Class<?> baseClass,
+            Class<?> clazz,
             Class<? extends Annotation> annotation,
             Scope scope,
             Class<?> returnType,
             int parameterCount) {
         LOGGER.trace(
                 "getAllMethods(%s, %s, %s, %s, %d)",
-                baseClass.getName(),
+                clazz.getName(),
                 annotation.getName(),
                 scope,
                 returnType.getName(),
                 parameterCount);
 
         Map<String, Method> methodMap = new HashMap<>();
-        resolveMethods(baseClass, annotation, scope, returnType, parameterCount, methodMap);
+        resolveMethods(clazz, annotation, scope, returnType, parameterCount, methodMap);
         List<Method> methodList = new LinkedList<>(methodMap.values());
         methodList.sort(Comparator.comparing(Method::getName));
 
@@ -265,7 +263,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            beforeClassMethodCache.put(clazz, methods);
+            beforeClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -291,7 +289,7 @@ public final class TestEngineUtils {
                             TestEngine.ParameterInject.class,
                             Scope.NON_STATIC);
 
-            parameterInjectFieldCache.put(clazz, fields);
+            parameterInjectFieldCache.put(clazz, Collections.unmodifiableCollection(fields));
 
             return fields;
         }
@@ -322,7 +320,7 @@ public final class TestEngineUtils {
             }
         }
 
-        parameterSupplierFieldsCache.put(clazz, parameterSupplierFields);
+        parameterSupplierFieldsCache.put(clazz, Collections.unmodifiableCollection(parameterSupplierFields));
 
         return parameterSupplierFields;
     }
@@ -349,7 +347,7 @@ public final class TestEngineUtils {
                             Collection.class,
                             0);
 
-            parameterSupplierMethodsCache.put(clazz, methods);
+            parameterSupplierMethodsCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -375,7 +373,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            beforeAllMethodCache.put(clazz, methods);
+            beforeAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -401,7 +399,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            beforeEachMethodCache.put(clazz, methods);
+            beforeEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -429,7 +427,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            testMethodCache.put(clazz, methods);
+            testMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -455,9 +453,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            testMethodCache.put(clazz, methods);
-
-            afterEachMethodCache.put(clazz, methods);
+            afterEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -483,7 +479,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            afterAllMethodCache.put(clazz, methods);
+            afterAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -509,7 +505,7 @@ public final class TestEngineUtils {
                             Void.class,
                             0);
 
-            afterClassMethodCache.put(clazz, methods);
+            afterClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }

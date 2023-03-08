@@ -92,20 +92,6 @@ public class TestEngineDiscoverySelectorResolver {
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
-        /*
-        // Sort the test methods by name (Test classes are already sorted by name)
-        for (Map.Entry<Class<?>, Collection<Method> mapEntry : testClassToMethodMap.entrySet()) {
-            Collections.sort(mapEntry.getValue(), Comparator.comparing(Method::getName));
-        }
-
-        for (Class<?> testClass : testClassToMethodMap.keySet()) {
-            List<Method> testMethodList = testClassToMethodMap.get(testClass);
-            for (Method method : testMethodList) {
-                LOGGER.trace("test class [%s] @TestEngine.Test method [%s]", testClass.getName(), method.getName());
-            }
-        }
-        */
-
         processSelectors(engineDescriptor, testClassToMethodMap);
     }
 
