@@ -16,48 +16,64 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.support.api.NamedImpl;
+import org.devopology.test.engine.support.api.ParameterImpl;
 
 import java.util.Objects;
 
 /**
- * Interface to implement a payload wrapper that is describable
+ * Interface to implement a Parameter
  */
-public interface Named extends Metadata, Comparable {
+public interface Parameter {
 
     /**
-     * Method to get the payload
-     *
+     * Method to get the parameter name
      * @return
      */
-    Object getPayload();
+    String name();
+
+    /**
+     * Method to get the parameter value
+     *
+     * @return
+     * @param <T>
+     */
+    <T> T value();
 
     /**
      * Method to create a Named object (useful for a static import)
      *
      * @param name
-     * @param payload
+     * @param value
      * @return
      */
-    static Named named(String name, Object payload) {
-        return of(name, payload);
+    static Parameter parameter(String name, Object value) {
+        return of(name, value);
     }
 
     /**
      * Method to create a Named object
      *
      * @param name
-     * @param payload
+     * @param value
      * @return
      */
-    static Named of(String name, Object payload) {
+    static Parameter of(String name, Object value) {
         Objects.requireNonNull(name);
 
-        String nameTrimmed = name.trim();
-        if (nameTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("name is empty");
         }
 
-        return new NamedImpl(nameTrimmed, payload);
+        return new ParameterImpl(name.trim(), value);
+    }
+
+    static Parameter of(String value) {
+        Objects.requireNonNull(value);
+
+        if (value.trim().isEmpty()) {
+            throw new IllegalArgumentException("value is empty");
+        }
+
+        return new ParameterImpl(value, value);
     }
 }

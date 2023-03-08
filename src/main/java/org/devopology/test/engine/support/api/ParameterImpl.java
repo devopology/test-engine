@@ -16,72 +16,71 @@
 
 package org.devopology.test.engine.support.api;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 
 import java.util.Objects;
 
-public class NamedImpl implements Named {
+public class ParameterImpl implements Parameter {
 
     private final String name;
-    private final Object payload;
+    private final Object value;
 
     /**
      * Constructor
      *
      * @param name
-     * @param payload
+     * @param value
      */
-    public NamedImpl(String name, Object payload) {
+    public ParameterImpl(String name, Object value) {
         Objects.requireNonNull(name);
 
-        String nameTrimmed = name.trim();
-        if (nameTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("name is empty");
         }
 
-        this.name = nameTrimmed;
-        this.payload = payload;
+        this.name = name.trim();
+        this.value = value;
     }
 
     /**
-     * Method to get the display name
+     * Method to get the parameter name
      *
      * @return
      */
-    public String getDisplayName() {
+    @Override
+    public String name() {
         return name;
     }
 
     /**
-     * Method to get the payload
-     *
+     * Method to get the parameter value
      * @return
+     * @param <T>
      */
-    public Object getPayload() {
-        return payload;
+    @Override
+    public <T> T value() {
+        return (T) value;
+    }
+
+    @Override
+    public String toString() {
+        if (value == null) {
+            return "null";
+        } else {
+            return value.toString();
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedImpl named = (NamedImpl) o;
-        return Objects.equals(name, named.name) && Objects.equals(payload, named.payload);
+        ParameterImpl named = (ParameterImpl) o;
+        return Objects.equals(name, named.name) && Objects.equals(value, named.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, payload);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        Objects.requireNonNull(o);
-
-        if (!(o instanceof Named)) {
-            throw new ClassCastException();
-        }
-
-        return name.compareTo(((Named) o).getDisplayName());
+        return Objects.hash(name, value);
     }
 }

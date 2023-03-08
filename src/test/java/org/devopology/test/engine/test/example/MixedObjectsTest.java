@@ -1,6 +1,6 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.math.BigDecimal;
@@ -39,15 +39,15 @@ public class MixedObjectsTest {
     public Object parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<Named> parameters() {
-        Set<Named> collection = new LinkedHashSet<>();
+    public static Collection<Parameter> parameters() {
+        Set<Parameter> collection = new LinkedHashSet<>();
 
-        collection.add(Named.of("BigDecimal", new BigDecimal("1000000000000000000000")));
-        collection.add(Named.of("Integer", 1));
-        collection.add(Named.of("Map", new HashMap<String, String>()));
-        collection.add(Named.of("String", "This is a string"));
-        collection.add(Named.of("null", null));
-        collection.add(Named.of("null2", null));
+        collection.add(Parameter.of("BigDecimal", new BigDecimal("1000000000000000000000")));
+        collection.add(Parameter.of("Integer", 1));
+        collection.add(Parameter.of("Map", new HashMap<String, String>()));
+        collection.add(Parameter.of("String", "This is a string"));
+        collection.add(Parameter.of("null", null));
+        collection.add(Parameter.of("null2", null));
 
         return collection;
     }

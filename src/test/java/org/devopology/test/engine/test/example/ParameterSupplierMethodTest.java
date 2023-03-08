@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -11,14 +12,14 @@ import java.util.Collection;
 public class ParameterSupplierMethodTest {
 
     @TestEngine.ParameterInject
-    public String parameter;
+    public Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<String> parameters() {
-        Collection<String> collection = new ArrayList<>();
+    public static Collection<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(String.valueOf(i));
+            collection.add(Parameter.of(String.valueOf(i)));
         }
 
         return collection;

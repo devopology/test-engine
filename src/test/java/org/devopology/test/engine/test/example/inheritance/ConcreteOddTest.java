@@ -1,6 +1,6 @@
 package org.devopology.test.engine.test.example.inheritance;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.Collection;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConcreteOddTest extends OddBaseTest {
 
     @TestEngine.ParameterSupplier
-    protected static Collection<Named> parameters() {
+    protected static Collection<Parameter> parameters() {
         return OddBaseTest.parameters();
     }
 
@@ -22,13 +22,13 @@ public class ConcreteOddTest extends OddBaseTest {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter + ")");
-        assertThat(parameter % 2).isOdd();
+        assertThat((Integer) parameter.value() % 2).isOdd();
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + parameter + ")");
-        assertThat(parameter % 2).isOdd();
+        assertThat((Integer) parameter.value() % 2).isOdd();
     }
 
     @TestEngine.AfterEach

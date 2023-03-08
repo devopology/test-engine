@@ -17,12 +17,13 @@
 package org.devopology.test.engine.support;
 
 import org.assertj.core.util.Arrays;
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
+import org.junit.jupiter.api.Named;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -208,13 +209,13 @@ public class TestEngineDiscoverySelectorResolver {
                                     testClass.getName()));
                 }
 
-                Collection<Object> testParameters;
+                Collection<Parameter> testParameters;
 
                 try {
                     if (parameterSupplierMethods.size() == 1) {
-                        testParameters = (Collection<Object>) parameterSupplierMethods.stream().findFirst().get().invoke(null, (Object[]) null);
+                        testParameters = (Collection<Parameter>) parameterSupplierMethods.stream().findFirst().get().invoke(null, (Object[]) null);
                     } else {
-                        testParameters = (Collection<Object>) parameterSupplierFields.stream().findFirst().get().get(null);
+                        testParameters = (Collection<Parameter>) parameterSupplierFields.stream().findFirst().get().get(null);
                     }
                 } catch (ClassCastException e) {
                     throw new RuntimeException(e);
@@ -252,26 +253,17 @@ public class TestEngineDiscoverySelectorResolver {
                                 testClassDisplayName,
                                 testClass);
 
-                List<Object> testParameterList = new ArrayList<>(testParameters);
+                List<Parameter> testParameterList = new ArrayList<>(testParameters);
                 for (int i = 0; i < testParameterList.size(); i++) {
                     // Build the test descriptor for each test class / test parameter
-                    Object testParameter = testParameterList.get(i);
-                    String testParameterDisplayName = TestEngineUtils.getDisplayName(testParameter);
-
-                    if (testParameter instanceof Named) {
-                        testParameter = ((Named) testParameter).getPayload();
-                    }
-
-                    if (Arrays.isArray(testParameter)) {
-                        testParameterDisplayName = "Array [" + i + "]";
-                    }
-
+                    Parameter testParameter = testParameterList.get(i);
+                    String testParameterName = testParameter.name();
                     String testParameterUniqueName = testParameter + "/" + UUID.randomUUID();
 
                     TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
                             new TestEngineParameterTestDescriptor(
                                     uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
-                                    testParameterDisplayName,
+                                    testParameterName,
                                     testClass,
                                     testParameter);
 
@@ -286,7 +278,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                         // Build the test descriptor for each test class / test parameter / test method
                         String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
-                        String testMethodUniqueName = testParameterDisplayName + "/" + UUID.randomUUID();
+                        String testMethodUniqueName = testParameterName + "/" + UUID.randomUUID();
 
                         TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
                                 new TestEngineTestMethodTestDescriptor(

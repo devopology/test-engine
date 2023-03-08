@@ -1,6 +1,6 @@
 package org.devopology.test.engine.test.example.inheritance;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,14 +10,14 @@ import java.util.Collection;
 public class BaseTest {
 
     @TestEngine.ParameterInject
-    protected int parameter;
+    protected Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    protected static Collection<Named> parameters() {
-        Collection<Named> collection = new ArrayList<>();
+    protected static Collection<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(Named.of("Array [" + i + "]", i));
+            collection.add(Parameter.of("Array [" + i + "]", i));
         }
 
         return collection;

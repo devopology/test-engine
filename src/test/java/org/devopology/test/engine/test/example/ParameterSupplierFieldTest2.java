@@ -1,6 +1,6 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,14 +12,17 @@ import java.util.Collection;
 public class ParameterSupplierFieldTest2 {
 
     @TestEngine.ParameterInject
-    public String[] parameter;
+    public Parameter parameter;
+
+    private String[] values;
 
     @TestEngine.ParameterSupplier
-    public static Collection<Named> PARAMETERS = TestParameterSupplier.values();
+    public static Collection<Parameter> PARAMETERS = TestParameterSupplier.values();
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+        values = parameter.value();
     }
 
     @TestEngine.BeforeEach
@@ -29,12 +32,12 @@ public class ParameterSupplierFieldTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + toString(parameter) + ")");
+        System.out.println("test1(" + toString(values) + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + toString(parameter) + ")");
+        System.out.println("test2(" + toString(values) + ")");
     }
 
     @TestEngine.AfterEach
@@ -49,11 +52,11 @@ public class ParameterSupplierFieldTest2 {
 
     private static class TestParameterSupplier {
 
-        public static Collection<Named> values() {
-            Collection<Named> list = new ArrayList<>();
+        public static Collection<Parameter> values() {
+            Collection<Parameter> list = new ArrayList<>();
 
-            list.add(Named.of("array 0", new String[] { "1", "2" }));
-            list.add(Named.of("array 1", new String[] { "1", "2", "3" }));
+            list.add(Parameter.of("array 0", new String[] { "1", "2" }));
+            list.add(Parameter.of("array 1", new String[] { "1", "2", "3" }));
 
             return list;
         }

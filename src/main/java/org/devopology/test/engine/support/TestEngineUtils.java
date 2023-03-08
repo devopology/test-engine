@@ -17,6 +17,7 @@
 package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.api.Metadata;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
@@ -616,7 +617,9 @@ public final class TestEngineUtils {
 
         String displayName = null;
 
-        if (object instanceof Metadata) {
+        if (object instanceof Parameter) {
+            displayName = ((Parameter) object).name();
+        } else if (object instanceof Metadata) {
             displayName = ((Metadata) object).getDisplayName();
         }
 

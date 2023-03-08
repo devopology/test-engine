@@ -1,18 +1,18 @@
 package org.devopology.test.engine.test.example.inheritance;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public abstract class OddBaseTest extends BaseTest {
 
-    protected static Collection<Named> parameters() {
+    protected static Collection<Parameter> parameters() {
         return BaseTest
                 .parameters()
                 .stream()
-                .filter(named -> {
-                    int value = (Integer) named.getPayload();
+                .filter(parameter -> {
+                    int value = parameter.value();
                     return (value % 2) != 0;
                 })
                 .collect(Collectors.toList());

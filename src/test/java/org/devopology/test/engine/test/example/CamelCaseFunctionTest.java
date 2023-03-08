@@ -1,7 +1,7 @@
 package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.Metadata;
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -21,32 +21,40 @@ public class CamelCaseFunctionTest {
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
     @TestEngine.ParameterInject
-    public Tuple parameter;
+    public Parameter parameter;
+
+    private Tuple tuple;
 
     @TestEngine.ParameterSupplier
-    public static Collection<Object> parameters() {
-        Collection<Object> collection = new ArrayList<>();
+    public static Collection<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS", "this");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("tHis", "this");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         return collection;
     }
 
+    @TestEngine.BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
+        tuple = parameter.value();
+    }
+
     @TestEngine.Test
     public void test() {
-        String actual = FUNCTION.apply(parameter.input);
-        System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
-        assertThat(actual).isEqualTo(parameter.expected);
+        String actual = FUNCTION.apply(tuple.input);
+        System.out.println("test() input [" + tuple.input + "] expected [" + tuple.expected + "] actual [" + actual + "]");
+        assertThat(actual).isEqualTo(tuple.expected);
     }
 
     // Based on https://www.baeldung.com/java-string-to-camel-case

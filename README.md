@@ -32,17 +32,17 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 
 ## Common Annotations
 
-| Annotation                      | Scope            | Required | Static | Examples                                                                                              |
-|---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
-| `@TestEngine.ParameterInject`   | field            | yes      | no     | `public String value;` <br/> `protected String value;`                                                |
-| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                   |
-| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                            |
-| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                           |
-| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                                 |
-| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                            |
-| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                             |
-| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                    |
+| Annotation                      | Scope            | Required | Static | Examples                                                                                                    |
+|---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<Parameter> PARAMETERS;` <br/> `public static Collection<Parameter> parameters();` |
+| `@TestEngine.ParameterInject`   | field            | yes      | no     | `public String value;` <br/> `protected String value;`                                                      |
+| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                         |
+| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                                  |
+| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                                 |
+| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                                       |
+| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                                  |
+| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                                   |
+| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                          |
 
 
 **NOTES**
@@ -64,19 +64,19 @@ Basic flow...
 ```
  Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
  
- for (each test class in the test class list) {
+ for (each test class in the Collection<Class>) {
  
     for each test class, create a thread
     
     thread {
     
-        call "@TestEngine.ParameterSupplier" field or method to get a parameter collection
+        call "@TestEngine.ParameterSupplier" field or method to get a Collection<Parameter>
     
         execute "@TestEngine.BeforeClass" methods 
      
         create a single instance of the test class
         
-        for (each parameter in the parameter collection) {
+        for (each Parameter in the Collection<Parameter>) {
         
             set the "@TestEngine.ParameterInject" field value
             
@@ -104,10 +104,6 @@ Basic flow...
 **Notes**
 
 - The type returned in the `@TestEngine.ParameterSupplier` `Collection` must match the type of the `@TestEngine.ParameterInject` field
-
-
-- `Named` is a special case. The `@TestEngine.ParameterInject` field type should match the type of Object wrapped by the `Named` instance
-
 
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported to Java

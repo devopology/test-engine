@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -11,10 +12,10 @@ import java.util.Collection;
 public class ParameterSupplierFieldTest {
 
     @TestEngine.ParameterInject
-    public String parameter;
+    public Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
+    public static Collection<Parameter> PARAMETERS = TestParameterSupplier.values();
 
     @TestEngine.BeforeClass
     public static void beforeClas() {
@@ -33,12 +34,12 @@ public class ParameterSupplierFieldTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterEach
@@ -58,11 +59,11 @@ public class ParameterSupplierFieldTest {
 
     private static class TestParameterSupplier {
 
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
+        public static Collection<Parameter> values() {
+            Collection<Parameter> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
+                collection.add(Parameter.of(String.valueOf(i)));
             }
 
             return collection;

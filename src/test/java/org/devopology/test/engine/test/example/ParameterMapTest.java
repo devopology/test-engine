@@ -1,5 +1,6 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.ParameterMap;
 import org.devopology.test.engine.api.TestEngine;
 
@@ -12,14 +13,16 @@ import java.util.Collection;
 public class ParameterMapTest {
 
     @TestEngine.ParameterInject
-    public ParameterMap parameter;
+    public Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<ParameterMap> parameters() {
-        Collection<ParameterMap> collection = new ArrayList<>();
+    public static Collection<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(ParameterMap.of("parameter map [" + i + "]").put("value", String.valueOf(i)));
+            ParameterMap parameterMap = new ParameterMap();
+            parameterMap.put("key1", "value1");
+            collection.add(Parameter.of("ParameterMap[" + i + "]", parameterMap));
         }
 
         return collection;
@@ -32,13 +35,13 @@ public class ParameterMapTest {
 
     @TestEngine.Test
     public void test1() {
-        String value = parameter.get("value");
+        String value = ((ParameterMap) parameter.value()).get("key1");
         System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        String value = parameter.get("value");
+        String value = ((ParameterMap) parameter.value()).get("key1");
         System.out.println("test2(" + value + ")");
     }
 

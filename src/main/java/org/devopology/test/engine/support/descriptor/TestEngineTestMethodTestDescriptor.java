@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine.support.descriptor;
 
+import org.devopology.test.engine.api.Parameter;
 import org.junit.platform.engine.UniqueId;
 
 import java.lang.reflect.Method;
@@ -23,14 +24,14 @@ import java.lang.reflect.Method;
 public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Object testParameter;
+    private final Parameter testParameter;
     private final Method testMethod;
 
     public TestEngineTestMethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Object testParameter,
+            Parameter testParameter,
             Method testMethod) {
         super(uniqueId, displayName);
         this.testClass = testClass;
@@ -47,7 +48,7 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
         return testClass;
     }
 
-    public Object getTestParameter() {
+    public Parameter getTestParameter() {
         return testParameter;
     }
 
