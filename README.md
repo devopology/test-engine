@@ -17,10 +17,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 **Notes**
 
-- **v1.0.x versions are NOT backward compatible with v0.0.Z versions**
-
-
-- v0.0.Z releases are considered deprecated
+- **v2.0.x versions are NOT backward compatible with v1.Y.Z versions**
 
 ## Getting Help
 
