@@ -46,7 +46,6 @@ public class ParameterWithMixedObjectTest {
         collection.add(Parameter.of("Map", new HashMap<String, String>()));
         collection.add(Parameter.of("String", "This is a string"));
         collection.add(Parameter.of("null", null));
-        collection.add(Parameter.of("null2", null));
 
         return collection.stream();
     }

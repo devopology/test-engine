@@ -32,7 +32,7 @@ public interface Parameter {
     String name();
 
     /**
-     * Method to get the parameter value
+     * Method to get the parameter value cast as the return type
      *
      * @return
      * @param <T>
@@ -49,7 +49,7 @@ public interface Parameter {
     <T> T value(Class<T> clazz);
 
     /**
-     * Method to create a Named object (useful for a static import)
+     * Method to create a Parameter object (useful for a static import)
      *
      * @param name
      * @param value
@@ -60,7 +60,7 @@ public interface Parameter {
     }
 
     /**
-     * Method to create a Named object
+     * Method to create a Parameter object
      *
      * @param name
      * @param value
@@ -76,6 +76,82 @@ public interface Parameter {
         return new ParameterImpl(name.trim(), value);
     }
 
+    /**
+     * Method to create a Parameter containing a boolean
+     *
+     * @param b
+     * @return
+     */
+    static Parameter of(boolean b) {
+        return of(String.valueOf(b), b);
+    }
+
+    /**
+     * Method to create a Parameter containing as byte
+     *
+     * @param b
+     * @return
+     */
+    static Parameter of(byte b) {
+        return of(String.valueOf(b), b);
+    }
+
+    /**
+     * Method to create a Parameter containing a short
+     *
+     * @param s
+     * @return
+     */
+    static Parameter of(short s) {
+        return of(String.valueOf(s), s);
+    }
+
+    /**
+     * Method to create a Parameter containing an int
+     *
+     * @param i
+     * @return
+     */
+    static Parameter of(int i) {
+        return of(String.valueOf(i), i);
+    }
+
+    /**
+     * Method to create a Parameter containing a long
+     *
+     * @param l
+     * @return
+     */
+    static Parameter of(long l) {
+        return of(String.valueOf(l), l);
+    }
+
+    /**
+     * Method to create a Parameter containing a float
+     *
+     * @param f
+     * @return
+     */
+    static Parameter of(float f) {
+        return of(String.valueOf(f), f);
+    }
+
+    /**
+     * Method to create a Parameter containing a double
+     *
+     * @param d
+     * @return
+     */
+    static Parameter of(double d) {
+        return of(String.valueOf(d), d);
+    }
+
+    /**
+     * Method to create a Parameter containing a String
+     *
+     * @param value not null
+     * @return
+     */
     static Parameter of(String value) {
         Objects.requireNonNull(value);
 
