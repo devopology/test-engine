@@ -82,77 +82,6 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of Fields for a Class and super Classes
-     *
-     * @param clazz
-     * @return
-     */
-    /*
-    private static Collection<Field> getAllFields(
-            Class<?> clazz,
-            Class<? extends Annotation> annotation,
-            Scope scope) {
-        LOGGER.trace(
-                "getAllFields(%s, %s, %s)",
-                clazz.getName(),
-                annotation.getName(),
-                scope);
-
-        Map<String, Field> fieldMap = new HashMap<>();
-        resolveFields(clazz, annotation, scope, fieldMap);
-        List<Field> fieldList = new LinkedList<>(fieldMap.values());
-        fieldList.sort(Comparator.comparing(Field::getName));
-
-        return fieldList;
-    }
-
-    /**
-     * Method to recursively resolve Fields
-     *
-     * @param clazz
-     * @param annotation
-     * @param scope
-     * @param fieldMap
-     */
-    /*
-    private static void resolveFields(
-            Class<?> clazz,
-            Class<? extends Annotation> annotation,
-            Scope scope,
-            Map<String, Field> fieldMap) {
-        LOGGER.trace(
-                "resolveFields(%s, %s, %s)",
-                clazz.getName(),
-                annotation.getName(),
-                scope);
-
-        Stream.of(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(annotation))
-                .filter(field -> {
-                    int modifiers = field.getModifiers();
-                    return Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers);
-                })
-                .filter(field -> {
-                    int modifiers = field.getModifiers();
-                    if (scope == Scope.STATIC) {
-                        return Modifier.isStatic(modifiers);
-                    } else {
-                        return !Modifier.isStatic(modifiers);
-                    }
-                }).forEach(field -> {
-                    if (fieldMap.putIfAbsent(field.getName(), field) == null) {
-                        LOGGER.trace("    add field [%s]", field.getName());
-                        field.setAccessible(true);
-                    }
-                });
-
-        Class<?> declaringClass = clazz.getSuperclass();
-        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
-            resolveFields(declaringClass, annotation, scope, fieldMap);
-        }
-    }
-
-    /**
      * Method to get a Collection of all methods from a Class and super Classes
      *
      * @param clazz
@@ -163,7 +92,7 @@ public final class TestEngineUtils {
             Class<? extends Annotation> annotation,
             Scope scope,
             Class<?> returnType,
-            Class<?>[] parameterTypes) {
+            Class<?> ... parameterTypes) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder

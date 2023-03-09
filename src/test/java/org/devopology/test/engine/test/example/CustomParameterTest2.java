@@ -62,8 +62,8 @@ public class CustomParameterTest2 {
 
     private static class CustomParameter implements Parameter {
 
-        private String name;
-        private Long value;
+        private final String name;
+        private final Long value;
 
         private CustomParameter(String name, Long value) {
             this.name = name;
