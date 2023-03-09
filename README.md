@@ -29,22 +29,23 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Examples                                                                                                  |
-|---------------------------------|--------|-----------|--------|-----------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();` <br/> `protected static Stream<Parameter> parameters();`  |
-| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` <br/> `proteced void setParameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`                                                                       |
-| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                                                                                |
-| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                                                                               |
-| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                                                                                     |
-| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                                                                                |
-| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                                                                                 |
-| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`                                                                        |
-
+| Annotation                      | Scope  |  Required | Static | Examples                                         |
+|---------------------------------|--------|-----------|--------|--------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
+| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`              |
+| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                       |
+| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                      |
+| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                            |
+| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                       |
+| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                        |
+| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`               |
 
 **NOTES**
 
-- Methods are sorted / executed in alphabetical order based on a `String.compareTo` comparison of method names
+- Methods are sorted / executed in alphabetical order based on a `String.compareTo(method.getNaem())` comparison, regardless of where they are declared (class or superclass)
+
+- `public` and `protected` methods are supported for `@TestEngine.X` annotations
 
 ## Additional Annotations
 
@@ -98,7 +99,7 @@ Basic flow...
 
 **Notes**
 
-- The type returned in the `@TestEngine.ParameterSupplier` `Stream` must implement `Parameter`
+- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
 
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported to Java
