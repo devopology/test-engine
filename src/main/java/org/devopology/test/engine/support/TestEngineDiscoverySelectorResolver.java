@@ -199,7 +199,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size());
 
                 // Validate parameter supplier method count
-                if (parameterSupplierMethods.size() < 1) {
+                if (parameterSupplierMethods.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] must declare a @TestEngine.ParameterSupplier method",
@@ -237,7 +237,8 @@ public class TestEngineDiscoverySelectorResolver {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream<Parameter>",
-                                    testClass.getName()));
+                                    testClass.getName()),
+                            e);
                 }
 
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
@@ -253,7 +254,7 @@ public class TestEngineDiscoverySelectorResolver {
                 Collection<Method> parameterSetterMethods = TestEngineUtils.getParameterSetterMethods(testClass);
                 LOGGER.trace("test class [%s] parameter setter method count [%d]", testClass.getName(), parameterSetterMethods.size());
 
-                if (parameterSetterMethods.size() < 1) {
+                if (parameterSetterMethods.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
                                     "Test class [%s] must declare a @TestEngine.ParameterSetter method",
