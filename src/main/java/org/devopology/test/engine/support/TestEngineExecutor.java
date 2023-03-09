@@ -77,7 +77,9 @@ public class TestEngineExecutor {
 
             TestDescriptor testDescriptor = rootTestDescriptor.getChildren().stream().findFirst().get();
 
-            logTestHierarchy(testDescriptor, 0);
+            if (LOGGER.isTraceEnabled()) {
+                logTestHierarchy(testDescriptor, 0);
+            }
 
             execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext, countDownLatch);
 
@@ -88,7 +90,9 @@ public class TestEngineExecutor {
 
         List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
 
-        logTestHierarchy(rootTestDescriptor, 0);
+        if (LOGGER.isTraceEnabled()) {
+            logTestHierarchy(rootTestDescriptor, 0);
+        }
 
         TestEngineExecutionContext testEngineExecutionContext =
                 new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
