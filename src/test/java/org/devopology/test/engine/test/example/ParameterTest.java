@@ -5,25 +5,28 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
  */
 public class ParameterTest {
 
-    @TestEngine.ParameterInject
-    public Parameter parameter;
+    private Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<Parameter> parameters() {
+    public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
+            collection.add(Parameter.of(String.valueOf(value)));
         }
+        return collection.stream();
+    }
 
-        return collection;
+    @TestEngine.ParameterSetter
+    public void setParameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll

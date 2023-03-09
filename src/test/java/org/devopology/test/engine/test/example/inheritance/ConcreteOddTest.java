@@ -4,13 +4,14 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcreteOddTest extends OddBaseTest {
 
     @TestEngine.ParameterSupplier
-    protected static Collection<Parameter> parameters() {
+    protected static Stream<Parameter> parameters() {
         return OddBaseTest.parameters();
     }
 

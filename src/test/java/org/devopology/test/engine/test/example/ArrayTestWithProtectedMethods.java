@@ -5,29 +5,30 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
  */
-public class ArrayTestProtectedMethods {
-
-    @TestEngine.ParameterInject
-    protected Parameter parameter;
+public class ArrayTestWithProtectedMethods {
 
     private String[] values;
 
     @TestEngine.ParameterSupplier
-    protected static Collection<Parameter> parameters() {
+    protected static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-
         for (int i = 0; i < 10; i++) {
             collection.add(
                     Parameter.of(
                             "Array [" + i + "]",
                             new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
+        return collection.stream();
+    }
 
-        return collection;
+    @TestEngine.ParameterSetter
+    protected void setParameter(Parameter parameter) {
+        values = parameter.value();
     }
 
     @TestEngine.BeforeClass
@@ -38,7 +39,6 @@ public class ArrayTestProtectedMethods {
     @TestEngine.BeforeAll
     protected void beforeAll() {
         System.out.println("beforeAll()");
-        values = parameter.value();
     }
 
     @TestEngine.BeforeEach

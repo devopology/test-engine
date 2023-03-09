@@ -220,12 +220,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.infoRaw(separator);
             LOGGER.infoRaw("");
             LOGGER.infoRaw(
-                            "TESTS : "
-                                    + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
-                                    + ", "
-                                    + "PASSED"
-                                    + " : "
-                                    + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
+                    "TESTS : "
+                            + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
+                            + ", "
+                            + "PASSED"
+                            + " : "
+                            + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
                             + ", "
                             + "FAILED"
                             + " : "
@@ -250,6 +250,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.infoRaw("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
             LOGGER.infoRaw("Finished At : " + HumanReadableTime.now());
             LOGGER.infoRaw(separator);
+        } catch (Throwable t) {
+            failed = true;
+            LOGGER.error("Internal Error occurred.");
+            t.printStackTrace();
         } finally {
             if (printStream != null) {
                 try {

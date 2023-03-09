@@ -29,17 +29,17 @@ Contributions to the Devopology Test Engine are both welcomed and appreciated.
 
 ## Common Annotations
 
-| Annotation                      | Scope            | Required | Static | Examples                                                                                                    |
-|---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<Parameter> PARAMETERS;` <br/> `public static Collection<Parameter> parameters();` |
-| `@TestEngine.ParameterInject`   | field            | yes      | no     | `public String value;` <br/> `protected String value;`                                                      |
-| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                         |
-| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                                  |
-| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                                 |
-| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                                       |
-| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                                  |
-| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                                   |
-| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                          |
+| Annotation                      | Scope  |  Required | Static | Examples                                                                                                  |
+|---------------------------------|--------|-----------|--------|-----------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();` <br/> `protected static Stream<Parameter> parameters();`  |
+| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` <br/> `proteced void setParameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`                                                                       |
+| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                                                                                |
+| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                                                                               |
+| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                                                                                     |
+| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                                                                                |
+| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                                                                                 |
+| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`                                                                        |
 
 
 **NOTES**
@@ -67,15 +67,15 @@ Basic flow...
     
     thread {
     
-        call "@TestEngine.ParameterSupplier" field or method to get a Collection<Parameter>
+        call "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
     
         execute "@TestEngine.BeforeClass" methods 
      
         create a single instance of the test class
         
-        for (each Parameter in the Collection<Parameter>) {
+        for (each Parameter in the Stream<Parameter>) {
         
-            set the "@TestEngine.ParameterInject" field value
+            execute the "@TestEngine.ParameterSetter" method with the Parameter value
             
             execute "@TestEngine.BeforeAll" methods
             
@@ -88,9 +88,7 @@ Basic flow...
                 execute "@TestEngine.AfterEach" methods
             }
             
-            execute "@TestEngine.AfterAll" methods
-            
-            set the "@TestEngine.ParameterInject" field to null
+            execute "@TestEngine.AfterAll" method
         }
         
         execute "@TestEngine.AfterClass" methods
@@ -100,7 +98,7 @@ Basic flow...
 
 **Notes**
 
-- The type returned in the `@TestEngine.ParameterSupplier` `Collection` must match the type of the `@TestEngine.ParameterInject` field
+- The type returned in the `@TestEngine.ParameterSupplier` `Stream` must implement `Parameter`
 
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported to Java
@@ -146,7 +144,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -177,74 +175,56 @@ Example:
 ```java
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
  */
-public class ParameterSupplierFieldTest {
+public class ParameterTest {
 
-    @TestEngine.ParameterInject
-    public String parameter;
+  private Parameter parameter;
 
-    @TestEngine.ParameterSupplier
-    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
+  @TestEngine.ParameterSupplier
+  public static Stream<Parameter> parameters() {
+    Collection<Parameter> collection = new ArrayList<>();
 
-    @TestEngine.BeforeClass
-    public static void beforeClas() {
-        System.out.println("beforeClass()");
+    for (int i = 0; i < 10; i++) {
+      int value = i * 3;
+      collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
     }
 
-    @TestEngine.BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
-    }
+    return collection.stream();
+  }
 
-    @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
+  @TestEngine.ParameterSetter
+  public void setParameter(Parameter parameter) {
+    this.parameter = parameter;
+  }
 
-    @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + parameter + ")");
-    }
+  @TestEngine.BeforeAll
+  public void beforeAll() {
+    System.out.println("beforeAll()");
+  }
 
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
-    }
+  @TestEngine.Test
+  public void test1() {
+    System.out.println("test1(" + parameter.value() + ")");
+  }
 
-    @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
-    }
+  @TestEngine.Test
+  public void test2() {
+    System.out.println("test2(" + parameter.value() + ")");
+  }
 
-    @TestEngine.AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
-    }
-
-    @TestEngine.AfterClass
-    public static void afterClass() {
-        System.out.println("afterClass()");
-    }
-
-    private static class TestParameterSupplier {
-
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
-
-            for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
-            }
-
-            return collection;
-        }
-    }
+  @TestEngine.AfterAll
+  public void afterAll() {
+    System.out.println("afterAll()");
+  }
 }
 ```
 

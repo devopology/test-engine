@@ -40,6 +40,15 @@ public interface Parameter {
     <T> T value();
 
     /**
+     * Method to get the parameter value cast to a specific type
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    <T> T value(Class<T> clazz);
+
+    /**
      * Method to create a Named object (useful for a static import)
      *
      * @param name

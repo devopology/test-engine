@@ -4,13 +4,14 @@ import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.ParameterSupplier
-    public static Collection<Parameter> parameters() {
+    public static Stream<Parameter> parameters() {
         return EvenBaseTest.parameters();
     }
 

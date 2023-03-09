@@ -16,14 +16,12 @@
 
 package org.devopology.test.engine.support;
 
-import org.assertj.core.util.Arrays;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
-import org.junit.jupiter.api.Named;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -34,7 +32,6 @@ import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -46,6 +43,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class to implement a code to discover tests
@@ -56,7 +55,7 @@ public class TestEngineDiscoverySelectorResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoverySelectorResolver.class);
 
     /**
-     * Predicate to determine if a class is a test class (has @TestEngine.Test methods)
+     * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
         int modifiers = clazz.getModifiers();
@@ -195,51 +194,76 @@ public class TestEngineDiscoverySelectorResolver {
 
                 LOGGER.trace("processing test class [%s]", testClass.getName());
 
-                // Try to get test parameters using a @TestEngine.ParameterSupplier or @TestEngine.ParameterSupplier fields and methods
+                // Get the parameter supplier methods
                 Collection<Method> parameterSupplierMethods = TestEngineUtils.getParameterSupplierMethods(testClass);
                 LOGGER.trace("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size());
 
-                Collection<Field> parameterSupplierFields = TestEngineUtils.getParameterSupplierFields(testClass);
-                LOGGER.trace("test class [%s] parameter supplier field count [%d]", testClass.getName(), parameterSupplierFields.size());
-
-                if ((parameterSupplierFields.size() + parameterSupplierMethods.size()) != 1) {
+                // Validate parameter supplier method count
+                if (parameterSupplierMethods.size() < 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] must define either one @TestEngine.ParameterSupplier field or one @TestEngine.ParameterSupplier method",
+                                    "Test class [%s] must declare a @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 }
 
+                // Validate parameter supplier method count
+                if (parameterSupplierMethods.size() > 1) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] declares more than one @TestEngine.ParameterSupplier method",
+                                    testClass.getName()));
+                }
+
+                // Get parameters from the paramter supplier method
                 Collection<Parameter> testParameters;
 
                 try {
-                    if (parameterSupplierMethods.size() == 1) {
-                        testParameters = (Collection<Parameter>) parameterSupplierMethods.stream().findFirst().get().invoke(null, (Object[]) null);
-                    } else {
-                        testParameters = (Collection<Parameter>) parameterSupplierFields.stream().findFirst().get().get(null);
+                    Stream<Parameter> testParameterStream =
+                            (Stream<Parameter>) parameterSupplierMethods
+                                    .stream()
+                                    .findFirst()
+                                    .get()
+                                    .invoke(null, (Object[]) null);
+
+                    if (testParameterStream == null) {
+                        throw new TestClassConfigurationException(
+                                String.format(
+                                        "Test class [%s] @TestEngine.ParameterSupplier Stream is null",
+                                        testClass.getName()));
                     }
+
+                    testParameters = testParameterStream.collect(Collectors.toList());
                 } catch (ClassCastException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // Validate that we have a @TestEngine.Parameter field
-                Collection<Field> parameterInjectFields = TestEngineUtils.getParameterInjectFields(testClass);
-
-                if (parameterInjectFields.size() != 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] must define one @TestEngine.ParameterInject field",
+                                    "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream<Parameter>",
                                     testClass.getName()));
                 }
 
-                Field parameterInjectField = parameterInjectFields.stream().findFirst().get();
-
                 LOGGER.trace("test class parameter count [%d]", testParameters.size());
-                LOGGER.trace("test class @TestEngine.ParameterInject field [%s]", parameterInjectField.getName());
 
+                // Validate we have
                 if (testParameters.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] @TestEngine.ParameterSupplier collection is empty",
+                                    "Test class [%s] @TestEngine.ParameterSupplier Stream is empty",
+                                    testClass.getName()));
+                }
+
+                Collection<Method> parameterSetterMethods = TestEngineUtils.getParameterSetterMethods(testClass);
+                LOGGER.trace("test class [%s] parameter setter method count [%d]", testClass.getName(), parameterSetterMethods.size());
+
+                if (parameterSetterMethods.size() < 1) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] must declare a @TestEngine.ParameterSetter method",
+                                    testClass.getName()));
+                }
+
+                if (parameterSetterMethods.size() > 1) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] declares more than one @TestEngine.ParameterSetter method",
                                     testClass.getName()));
                 }
 
@@ -301,7 +325,7 @@ public class TestEngineDiscoverySelectorResolver {
                 }
             }
         } catch (Throwable t) {
-            throw new TestEngineException("Exception in test engine", t);
+            throw new TestEngineException("Exception in TestEngine", t);
         }
     }
 }

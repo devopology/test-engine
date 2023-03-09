@@ -9,12 +9,12 @@ import java.lang.annotation.Target;
 
 public @interface TestEngine {
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     /**
-     * Annotation for a parameter injection
+     * Annotation for a parameter setter method
      */
-    @interface ParameterInject {
+    @interface ParameterSetter {
 
     }
 

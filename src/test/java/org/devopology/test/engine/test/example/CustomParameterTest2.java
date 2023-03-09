@@ -11,23 +11,28 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class CustomParameterTest {
+public class CustomParameterTest2 {
 
-    private CustomParameter customParameter;
+    private Long value;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, String.valueOf(value)));
+            long value = i * 3;
+            collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, value));
         }
         return collection.stream();
     }
 
     @TestEngine.ParameterSetter
     public void setParameter(Parameter parameter) {
-        customParameter = parameter.value();
+        value = parameter.value(Long.class);
+    }
+
+    @TestEngine.BeforeClass
+    public static void beforeClass() {
+        System.out.println("beforeClass()");
     }
 
     @TestEngine.BeforeAll
@@ -37,12 +42,12 @@ public class CustomParameterTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + customParameter.value() + ")");
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + customParameter.value() + ")");
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll
@@ -50,12 +55,17 @@ public class CustomParameterTest {
         System.out.println("afterAll()");
     }
 
+    @TestEngine.AfterClass
+    public static void afterClass() {
+        System.out.println("afterClass()");
+    }
+
     private static class CustomParameter implements Parameter {
 
         private String name;
-        private String value;
+        private Long value;
 
-        private CustomParameter(String name, String value) {
+        private CustomParameter(String name, Long value) {
             this.name = name;
             this.value = value;
         }
@@ -72,10 +82,10 @@ public class CustomParameterTest {
 
         @Override
         public <T> T value(Class<T> clazz) {
-            return clazz.cast(this);
+            return clazz.cast(value);
         }
 
-        public static CustomParameter of(String name, String value) {
+        public static CustomParameter of(String name, Long value) {
             Objects.requireNonNull(name);
             return new CustomParameter(name, value);
         }

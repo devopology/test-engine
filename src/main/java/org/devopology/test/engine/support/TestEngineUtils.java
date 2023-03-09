@@ -16,7 +16,6 @@
 
 package org.devopology.test.engine.support;
 
-import org.devopology.test.engine.api.Metadata;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.logger.Logger;
@@ -26,10 +25,8 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.launcher.TestPlan;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,11 +46,11 @@ public final class TestEngineUtils {
 
     private enum Scope { STATIC, NON_STATIC }
 
-    private static final Map<Class<?>, Collection<Field>> parameterInjectFieldCache;
-    private static final Map<Class<?>, Collection<Field>> parameterSupplierFieldsCache;
+    //private static final Map<Class<?>, Collection<Field>> parameterSupplierFieldsCache;
     private static final Map<Class<?>, Collection<Method>> parameterSupplierMethodsCache;
-    private static final Map<Class<?>, Collection<Method>> beforeAllMethodCache;
+    private static final Map<Class<?>, Collection<Method>> parameterSetterMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeClassMethodCache;
+    private static final Map<Class<?>, Collection<Method>> beforeAllMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeEachMethodCache;
     private static final Map<Class<?>, Collection<Method>> testMethodCache;
     private static final Map<Class<?>, Collection<Method>> afterEachMethodCache;
@@ -63,9 +60,9 @@ public final class TestEngineUtils {
     private static final Map<Method, String> methodDisplayNameCache;
 
     static {
-        parameterInjectFieldCache = new HashMap<>();
-        parameterSupplierFieldsCache = new HashMap<>();
+        //parameterSupplierFieldsCache = new HashMap<>();
         parameterSupplierMethodsCache = new HashMap<>();
+        parameterSetterMethodCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
         beforeAllMethodCache = new HashMap<>();
         beforeEachMethodCache = new HashMap<>();
@@ -90,6 +87,7 @@ public final class TestEngineUtils {
      * @param clazz
      * @return
      */
+    /*
     private static Collection<Field> getAllFields(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
@@ -116,6 +114,7 @@ public final class TestEngineUtils {
      * @param scope
      * @param fieldMap
      */
+    /*
     private static void resolveFields(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
@@ -164,17 +163,29 @@ public final class TestEngineUtils {
             Class<? extends Annotation> annotation,
             Scope scope,
             Class<?> returnType,
-            int parameterCount) {
-        LOGGER.trace(
-                "getAllMethods(%s, %s, %s, %s, %d)",
-                clazz.getName(),
-                annotation.getName(),
-                scope,
-                returnType.getName(),
-                parameterCount);
+            Class<?>[] parameterTypes) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder
+                .append(
+                    String.format(
+                            "getAllMethods(%s, %s, %s, %s",
+                            clazz.getName(),
+                            annotation.getName(),
+                            scope,
+                            returnType.getName()));
+
+        if (parameterTypes != null) {
+            for (Class<?> parameterTypeClass : parameterTypes) {
+                stringBuilder.append(", ").append(parameterTypeClass.getName());
+            }
+        }
+
+        stringBuilder.append(")");
+        LOGGER.trace(stringBuilder.toString());
 
         Map<String, Method> methodMap = new HashMap<>();
-        resolveMethods(clazz, annotation, scope, returnType, parameterCount, methodMap);
+        resolveMethods(clazz, annotation, scope, returnType, parameterTypes, methodMap);
         List<Method> methodList = new LinkedList<>(methodMap.values());
         methodList.sort(Comparator.comparing(Method::getName));
 
@@ -188,7 +199,7 @@ public final class TestEngineUtils {
      * @param annotation
      * @param scope
      * @param returnType
-     * @param parameterCount
+     * @param parameterTypes
      * @param methodMap
      */
     private static void resolveMethods(
@@ -196,15 +207,27 @@ public final class TestEngineUtils {
             Class<? extends Annotation> annotation,
             Scope scope,
             Class<?> returnType,
-            int parameterCount,
+            Class<?>[] parameterTypes,
             Map<String, Method> methodMap) {
-        LOGGER.trace(
-                "resolveMethods(%s, %s, %s, %s, %d)",
-                clazz.getName(),
-                annotation.getName(),
-                scope,
-                returnType.getName(),
-                parameterCount);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder
+                .append(
+                        String.format(
+                                "resolveMethods(%s, %s, %s, %s",
+                                clazz.getName(),
+                                annotation.getName(),
+                                scope,
+                                returnType.getName()));
+
+        if (parameterTypes != null) {
+            for (Class<?> parameterTypeClass : parameterTypes) {
+                stringBuilder.append(", ").append(parameterTypeClass.getName());
+            }
+        }
+
+        stringBuilder.append(")");
+        LOGGER.trace(stringBuilder.toString());
 
         Stream.of(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(annotation))
@@ -221,7 +244,25 @@ public final class TestEngineUtils {
                         return !Modifier.isStatic(modifiers);
                     }
                 })
-                .filter(method -> method.getParameterCount() == parameterCount)
+                .filter(method -> {
+                    if (parameterTypes == null) {
+                        return (method.getParameterTypes().length == 0);
+                    }
+
+                    if (parameterTypes.length != method.getParameterCount()) {
+                        return false;
+                    }
+
+                    Class<?>[] methodParameterTypes = method.getParameterTypes();
+
+                    for (int i = 0; i < parameterTypes.length; i++) {
+                        if (!methodParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
                 .filter(method -> {
                     // TODO understand why void is special
                     if (returnType == Void.class) {
@@ -238,7 +279,7 @@ public final class TestEngineUtils {
 
         Class<?> declaringClass = clazz.getSuperclass();
         if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
-            resolveMethods(declaringClass, annotation, scope, returnType, parameterCount, methodMap);
+            resolveMethods(declaringClass, annotation, scope, returnType, parameterTypes, methodMap);
         }
     }
 
@@ -262,7 +303,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeClass.class,
                             Scope.STATIC,
                             Void.class,
-                            0);
+                            null);
 
             beforeClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -276,6 +317,7 @@ public final class TestEngineUtils {
      * @param clazz
      * @return
      */
+    /*
     public static Collection<Field> getParameterInjectFields(Class<?> clazz) {
         synchronized (parameterInjectFieldCache) {
             LOGGER.trace("getParameterInjectFields(%s)", clazz.getName());
@@ -287,7 +329,7 @@ public final class TestEngineUtils {
             Collection<Field> fields =
                     getAllFields(
                             clazz,
-                            TestEngine.ParameterInject.class,
+                            TestEngine.ParameterSetter.class,
                             Scope.NON_STATIC);
 
             parameterInjectFieldCache.put(clazz, Collections.unmodifiableCollection(fields));
@@ -295,6 +337,7 @@ public final class TestEngineUtils {
             return fields;
         }
     }
+    */
 
     /**
      * Method to get a Collection of @TestEngine.ParameterSupplier Fields sorted alphabetically
@@ -302,6 +345,7 @@ public final class TestEngineUtils {
      * @param clazz
      * @return
      */
+    /*
     public static Collection<Field> getParameterSupplierFields(Class<?> clazz) {
         Collection<Field> parameterSupplierFields = parameterSupplierFieldsCache.get(clazz);
         if (parameterSupplierFields != null) {
@@ -345,10 +389,30 @@ public final class TestEngineUtils {
                             clazz,
                             TestEngine.ParameterSupplier.class,
                             Scope.STATIC,
-                            Collection.class,
-                            0);
+                            Stream.class,
+                            null);
 
             parameterSupplierMethodsCache.put(clazz, Collections.unmodifiableCollection(methods));
+
+            return methods;
+        }
+    }
+
+    public static Collection<Method> getParameterSetterMethods(Class<?> clazz) {
+        synchronized (parameterSetterMethodCache) {
+            if (parameterSetterMethodCache.containsKey(clazz)) {
+                return parameterSetterMethodCache.get(clazz);
+            }
+
+            Collection<Method> methods =
+                    getAllMethods(
+                            clazz,
+                            TestEngine.ParameterSetter.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            new Class<?>[] { Parameter.class });
+
+            parameterSetterMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
@@ -372,7 +436,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            0);
+                            null);
 
             beforeAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -398,7 +462,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            0);
+                            null);
 
             beforeEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -426,7 +490,7 @@ public final class TestEngineUtils {
                             TestEngine.Test.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            0);
+                            null);
 
             testMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -452,7 +516,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            0);
+                            null);
 
             afterEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -478,7 +542,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            0);
+                            null);
 
             afterAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -504,7 +568,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterClass.class,
                             Scope.STATIC,
                             Void.class,
-                            0);
+                            null);
 
             afterClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -601,37 +665,6 @@ public final class TestEngineUtils {
         }
 
         methodDisplayNameCache.put(method, displayName);
-        return displayName;
-    }
-
-    /**
-     * Method to get a display name
-     *
-     * @param object
-     * @return
-     */
-    public static String getDisplayName(Object object) {
-        if (object == null) {
-            return "null";
-        }
-
-        String displayName = null;
-
-        if (object instanceof Parameter) {
-            displayName = ((Parameter) object).name();
-        } else if (object instanceof Metadata) {
-            displayName = ((Metadata) object).getDisplayName();
-        }
-
-        if (displayName == null) {
-            displayName = object.toString();
-        } else {
-            displayName = displayName.trim();
-            if (displayName.isEmpty()) {
-                displayName = object.toString();
-            }
-        }
-
         return displayName;
     }
 

@@ -21,17 +21,27 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Class to implement a {@link ParameterMap}
+ * Class to implement a ParameterMap
  */
 @SuppressWarnings("unchecked")
 public class ParameterMap {
 
     private final Map<String, Object> map;
 
+    /**
+     * Constructor
+     */
     public ParameterMap() {
         this.map = new LinkedHashMap<>();
     }
 
+    /**
+     * Method to put a key / value into the map
+     *
+     * @param key
+     * @param object
+     * @return
+     */
     public ParameterMap put(String key, Object object) {
         Objects.requireNonNull(key);
 
@@ -44,6 +54,12 @@ public class ParameterMap {
         return this;
     }
 
+    /**
+     * Method to return whether a key exists in the map
+     *
+     * @param key
+     * @return
+     */
     public boolean containsKey(String key) {
         Objects.requireNonNull(key);
 
@@ -55,6 +71,13 @@ public class ParameterMap {
         return map.containsKey(keyTrimmed);
     }
 
+    /**
+     * Method to get value from the map
+     *
+     * @param key
+     * @return
+     * @param <T>
+     */
     public <T> T get(String key) {
         Objects.requireNonNull(key);
 

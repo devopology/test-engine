@@ -17,6 +17,7 @@
 package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.TestEngine;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
@@ -89,8 +90,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
                     TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
-                    Object parameter = testEngineParameterTestDescriptor.getTestParameter();
-                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
+                    Parameter parameter = testEngineParameterTestDescriptor.getTestParameter();
+                    String parameterDisplayName = parameter.name();
                     stringBuilder
                             .append("[")
                             .append(parameterDisplayName)
@@ -103,8 +104,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Object parameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
+                    Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                    String parameterDisplayName = parameter.name();
                     stringBuilder
                             .append("[")
                             .append(parameterDisplayName)
@@ -135,8 +136,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
                     TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
                     Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
-                    Object parameter = testengineParameterTestDescriptor.getTestParameter();
-                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
+                    Parameter parameter = testengineParameterTestDescriptor.getTestParameter();
+                    String parameterDisplayName = parameter.name();
                     stringBuilder
                             .append("[")
                             .append(parameterDisplayName)
@@ -147,8 +148,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Object parameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String parameterDisplayName = TestEngineUtils.getDisplayName(parameter);
+                    Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                    String parameterDisplayName = parameter.name();
                     stringBuilder
                             .append("[")
                             .append(parameterDisplayName)

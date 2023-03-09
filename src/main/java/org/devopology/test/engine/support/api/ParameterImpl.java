@@ -62,6 +62,18 @@ public class ParameterImpl implements Parameter {
         return (T) value;
     }
 
+    /**
+     * Method to get the parameter value cast to a specific type
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    @Override
+    public <T> T value(Class<T> clazz) {
+        return clazz.cast(value);
+    }
+
     @Override
     public String toString() {
         if (value == null) {

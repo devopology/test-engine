@@ -5,22 +5,27 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 @TestEngine.BaseClass
 public class BaseTest {
 
-    @TestEngine.ParameterInject
     protected Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    protected static Collection<Parameter> parameters() {
+    protected static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
             collection.add(Parameter.of("Array [" + i + "]", i));
         }
 
-        return collection;
+        return collection.stream();
+    }
+
+    @TestEngine.ParameterSetter
+    protected void setParameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeClass
