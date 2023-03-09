@@ -16,56 +16,105 @@
 
 package org.devopology.test.engine.api;
 
-import org.devopology.test.engine.support.api.ParameterMapImpl;
-
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
- * Interface to implement a parameter map
+ * Class to implement a ParameterMap
  */
 @SuppressWarnings("unchecked")
-public interface ParameterMap extends Metadata {
+public class ParameterMap {
+
+    private final Map<String, Object> map;
 
     /**
-     * Method to put a key / value into the {@link ParameterMap}
-     * <p/>
+     * Constructor
+     */
+    public ParameterMap() {
+        this.map = new LinkedHashMap<>();
+    }
+
+    /**
+     * Method to put a key / value into the map
+     *
      * @param key
-     * @param value
+     * @param object
      * @return
      */
-    ParameterMap put(String key, Object value);
+    public ParameterMap put(String key, Object object) {
+        Objects.requireNonNull(key);
 
-    /**
-     * Method to determine if a {@link ParameterMap} contains a value for a key
-     * <p/>
-     * @param key
-     * @return
-     */
-    boolean containsKey(String key);
-
-    /**
-     * Method to get a value for a key from the {@link ParameterMap}
-     * <p/>
-     * @param key
-     * @return the value for a key or {@code null} if none exists
-     */
-    <T> T get(String key);
-
-    /**
-     * Method to create a {@link ParameterMap}
-     * <p/>
-     * @param name
-     * @return an empty {@link ParameterMap} with a name
-     */
-    static ParameterMap of(String name) {
-        Objects.requireNonNull(name);
-
-        String nameTrimmed = name.trim();
-        if (nameTrimmed.isEmpty()) {
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        return new ParameterMapImpl(nameTrimmed);
+        map.put(keyTrimmed, object);
+        return this;
     }
 
+    /**
+     * Method to return whether a key exists in the map
+     *
+     * @param key
+     * @return
+     */
+    public boolean containsKey(String key) {
+        Objects.requireNonNull(key);
+
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        return map.containsKey(keyTrimmed);
+    }
+
+    /**
+     * Method to get value from the map
+     *
+     * @param key
+     * @return
+     * @param <T>
+     */
+    public <T> T get(String key) {
+        Objects.requireNonNull(key);
+
+        String keyTrimmed = key.trim();
+        if (keyTrimmed.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        return (T) map.get(keyTrimmed);
+    }
+
+    /**
+     * Method to get a value from the map cast to a specific type
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> T get(String key, Class<T> clazz) {
+        Object value = get(key);
+        if (value == null) {
+            return null;
+        } else {
+            return clazz.cast(value);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParameterMap that = (ParameterMap) o;
+        return Objects.equals(map, that.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
+    }
 }

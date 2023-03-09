@@ -1,16 +1,17 @@
 package org.devopology.test.engine.test.example.inheritance;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.ParameterSupplier
-    public static Collection<Named> parameters() {
+    public static Stream<Parameter> parameters() {
         return EvenBaseTest.parameters();
     }
 
@@ -21,14 +22,14 @@ public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
-        assertThat(parameter % 2).isEven();
+        System.out.println("test1(" + parameter.value() + ")");
+        assertThat((Integer) parameter.value() % 2).isEven();
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter + ")");
-        assertThat(parameter % 2).isEven();
+        System.out.println("test2(" + parameter.value() + ")");
+        assertThat((Integer) parameter.value() % 2).isEven();
     }
 
     @TestEngine.AfterEach

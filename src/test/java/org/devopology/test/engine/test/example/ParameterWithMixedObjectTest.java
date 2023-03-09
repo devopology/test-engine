@@ -1,14 +1,14 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -16,7 +16,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 /**
  * Example test
  */
-public class MixedObjectsTest {
+public class ParameterWithMixedObjectTest {
+
+    private Object parameter;
 
     // Function to test... typically this would be core project code
     private static Function<Object, String> TO_SPECIAL_NAME = object -> {
@@ -35,21 +37,22 @@ public class MixedObjectsTest {
         }
     };
 
-    @TestEngine.ParameterInject
-    public Object parameter;
-
     @TestEngine.ParameterSupplier
-    public static Collection<Named> parameters() {
-        Set<Named> collection = new LinkedHashSet<>();
+    public static Stream<Parameter> parameters() {
+        Set<Parameter> collection = new LinkedHashSet<>();
 
-        collection.add(Named.of("BigDecimal", new BigDecimal("1000000000000000000000")));
-        collection.add(Named.of("Integer", 1));
-        collection.add(Named.of("Map", new HashMap<String, String>()));
-        collection.add(Named.of("String", "This is a string"));
-        collection.add(Named.of("null", null));
-        collection.add(Named.of("null2", null));
+        collection.add(Parameter.of("BigDecimal", new BigDecimal("1000000000000000000000")));
+        collection.add(Parameter.of("Integer", 1));
+        collection.add(Parameter.of("Map", new HashMap<String, String>()));
+        collection.add(Parameter.of("String", "This is a string"));
+        collection.add(Parameter.of("null", null));
 
-        return collection;
+        return collection.stream();
+    }
+
+    @TestEngine.ParameterSetter
+    public void setParameter(Parameter parameter) {
+        this.parameter = parameter.value();
     }
 
     @TestEngine.BeforeAll

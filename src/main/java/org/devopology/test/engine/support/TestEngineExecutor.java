@@ -30,11 +30,9 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +77,9 @@ public class TestEngineExecutor {
 
             TestDescriptor testDescriptor = rootTestDescriptor.getChildren().stream().findFirst().get();
 
-            logTestHierarchy(testDescriptor, 0);
+            if (LOGGER.isTraceEnabled()) {
+                logTestHierarchy(testDescriptor, 0);
+            }
 
             execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext, countDownLatch);
 
@@ -90,7 +90,9 @@ public class TestEngineExecutor {
 
         List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
 
-        logTestHierarchy(rootTestDescriptor, 0);
+        if (LOGGER.isTraceEnabled()) {
+            logTestHierarchy(rootTestDescriptor, 0);
+        }
 
         TestEngineExecutionContext testEngineExecutionContext =
                 new TestEngineExecutionContext(engineExecutionListener, testExecutionResultList);
@@ -221,10 +223,11 @@ public class TestEngineExecutor {
         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
-        Collection<Field> testParameterFields = TestEngineUtils.getParameterInjectFields(testClass);
 
         try {
-            testParameterFields.stream().findFirst().get().set(testInstance, testParameter);
+            LOGGER.trace("executing @TestEngine.ParameterSetter method...");
+            Method testParameterSetterMethod = TestEngineUtils.getParameterSetterMethods(testClass).stream().findFirst().get();
+            testParameterSetterMethod.invoke(testInstance, testParameter);
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
             for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
@@ -447,7 +450,7 @@ public class TestEngineExecutor {
         public Thread newThread(Runnable r) {
             String threadName;
             synchronized (this) {
-                threadName = "test-engine-" + this.threadId;
+                threadName = String.format("test-engine-%02d", this.threadId);
                 this.threadId++;
             }
 

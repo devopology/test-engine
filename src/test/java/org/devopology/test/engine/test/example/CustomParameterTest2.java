@@ -5,30 +5,29 @@ import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
  * Example test
  */
-public class ArrayTest {
+public class CustomParameterTest2 {
 
-    private String[] values;
+    private Long value;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(
-                    Parameter.of(
-                            "Array [" + i + "]",
-                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+            long value = i * 3;
+            collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, value));
         }
         return collection.stream();
     }
 
     @TestEngine.ParameterSetter
     public void setParameter(Parameter parameter) {
-        values = parameter.value();
+        value = parameter.value(Long.class);
     }
 
     @TestEngine.BeforeClass
@@ -41,29 +40,14 @@ public class ArrayTest {
         System.out.println("beforeAll()");
     }
 
-    @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
-
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + values[0] + ", " + values[1] + ")");
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + values[0] + ", " + values[1] + ")");
-    }
-
-    @TestEngine.Test
-    public void test3() {
-        System.out.println("test3(" + values[0] + ", " + values[1] + ")");
-    }
-
-    @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll
@@ -74,5 +58,36 @@ public class ArrayTest {
     @TestEngine.AfterClass
     public static void afterClass() {
         System.out.println("afterClass()");
+    }
+
+    private static class CustomParameter implements Parameter {
+
+        private final String name;
+        private final Long value;
+
+        private CustomParameter(String name, Long value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public <T> T value() {
+            return (T) this;
+        }
+
+        @Override
+        public <T> T value(Class<T> clazz) {
+            return clazz.cast(value);
+        }
+
+        public static CustomParameter of(String name, Long value) {
+            Objects.requireNonNull(name);
+            return new CustomParameter(name, value);
+        }
     }
 }

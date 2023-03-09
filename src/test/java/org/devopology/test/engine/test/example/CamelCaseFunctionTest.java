@@ -1,13 +1,13 @@
 package org.devopology.test.engine.test.example;
 
-import org.devopology.test.engine.api.Metadata;
-import org.devopology.test.engine.api.Named;
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,33 +20,42 @@ public class CamelCaseFunctionTest {
 
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
-    @TestEngine.ParameterInject
-    public Tuple parameter;
+    private Tuple tuple;
 
     @TestEngine.ParameterSupplier
-    public static Collection<Object> parameters() {
-        Collection<Object> collection = new ArrayList<>();
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS", "this");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
         tuple = new Tuple("tHis", "this");
-        collection.add(Named.of(tuple.input, tuple));
+        collection.add(Parameter.of(tuple.input, tuple));
 
-        return collection;
+        return collection.stream();
+    }
+
+    @TestEngine.ParameterSetter
+    public void setParameter(Parameter parameter) {
+        tuple = parameter.value();
+    }
+
+    @TestEngine.BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
     public void test() {
-        String actual = FUNCTION.apply(parameter.input);
-        System.out.println("test() input [" + parameter.input + "] expected [" + parameter.expected + "] actual [" + actual + "]");
-        assertThat(actual).isEqualTo(parameter.expected);
+        String actual = FUNCTION.apply(tuple.input);
+        System.out.println("test() input [" + tuple.input + "] expected [" + tuple.expected + "] actual [" + actual + "]");
+        assertThat(actual).isEqualTo(tuple.expected);
     }
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
@@ -78,7 +87,7 @@ public class CamelCaseFunctionTest {
         }
     }
 
-    private static class Tuple implements Metadata {
+    private static class Tuple {
 
         public String input;
         public String expected;
@@ -86,11 +95,6 @@ public class CamelCaseFunctionTest {
         public Tuple(String input, String expected) {
             this.input = input;
             this.expected = expected;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "Tuple { " + input + " | " + expected + " }";
         }
     }
 }

@@ -13,109 +13,15 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Devopology Test Engine v1.0.1](https://github.com/devopology/test-engine/releases/tag/v1.0.1) (2023-03-04)
+- General Availability (GA): [Devopology Test Engine v2.0.0](https://github.com/devopology/test-engine/releases/tag/v2.0.0) (2023-03-08)
 
 **Notes**
 
-- **v1.0.x versions are NOT backward compatible with v0.0.Z versions**
+- **v2.0.x versions are NOT backward compatible with v1.Y.Z versions**
 
+## Maven
 
-- v0.0.Z releases are considered deprecated
-
-## Getting Help
-
-Github discussions is the current mechanism
-
-## Contributing
-
-Contributions to the Devopology Test Engine are both welcomed and appreciated.
-
-## Common Annotations
-
-| Annotation                      | Scope            | Required | Static | Examples                                                                                              |
-|---------------------------------|------------------|----------|--------|-------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | field or method  | yes      | yes    | `public static Collection<String> PARAMETERS;` <br/> `public static Collection<String> parameters();` |
-| `@TestEngine.ParameterInject`   | field            | yes      | no     | `public String value;` <br/> `protected String value;`                                                |
-| `@TestEngine.BeforeClass`       | method           | no       | yes    | `public static void beforeClass();`                                                                   |
-| `@TestEngine.BeforeAll`         | method           | no       | no     | `public void beforeAll();`                                                                            |
-| `@TestEngine.BeforeEach`        | method           | no       | no     | `public void beforeEach();`                                                                           |
-| `@TestEngine.Test`              | method           | yes      | no     | `public void test();`                                                                                 |
-| `@TestEngine.AfterEach`         | method           | no       | no     | `public void afterEach();`                                                                            |
-| `@TestEngine.AfterAll`          | method           | no       | no     | `public void afterAll();`                                                                             |
-| `@TestEngine.AfterClass`        | method           | no       | yes    | `public static void afterClass();`                                                                    |
-
-
-**NOTES**
-
-- Methods are sorted / executed in alphabetical order based on a `String.compareTo` comparison of method names
-
-## Additional Annotations
-
-
-| Annotation              | Scope | Required | Usage                                                             |
-|-------------------------|-------|----------|-------------------------------------------------------------------|
-| `@TestEngine.BaseClass` | class | no       | Marks a test class as being a base class (skips direct execution) |
-
-
-# State Machine Flow
-
-Basic flow...
-
-```
- Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
- 
- for (each test class in the test class list) {
- 
-    for each test class, create a thread
-    
-    thread {
-    
-        call "@TestEngine.ParameterSupplier" field or method to get a parameter collection
-    
-        execute "@TestEngine.BeforeClass" methods 
-     
-        create a single instance of the test class
-        
-        for (each parameter in the parameter collection) {
-        
-            set the "@TestEngine.ParameterInject" field value
-            
-            execute "@TestEngine.BeforeAll" methods
-            
-            for (each "@TestEngine.Test" method in the test class) {
-            
-                execute "@TestEngine.BeforeEach" methods
-            
-                execute "@TestEngine.Test" method
-                
-                execute "@TestEngine.AfterEach" methods
-            }
-            
-            execute "@TestEngine.AfterAll" methods
-            
-            set the "@TestEngine.ParameterInject" field to null
-        }
-        
-        execute "@TestEngine.AfterClass" methods
-    }
- }
-```
-
-**Notes**
-
-- The type returned in the `@TestEngine.ParameterSupplier` `Collection` must match the type of the `@TestEngine.ParameterInject` field
-
-
-- `Named` is a special case. The `@TestEngine.ParameterInject` field type should match the type of Object wrapped by the `Named` instance
-
-
-- Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
-  - By default, thread count is equal to number of available processors as reported to Java
-  - The thread count can be changed by using a Java system property `devopology.test.engine.thread.count=<THREAD COUNT>`
-
-## Maven Usage
-
-Add the Devopology Maven repository to your `pom.xml` file...
+Add the Devopology Test Engine Maven repository to your `pom.xml` file...
 
 ```xml
 <repositories>
@@ -153,15 +59,181 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
-Set up Maven to use the test engine
+**Notes**
+
+- The Devopology Test Engine requires core JUnit 5 jars as dependencies
+
+## Common Annotations
+
+| Annotation                      | Scope  |  Required | Static | Examples                                         |
+|---------------------------------|--------|-----------|--------|--------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
+| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`              |
+| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                       |
+| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                      |
+| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                            |
+| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                       |
+| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                        |
+| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`               |
+
+**NOTES**
+
+- Methods are sorted / executed in alphabetical order based on a `String` `method.getName()` comparison, regardless of where they are declared (class or superclasses)
+
+
+- `public` and `protected` methods are supported for `@TestEngine.X` annotations
+
+## Additional Annotations
+
+| Annotation              | Scope | Required | Usage                                                             |
+|-------------------------|-------|----------|-------------------------------------------------------------------|
+| `@TestEngine.BaseClass` | class | no       | Marks a test class as being a base class (skips direct execution) |
+
+## What is a `Parameter` ?
+
+`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
+
+- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
+
+
+- `@TestEngine.ParameterSetter` requires single `Parameter` object
+
+
+- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
+  - `boolean`
+  - `byte`
+  - `short`
+  - `int`
+  - `long`
+  - `float`
+  - `double`
+  - `String` 
+
+## Example Usage
+
+Example:
+
+```java
+package org.devopology.test.engine.test.example;
+
+import org.devopology.test.engine.api.Parameter;
+import org.devopology.test.engine.api.TestEngine;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Stream;
+
+/**
+ * Example test
+ */
+public class ParameterTest {
+
+  private Parameter parameter;
+
+  @TestEngine.ParameterSupplier
+  public static Stream<Parameter> parameters() {
+    Collection<Parameter> collection = new ArrayList<>();
+
+    for (int i = 0; i < 10; i++) {
+      int value = i * 3;
+      collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
+    }
+
+    return collection.stream();
+  }
+
+  @TestEngine.ParameterSetter
+  public void setParameter(Parameter parameter) {
+    this.parameter = parameter;
+  }
+
+  @TestEngine.BeforeAll
+  public void beforeAll() {
+    System.out.println("beforeAll()");
+  }
+
+  @TestEngine.Test
+  public void test1() {
+    System.out.println("test1(" + parameter.value() + ")");
+  }
+
+  @TestEngine.Test
+  public void test2() {
+    System.out.println("test2(" + parameter.value() + ")");
+  }
+
+  @TestEngine.AfterAll
+  public void afterAll() {
+    System.out.println("afterAll()");
+  }
+}
+```
+
+Additional test examples...
+
+https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
+
+
+## Getting Help
+
+Github discussions is the current mechanism for help/support
+
+## Contributing
+
+Contributions to the Devopology Test Engine are both welcomed and appreciated.
+
+## Design
+
+State Machine flow...
+
+```
+ Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
+ 
+ for (each test class in the Collection<Class>) {
+ 
+    for each test class, create a thread
+    
+    thread {
+    
+        call "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+    
+        execute "@TestEngine.BeforeClass" methods 
+     
+        create a single instance of the test class
+        
+        for (each Parameter in the Stream<Parameter>) {
+        
+            execute the "@TestEngine.ParameterSetter" method with the Parameter value
+            
+            execute "@TestEngine.BeforeAll" methods
+            
+            for (each "@TestEngine.Test" method in the test class) {
+            
+                execute "@TestEngine.BeforeEach" methods
+            
+                execute "@TestEngine.Test" method
+                
+                execute "@TestEngine.AfterEach" methods
+            }
+            
+            execute "@TestEngine.AfterAll" method
+        }
+        
+        execute "@TestEngine.AfterClass" methods
+    }
+ }
+```
 
 **Notes**
 
-- The Devopology Test Engine uses core JUnit 5 jars as dependencies
+- Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
+  - By default, thread count is equal to number of available processors as reported to Java
+  - The thread count can be changed by using a Java system property `devopology.test.engine.thread.count=<THREAD COUNT>`
 
 ## Command Line (standalone) Usage
 
@@ -174,94 +246,6 @@ java \
   -cp "<directory of all your dependencies>/*" \
   org.devopology.test.engine.TestEngine
 ```
-
-The Devopology Test Engine [POM](https://github.com/devopology/test-engine/blob/main/pom.xml) uses this approach and is typically easier than configuring the Mave Surefire plugin
-
-Write a test...
-
-Example:
-
-```java
-package org.devopology.test.engine.test.example;
-
-import org.devopology.test.engine.api.TestEngine;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-/**
- * Example test
- */
-public class ParameterSupplierFieldTest {
-
-    @TestEngine.ParameterInject
-    public String parameter;
-
-    @TestEngine.ParameterSupplier
-    public static Collection<String> PARAMETERS = TestParameterSupplier.values();
-
-    @TestEngine.BeforeClass
-    public static void beforeClas() {
-        System.out.println("beforeClass()");
-    }
-
-    @TestEngine.BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
-    }
-
-    @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
-
-    @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + parameter + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
-    }
-
-    @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
-    }
-
-    @TestEngine.AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
-    }
-
-    @TestEngine.AfterClass
-    public static void afterClass() {
-        System.out.println("afterClass()");
-    }
-
-    private static class TestParameterSupplier {
-
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
-
-            for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
-            }
-
-            return collection;
-        }
-    }
-}
-```
-
-Other test examples
-
-https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology/test/engine/test/example
-
-**Notes**
-
-- While the annotation names are similar to standard JUnit 5 annotations, they are specific to the Devopology Test Engine. Use the correct imports
 
 # Building
 

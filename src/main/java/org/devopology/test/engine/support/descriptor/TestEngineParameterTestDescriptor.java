@@ -16,15 +16,16 @@
 
 package org.devopology.test.engine.support.descriptor;
 
+import org.devopology.test.engine.api.Parameter;
 import org.junit.platform.engine.UniqueId;
 
 public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Object testParameter;
+    private final Parameter testParameter;
 
-    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Object testParameter) {
-        super(uniqueId, displayName);
+    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
+        super(uniqueId, testParameter.name());
         this.testClass = testClass;
         this.testParameter = testParameter;
     }
@@ -38,7 +39,7 @@ public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDes
         return testClass;
     }
 
-    public Object getTestParameter() {
+    public Parameter getTestParameter() {
         return testParameter;
     }
 }

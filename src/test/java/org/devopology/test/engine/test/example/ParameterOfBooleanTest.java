@@ -7,19 +7,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
-public class ParameterSupplierMethodTest {
+public class ParameterOfBooleanTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(Parameter.of(String.valueOf(i)));
-        }
+        collection.add(Parameter.of(true));
+        collection.add(Parameter.of(false));
         return collection.stream();
     }
 
@@ -35,12 +36,8 @@ public class ParameterSupplierMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test1(" + parameter.value() + ")");
+        assertThat(parameter.value(Boolean.class).getClass()).isEqualTo(Boolean.class);
     }
 
     @TestEngine.AfterAll

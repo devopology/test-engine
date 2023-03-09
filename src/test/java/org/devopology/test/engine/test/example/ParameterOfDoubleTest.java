@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
-public class ParameterSupplierMethodTest {
+public class ParameterOfDoubleTest {
 
     private Parameter parameter;
 
@@ -18,7 +20,8 @@ public class ParameterSupplierMethodTest {
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Parameter.of(String.valueOf(i)));
+            double value = i * 3d;
+            collection.add(Parameter.of(value));
         }
         return collection.stream();
     }
@@ -35,12 +38,8 @@ public class ParameterSupplierMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test1(" + parameter.value() + ")");
+        assertThat(parameter.value(Double.class).getClass()).isEqualTo(Double.class);
     }
 
     @TestEngine.AfterAll

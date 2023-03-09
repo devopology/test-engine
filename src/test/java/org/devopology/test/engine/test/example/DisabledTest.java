@@ -1,9 +1,11 @@
 package org.devopology.test.engine.test.example;
 
+import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Example test
@@ -11,11 +13,15 @@ import java.util.Collection;
 @TestEngine.Disabled
 public class DisabledTest {
 
-    @TestEngine.ParameterInject
-    public String parameter;
+    private Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Collection<String> PARAMETERS = StringParameterSupplier.values();
+    public static Stream<Parameter> parameters = StringParameterSupplier.values();
+
+    @TestEngine.ParameterSetter
+    public void setParameter(Parameter parameter) {
+        this.parameter = parameter;
+    }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
@@ -49,14 +55,14 @@ public class DisabledTest {
 
     private static class StringParameterSupplier {
 
-        public static Collection<String> values() {
-            Collection<String> collection = new ArrayList<>();
+        public static Stream<Parameter> values() {
+            Collection<Parameter> collection = new ArrayList<>();
 
             for (int i = 0; i < 10; i++) {
-                collection.add(String.valueOf(i));
+                collection.add(Parameter.of(String.valueOf(i)));
             }
 
-            return collection;
+            return collection.stream();
         }
     }
 }

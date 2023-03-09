@@ -10,41 +10,42 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterSupplierMethodTest {
+public class ParameterTestWithProtectedMethods {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
+    protected static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Parameter.of(String.valueOf(i)));
+            int value = i * 3;
+            collection.add(Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
     }
 
     @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    protected void setParameter(Parameter parameter) {
         this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    protected void beforeAll() {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + parameter + ")");
+    protected void test1() {
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
+    protected void test2() {
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    protected void afterAll() {
         System.out.println("afterAll()");
     }
 }

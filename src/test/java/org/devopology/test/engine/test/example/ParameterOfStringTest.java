@@ -7,19 +7,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
-public class ParameterSupplierMethodTest {
+public class ParameterOfStringTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(Parameter.of(String.valueOf(i)));
-        }
+        collection.add(Parameter.of("test"));
+        collection.add(Parameter.of(null));
+        collection.add(Parameter.of(""));
         return collection.stream();
     }
 
@@ -35,12 +37,10 @@ public class ParameterSupplierMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test1(" + parameter.value() + ")");
+        if (parameter.value() != null) {
+            assertThat(parameter.value(String.class).getClass()).isEqualTo(String.class);
+        }
     }
 
     @TestEngine.AfterAll
