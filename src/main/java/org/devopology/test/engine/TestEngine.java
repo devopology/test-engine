@@ -196,7 +196,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestPlan testPlan = TestEngineUtils.createTestPlan(testDescriptor, configurationParameters);
 
-            TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan, System.out);
+            TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan);
 
             testEngine.execute(
                     ExecutionRequest.create(
