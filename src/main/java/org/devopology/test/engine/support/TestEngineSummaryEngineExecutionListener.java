@@ -34,37 +34,29 @@ import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class TestEngineSummaryEngineExecutionListener implements EngineExecutionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    private static final String TEST = "[TEST]";
-    private static final String ABORT = "[ABORT]";
-    private static final String FAIL = "[FAIL]";
-    private static final String PASS = "[PASS]";
+    private static final String TEST = "TEST";
+    private static final String ABORT = "ABORT";
+    private static final String FAIL = "FAIL";
+    private static final String PASS = "PASS";
 
     private final TestPlan testPlan;
-    private final PrintWriter printWriter;
     private final SummaryGeneratingListener summaryGeneratingListener;
     private boolean detailedOutput = true;
 
-    public TestEngineSummaryEngineExecutionListener(TestPlan testPlan, PrintStream printWriter) {
-        this.printWriter = new PrintWriter(new OutputStreamWriter(printWriter, StandardCharsets.UTF_8));
+    public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
         this.testPlan = testPlan;
         this.summaryGeneratingListener = new SummaryGeneratingListener();
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
         Optional<String> optionalDetailOutput =testPlan.getConfigurationParameters().get("devopology.test.engine.output");
-        if (optionalDetailOutput.isPresent()) {
-            detailedOutput = "detailed".equalsIgnoreCase(optionalDetailOutput.get());
-        }
+        optionalDetailOutput.ifPresent(s -> detailedOutput = "detailed".equalsIgnoreCase(s));
     }
 
     @Override
@@ -96,9 +88,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             .append("[")
                             .append(parameterDisplayName)
                             .append("] - ")
-                            .append(testClass.getName())
+                            .append(TEST)
                             .append(" ")
-                            .append(TEST);
+                            .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
@@ -110,11 +102,12 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             .append("[")
                             .append(parameterDisplayName)
                             .append("] - ")
+                            .append(TEST)
+                            .append(" ")
                             .append(testClass.getName())
                             .append(" ")
                             .append(testMethod.getName())
-                            .append("() ")
-                            .append(TEST);
+                            .append("()");
                 })
         );
 
@@ -142,6 +135,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             .append("[")
                             .append(parameterDisplayName)
                             .append("] - ")
+                            .append("%s ")
                             .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
@@ -154,6 +148,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             .append("[")
                             .append(parameterDisplayName)
                             .append("] - ")
+                            .append("%s ")
                             .append(testClass.getName())
                             .append(" ")
                             .append(testMethod.getName())
@@ -161,19 +156,19 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 }));
 
         if (stringBuilder.length() > 0) {
-            stringBuilder.append(" ");
             TestExecutionResult.Status status = testExecutionResult.getStatus();
+            String string = null;
             switch (status) {
                 case ABORTED: {
-                    stringBuilder.append(ABORT);
+                    string = String.format(stringBuilder.toString(), ABORT);
                     break;
                 }
                 case FAILED: {
-                    stringBuilder.append(FAIL);
+                    string = String.format(stringBuilder.toString(), FAIL);
                     break;
                 }
                 case SUCCESSFUL: {
-                    stringBuilder.append(PASS);
+                    string = String.format(stringBuilder.toString(), PASS);
                     break;
                 }
                 default: {
@@ -182,8 +177,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 }
             }
 
-            if (detailedOutput && (stringBuilder.length() > 0)) {
-                LOGGER.infoRaw(stringBuilder.toString());
+            if (detailedOutput && (string != null)) {
+                LOGGER.infoRaw(string);
             }
         }
     }
