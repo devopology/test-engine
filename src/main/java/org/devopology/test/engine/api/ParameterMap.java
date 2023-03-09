@@ -89,6 +89,22 @@ public class ParameterMap {
         return (T) map.get(keyTrimmed);
     }
 
+    /**
+     * Method to get a value from the map cast to a specific type
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> T get(String key, Class<T> clazz) {
+        Object value = get(key);
+        if (value == null) {
+            return null;
+        } else {
+            return clazz.cast(value);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

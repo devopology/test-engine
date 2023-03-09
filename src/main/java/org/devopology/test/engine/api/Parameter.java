@@ -153,12 +153,12 @@ public interface Parameter {
      * @return
      */
     static Parameter of(String value) {
-        Objects.requireNonNull(value);
-
-        if (value.trim().isEmpty()) {
-            throw new IllegalArgumentException("value is empty");
+        if (value == null) {
+            return new ParameterImpl("((null))", null);
+        } else if (value.trim().isEmpty()) {
+            return new ParameterImpl("((empty))", value);
+        } else {
+            return new ParameterImpl(value, value);
         }
-
-        return new ParameterImpl(value, value);
     }
 }

@@ -12,16 +12,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example test
  */
-public class ParameterOfStringTest {
+public class ParameterOfByteTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-        collection.add(Parameter.of("test"));
-        collection.add(Parameter.of(null));
-        collection.add(Parameter.of(""));
+        collection.add(Parameter.of((byte) 1));
+        collection.add(Parameter.of((byte) 2));
         return collection.stream();
     }
 
@@ -38,9 +37,7 @@ public class ParameterOfStringTest {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter.value() + ")");
-        if (parameter.value() != null) {
-            assertThat(parameter.value(String.class).getClass()).isEqualTo(String.class);
-        }
+        assertThat(parameter.value(Byte.class).getClass()).isEqualTo(Byte.class);
     }
 
     @TestEngine.AfterAll

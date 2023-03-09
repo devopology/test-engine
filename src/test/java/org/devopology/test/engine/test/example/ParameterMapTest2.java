@@ -1,33 +1,36 @@
 package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.Parameter;
+import org.devopology.test.engine.api.ParameterMap;
 import org.devopology.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Example test
  */
-public class ParameterOfStringTest {
+public class ParameterMapTest2 {
 
-    private Parameter parameter;
+    private ParameterMap parameterMap;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-        collection.add(Parameter.of("test"));
-        collection.add(Parameter.of(null));
-        collection.add(Parameter.of(""));
+        for (int i = 0; i < 10; i++) {
+            collection.add(
+                    Parameter.of(
+                            "ParameterMap[" + i + "]",
+                            new ParameterMap().put("key1", "value1")));
+        }
+        collection.add(Parameter.of("null value", new ParameterMap().put("null key", null)));
         return collection.stream();
     }
 
     @TestEngine.ParameterSetter
     public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
+        parameterMap = parameter.value();
     }
 
     @TestEngine.BeforeAll
@@ -37,10 +40,14 @@ public class ParameterOfStringTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
-        if (parameter.value() != null) {
-            assertThat(parameter.value(String.class).getClass()).isEqualTo(String.class);
-        }
+        String value = parameterMap.get("key1", String.class);
+        System.out.println("test1(" + value + ")");
+    }
+
+    @TestEngine.Test
+    public void test2() {
+        String value = parameterMap.get("key1", String.class);
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll

@@ -232,7 +232,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeClass.class,
                             Scope.STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             beforeClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -319,7 +319,7 @@ public final class TestEngineUtils {
                             TestEngine.ParameterSupplier.class,
                             Scope.STATIC,
                             Stream.class,
-                            null);
+                            (Class<?>[]) null);
 
             parameterSupplierMethodsCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -365,7 +365,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             beforeAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -391,7 +391,7 @@ public final class TestEngineUtils {
                             TestEngine.BeforeEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             beforeEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -419,7 +419,7 @@ public final class TestEngineUtils {
                             TestEngine.Test.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             testMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -445,7 +445,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             afterEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -471,7 +471,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             afterAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -497,7 +497,7 @@ public final class TestEngineUtils {
                             TestEngine.AfterClass.class,
                             Scope.STATIC,
                             Void.class,
-                            null);
+                            (Class<?>[]) null);
 
             afterClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
