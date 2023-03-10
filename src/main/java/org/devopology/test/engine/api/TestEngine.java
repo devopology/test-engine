@@ -11,18 +11,12 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter setter method
-     */
     @interface ParameterSetter {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a parameter supplier
-     */
     @interface ParameterSupplier {
 
     }
@@ -50,6 +44,11 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Test {
 
+        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Order {
+            int value();
+        }
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
@@ -72,27 +71,18 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a disabled test class or method
-     */
     @interface Disabled {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation to mark a test class as a base class (don't execute)
-     */
     @interface BaseClass {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
-    /**
-     * Annotation for a before each method
-     */
     @interface DisplayName {
         String value();
     }

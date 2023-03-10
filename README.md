@@ -41,26 +41,28 @@ Add the Devopology Test Engine Maven repository to your `pom.xml` file...
 Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 ```xml
-<dependency>
+<dependencies>
+  <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-api</artifactId>
     <version>5.9.2</version>
-</dependency>
-<dependency>
+  </dependency>
+  <dependency>
     <groupId>org.junit.platform</groupId>
     <artifactId>junit-platform-launcher</artifactId>
     <version>1.9.2</version>
-</dependency>
-<dependency>
+  </dependency>
+  <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-engine</artifactId>
     <version>5.9.2</version>
-</dependency>
-<dependency>
+  </dependency>
+  <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
     <version>2.0.0</version>
-</dependency>
+  </dependency>
+</dependencies>
 ```
 
 **Notes**
@@ -83,16 +85,21 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 **NOTES**
 
-- Methods are sorted / executed in alphabetical order based on a `String` `method.getName()` comparison, regardless of where they are declared (class or superclasses)
-
-
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
+
+
+- By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
+
+
+- `@TestEngine.Test.Order` can be used to control **test method order**
+  - Methods are sorted by the annotation value first, then alphabetically by the test method name
 
 ## Additional Annotations
 
-| Annotation              | Scope | Required | Usage                                                             |
-|-------------------------|-------|----------|-------------------------------------------------------------------|
-| `@TestEngine.BaseClass` | class | no       | Marks a test class as being a base class (skips direct execution) |
+| Annotation               | Scope       | Required | Usage                                                             |
+|--------------------------|-------------|----------|-------------------------------------------------------------------|
+| `@TestEngine.BaseClass`  | class       | no       | Marks a test class as being a base class (skips direct execution) |
+ | `@TestEngine.Test.Order` | test method | no       | Provides an order index for an `@TestEngine.Test` method          |
 
 ## What is a `Parameter` ?
 
