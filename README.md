@@ -114,6 +114,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 - The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
   - `boolean`
   - `byte`
+  - `char`
   - `short`
   - `int`
   - `long`
