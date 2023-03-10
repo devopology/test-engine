@@ -96,10 +96,10 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 ## Additional Annotations
 
-| Annotation               | Scope       | Required | Usage                                                             |
-|--------------------------|-------------|----------|-------------------------------------------------------------------|
-| `@TestEngine.BaseClass`  | class       | no       | Marks a test class as being a base class (skips direct execution) |
- | `@TestEngine.Test.Order` | test method | no       | Provides an order index for an `@TestEngine.Test` method          |
+| Annotation                      | Scope       | Required | Usage                                                             |
+|---------------------------------|-------------|----------|-------------------------------------------------------------------|
+| `@TestEngine.BaseClass`         | class       | no       | Marks a test class as being a base class (skips direct execution) |
+ | `@TestEngine.Test.Order(<int>)` | test method | no       | Provides an order index for an `@TestEngine.Test` method          |
 
 ## What is a `Parameter` ?
 
