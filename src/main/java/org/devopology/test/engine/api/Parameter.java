@@ -97,6 +97,16 @@ public interface Parameter {
     }
 
     /**
+     * Method to create a Parameter containing as char
+     *
+     * @param c
+     * @return
+     */
+    static Parameter of(char c) {
+        return of(String.valueOf(c), c);
+    }
+
+    /**
      * Method to create a Parameter containing a short
      *
      * @param s

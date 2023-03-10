@@ -27,11 +27,11 @@ import org.junit.platform.launcher.TestPlan;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -46,7 +46,6 @@ public final class TestEngineUtils {
 
     private enum Scope { STATIC, NON_STATIC }
 
-    //private static final Map<Class<?>, Collection<Field>> parameterSupplierFieldsCache;
     private static final Map<Class<?>, Collection<Method>> parameterSupplierMethodsCache;
     private static final Map<Class<?>, Collection<Method>> parameterSetterMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeClassMethodCache;
@@ -60,7 +59,6 @@ public final class TestEngineUtils {
     private static final Map<Method, String> methodDisplayNameCache;
 
     static {
-        //parameterSupplierFieldsCache = new HashMap<>();
         parameterSupplierMethodsCache = new HashMap<>();
         parameterSetterMethodCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
@@ -87,7 +85,7 @@ public final class TestEngineUtils {
      * @param clazz
      * @return
      */
-    private static Collection<Method> getAllMethods(
+    private static List<Method> getMethods(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
             Scope scope,
@@ -115,7 +113,7 @@ public final class TestEngineUtils {
 
         Map<String, Method> methodMap = new HashMap<>();
         resolveMethods(clazz, annotation, scope, returnType, parameterTypes, methodMap);
-        List<Method> methodList = new LinkedList<>(methodMap.values());
+        List<Method> methodList = new ArrayList<>(methodMap.values());
         methodList.sort(Comparator.comparing(Method::getName));
 
         return methodList;
@@ -227,76 +225,17 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.BeforeClass.class,
                             Scope.STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             beforeClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
             return methods;
         }
-    }
-
-    /**
-     * Method to get a Collection of @TestEngine.ParameterInject Fields sorted alphabetically
-     *
-     * @param clazz
-     * @return
-     */
-    /*
-    public static Collection<Field> getParameterInjectFields(Class<?> clazz) {
-        synchronized (parameterInjectFieldCache) {
-            LOGGER.trace("getParameterInjectFields(%s)", clazz.getName());
-
-            if (parameterInjectFieldCache.containsKey(clazz)) {
-                return parameterInjectFieldCache.get(clazz);
-            }
-
-            Collection<Field> fields =
-                    getAllFields(
-                            clazz,
-                            TestEngine.ParameterSetter.class,
-                            Scope.NON_STATIC);
-
-            parameterInjectFieldCache.put(clazz, Collections.unmodifiableCollection(fields));
-
-            return fields;
-        }
-    }
-    */
-
-    /**
-     * Method to get a Collection of @TestEngine.ParameterSupplier Fields sorted alphabetically
-     *
-     * @param clazz
-     * @return
-     */
-    /*
-    public static Collection<Field> getParameterSupplierFields(Class<?> clazz) {
-        Collection<Field> parameterSupplierFields = parameterSupplierFieldsCache.get(clazz);
-        if (parameterSupplierFields != null) {
-            return parameterSupplierFields;
-        }
-
-        parameterSupplierFields = new ArrayList<>();
-
-        Field[] fields = clazz.getFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(TestEngine.ParameterSupplier.class)) {
-                int modifiers = field.getModifiers();
-                if (Modifier.isStatic(modifiers)) {
-                    field.setAccessible(true);
-                    parameterSupplierFields.add(field);
-                }
-            }
-        }
-
-        parameterSupplierFieldsCache.put(clazz, Collections.unmodifiableCollection(parameterSupplierFields));
-
-        return parameterSupplierFields;
     }
 
     /**
@@ -314,12 +253,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.ParameterSupplier.class,
                             Scope.STATIC,
                             Stream.class,
-                            (Class<?>[]) null);
+                            null);
 
             parameterSupplierMethodsCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -334,12 +273,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.ParameterSetter.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            new Class<?>[] { Parameter.class });
+                            Parameter.class);
 
             parameterSetterMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -360,12 +299,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.BeforeAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             beforeAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -386,12 +325,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.BeforeEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             beforeEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -413,13 +352,32 @@ public final class TestEngineUtils {
                 return testMethodCache.get(clazz);
             }
 
-            Collection<Method> methods =
-                    getAllMethods(
+            List<Method> methods =
+                    getMethods(
                             clazz,
                             TestEngine.Test.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
+
+            Collections.sort(methods, (o1, o2) -> {
+                boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Test.Order.class);
+                boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Test.Order.class);
+                if (o1AnnotationPresent) {
+                    if (o2AnnotationPresent) {
+                        // Sort based on @TestEngine.Test.Order value
+                        int o1Order = o1.getAnnotation(TestEngine.Test.Order.class).value();
+                        int o2Order = o2.getAnnotation(TestEngine.Test.Order.class).value();
+                        return (o1Order < o2Order) ? -1 : ((o1Order == o2Order) ? 0 : 1);
+                    } else {
+                        return -1;
+                    }
+                } else if (o2AnnotationPresent) {
+                    return 1;
+                } else {
+                    return o1.getName().compareTo(o2.getName());
+                }
+            });
 
             testMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -440,12 +398,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.AfterEach.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             afterEachMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -466,12 +424,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.AfterAll.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             afterAllMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
@@ -492,12 +450,12 @@ public final class TestEngineUtils {
             }
 
             Collection<Method> methods =
-                    getAllMethods(
+                    getMethods(
                             clazz,
                             TestEngine.AfterClass.class,
                             Scope.STATIC,
                             Void.class,
-                            (Class<?>[]) null);
+                            null);
 
             afterClassMethodCache.put(clazz, Collections.unmodifiableCollection(methods));
 
