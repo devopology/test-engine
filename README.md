@@ -101,8 +101,9 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
 - By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
 
 
-- `@TestEngine.Order` can be used to control **test method order**
+- `@TestEngine.Order` can be used to control method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
+  - Method order is relative to other methods with the same annotation
 
 ## Additional Annotations
 
