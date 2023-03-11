@@ -13,7 +13,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Devopology Test Engine v2.0.0](https://github.com/devopology/test-engine/releases/tag/v2.0.0) (2023-03-09)
+- General Availability (GA): [Devopology Test Engine v2.0.1](https://github.com/devopology/test-engine/releases/tag/v2.0.1) (TBD)
 
 **Notes**
 
@@ -60,9 +60,19 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
   <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
   </dependency>
 </dependencies>
+```
+
+To use the Test Engine `CsvSource`, you need to also include the uniVocity parsers jar
+
+```xml
+  <dependency>
+    <groupId>com.univocity</groupId>
+    <artifactId>univocity-parsers</artifactId>
+    <version>2.9.1</version>
+  </dependency>
 ```
 
 **Notes**
@@ -194,6 +204,15 @@ Github discussions is the current mechanism for help/support
 ## Contributing
 
 Contributions to the Devopology Test Engine are both welcomed and appreciated.
+
+The project uses a simplified GitFlow branching strategy
+ - `main` is the latest release
+ - `development` is the next release
+
+For changes, you should...
+- Create a branch based on `development`
+- Make your changes
+- Open a PR against `development`
 
 ## Design
 
