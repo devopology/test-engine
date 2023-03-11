@@ -1,6 +1,6 @@
 package org.devopology.test.engine.support.predicate;
 
-public class IncludeTestClassPredicate extends RegexPredicate<Class<?>> {
+public final class IncludeTestClassPredicate extends RegexPredicate<Class<?>> {
 
     private IncludeTestClassPredicate(String regex) {
         super(regex);

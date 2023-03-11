@@ -1,6 +1,6 @@
 package org.devopology.test.engine.support.predicate;
 
-public class ExcludeTestClassPredicate extends RegexPredicate<Class<?>> {
+public final class ExcludeTestClassPredicate extends RegexPredicate<Class<?>> {
 
     private ExcludeTestClassPredicate(String regex) {
         super(regex);

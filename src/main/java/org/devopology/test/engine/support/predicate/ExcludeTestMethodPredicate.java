@@ -2,7 +2,7 @@ package org.devopology.test.engine.support.predicate;
 
 import java.lang.reflect.Method;
 
-public class ExcludeTestMethodPredicate extends RegexPredicate<Method> {
+public final class ExcludeTestMethodPredicate extends RegexPredicate<Method> {
 
     private ExcludeTestMethodPredicate(String regex) {
         super(regex);
