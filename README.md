@@ -107,10 +107,10 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
 
 ## Additional Annotations
 
-| Annotation                 | Scope  | Required | Usage                                                                           |
-|----------------------------|--------|----------|---------------------------------------------------------------------------------|
-| `@TestEngine.BaseClass`    | class  | no       | Marks a test class as being a base class (skips direct execution)               |
-| `@TestEngine.Order(<int>)` | method | no       | Provides a way to order methods  relative to other methods in the same category |
+| Annotation                 | Scope  | Required | Usage                                                                               |
+|----------------------------|--------|----------|-------------------------------------------------------------------------------------|
+| `@TestEngine.BaseClass`    | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
+| `@TestEngine.Order(<int>)` | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
 
 ## What is a `Parameter` ?
 
