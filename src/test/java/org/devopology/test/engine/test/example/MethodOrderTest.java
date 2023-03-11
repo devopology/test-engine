@@ -52,15 +52,15 @@ public class MethodOrderTest {
         ACTUAL_LIST.add("testB");
     }
 
-    @TestEngine.Test.Order(2)
     @TestEngine.Test
+    @TestEngine.Test.Order(2)
     public void test3() {
         System.out.println("test3(" + parameter.value() + ")");
         ACTUAL_LIST.add("test3");
     }
 
-    @TestEngine.Test.Order(1)
     @TestEngine.Test
+    @TestEngine.Test.Order(1)
     public void test2() {
         System.out.println("test2(" + parameter.value() + ")");
         ACTUAL_LIST.add("test2");

@@ -10,8 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Disabled
-public class DisabledTest {
+public class DisabledMethodTest {
 
     private Parameter parameter;
 
@@ -40,6 +39,7 @@ public class DisabledTest {
         System.out.println("test1(" + parameter + ")");
     }
 
+    @TestEngine.Disabled
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + parameter + ")");
