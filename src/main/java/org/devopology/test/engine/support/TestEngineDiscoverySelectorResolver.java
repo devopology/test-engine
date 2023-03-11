@@ -17,7 +17,6 @@
 package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.api.Parameter;
-import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
@@ -44,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -153,9 +151,7 @@ public class TestEngineDiscoverySelectorResolver {
         Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
 
         if (includeTestClassPredicate != null) {
-            Iterator<Class<?>> iterator = workingTestClassToMethodMap.keySet().iterator();
-            while (iterator.hasNext()) {
-                Class<?> clazz = iterator.next();
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
                 if (!includeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
                 }
@@ -163,9 +159,7 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (excludeTestClassPredicate != null) {
-            Iterator<Class<?>> iterator = workingTestClassToMethodMap.keySet().iterator();
-            while (iterator.hasNext()) {
-                Class<?> clazz = iterator.next();
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
                 if (excludeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
                 }
@@ -173,17 +167,9 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (includeTestMethodPredicate != null) {
-            Iterator<Class<?>> iterator = testClassToMethodMap.keySet().iterator();
-            while (iterator.hasNext()) {
-                Class<?> clazz = iterator.next();
+            for (Class<?> clazz : testClassToMethodMap.keySet()) {
                 Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
-                Iterator<Method> methodIterator = methods.iterator();
-                while (methodIterator.hasNext()) {
-                    Method method = methodIterator.next();
-                    if (!includeTestMethodPredicate.test(method)) {
-                        methodIterator.remove();
-                    }
-                }
+                methods.removeIf(method -> !includeTestMethodPredicate.test(method));
 
                 if (methods.isEmpty()) {
                     testClassToMethodMap.remove(clazz);
@@ -194,17 +180,9 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (excludeTestMethodPredicate != null) {
-            Iterator<Class<?>> iterator = testClassToMethodMap.keySet().iterator();
-            while (iterator.hasNext()) {
-                Class<?> clazz = iterator.next();
+            for (Class<?> clazz : testClassToMethodMap.keySet()) {
                 Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
-                Iterator<Method> methodIterator = methods.iterator();
-                while (methodIterator.hasNext()) {
-                    Method method = methodIterator.next();
-                    if (excludeTestMethodPredicate.test(method)) {
-                        methodIterator.remove();
-                    }
-                }
+                methods.removeIf(excludeTestMethodPredicate);
 
                 if (methods.isEmpty()) {
                     testClassToMethodMap.remove(clazz);
@@ -283,11 +261,7 @@ public class TestEngineDiscoverySelectorResolver {
 
             if (IS_TEST_METHOD.test(method)) {
                 LOGGER.trace("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName());
-                Collection<Method> methods = testClassToMethodMap.get(clazz);
-                if (methods == null) {
-                    methods = new ArrayList<>();
-                    testClassToMethodMap.put(clazz, methods);
-                }
+                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
 
                 methods.add(method);
             }
@@ -336,7 +310,7 @@ public class TestEngineDiscoverySelectorResolver {
                                     testClass.getName()));
                 }
 
-                // Get parameters from the paramter supplier method
+                // Get parameters from the parameter supplier method
                 Collection<Parameter> testParameters;
 
                 try {
@@ -401,9 +375,8 @@ public class TestEngineDiscoverySelectorResolver {
                                 testClass);
 
                 List<Parameter> testParameterList = new ArrayList<>(testParameters);
-                for (int i = 0; i < testParameterList.size(); i++) {
+                for (Parameter testParameter : testParameterList) {
                     // Build the test descriptor for each test class / test parameter
-                    Parameter testParameter = testParameterList.get(i);
                     String testParameterName = testParameter.name();
                     String testParameterUniqueName = testParameter + "/" + UUID.randomUUID();
 
