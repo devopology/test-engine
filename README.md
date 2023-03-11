@@ -138,6 +138,40 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
 
 - An empty string will have the name `((empty))`
 
+## Configuration values
+
+The Devopology Test Engine has 5 configuration parameters
+
+- thread count
+  - Java system property `devopology.test.engine.thread.count`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_THREAD_COUNT`
+
+
+- test class name include filter (regex)
+  - Java system property `devopology.test.engine.test.class.include`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_INCLUDE`
+
+
+- test class name exclude filter (regex)
+  - Java system property `devopology.test.engine.test.class.exclude`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_EXCLUDE`
+
+
+- test method name include filter (regex)
+  - Java system property `devopology.test.engine.test.method.include`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_INCLUDE`
+
+- test method name include filter (regex)
+  - Java system property `devopology.test.engine.test.method.exclude`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE`
+
+Using a combination of the properties allows for running individual test class / test methods
+
+**Notes**
+
+Java system properties take precedence over environment variables
+
+
 ## Example Usage
 
 Example:
