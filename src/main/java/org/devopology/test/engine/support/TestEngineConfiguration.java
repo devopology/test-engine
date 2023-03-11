@@ -23,13 +23,13 @@ public final class TestEngineConfiguration {
     }
 
     public static String getValue(String systemProperty, String environmentVariable) {
-        String propertyValue = System.getProperty(systemProperty);
-        String environmentVariableProperty = System.getenv(environmentVariable);
+        String systemPropertyValue = System.getProperty(systemProperty);
+        String environmentVariableValue = System.getenv(environmentVariable);
 
-        if (propertyValue != null) {
-            return propertyValue;
-        } else if (environmentVariableProperty != null) {
-            return environmentVariableProperty;
+        if ((systemPropertyValue != null) && !systemPropertyValue.trim().isEmpty()) {
+            return systemPropertyValue;
+        } else if ((environmentVariableValue != null) && !environmentVariableValue.trim().isEmpty()) {
+            return environmentVariableValue;
         }
 
         return null;
