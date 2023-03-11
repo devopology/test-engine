@@ -479,6 +479,11 @@ public final class TestEngineUtils {
         }
     }
 
+    /**
+     * Method to sort a List of methods first by @TestEngine.Order annotation, then alphabetically
+     * 
+     * @param methods
+     */
     private static void sortByOrderAnnotation(List<Method> methods) {
         Collections.sort(methods, (o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
