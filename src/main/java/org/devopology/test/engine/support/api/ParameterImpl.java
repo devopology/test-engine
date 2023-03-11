@@ -20,6 +20,7 @@ import org.devopology.test.engine.api.Parameter;
 
 import java.util.Objects;
 
+@SuppressWarnings("unchecked")
 public class ParameterImpl implements Parameter {
 
     private final String name;

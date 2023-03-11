@@ -44,11 +44,6 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Test {
 
-        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Order {
-            int value();
-        }
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
@@ -67,6 +62,12 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterClass {
 
+    }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Order {
+        int value();
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
