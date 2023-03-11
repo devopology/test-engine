@@ -241,7 +241,7 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 ## Getting Help
 
-Github discussions is the current mechanism for help/support
+GitHub's discussions is the current mechanism for help/support
 
 ## Contributing
 
