@@ -103,8 +103,27 @@ public class TestEngineDiscoverySelectorResolver {
             excludeTestClassPredicate = null;
         }
 
-        includeTestMethodPredicate = null; // IncludeTestMethodPredicate.of("test1");
-        excludeTestMethodPredicate = null; // ExcludeTestMethodPredicate.of("test");
+        String includeTestMethodPredicateRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.method.include",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_INCLUDE");
+
+        if (includeTestMethodPredicateRegex != null) {
+            includeTestMethodPredicate = IncludeTestMethodPredicate.of(includeTestMethodPredicateRegex);
+        } else {
+            includeTestMethodPredicate = null;
+        }
+
+        String excludeTestMethodPredicateRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.method.exclude",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_exclude");
+
+        if (excludeTestMethodPredicateRegex != null) {
+            excludeTestMethodPredicate = ExcludeTestMethodPredicate.of(excludeTestMethodPredicateRegex);
+        } else {
+            excludeTestMethodPredicate = null;
+        }
     }
 
     /**
@@ -148,26 +167,52 @@ public class TestEngineDiscoverySelectorResolver {
             while (iterator.hasNext()) {
                 Class<?> clazz = iterator.next();
                 if (excludeTestClassPredicate.test(clazz)) {
-                    System.out.println("DEBUG excluding [" + clazz.getName() + "]");
                     testClassToMethodMap.remove(clazz);
                 }
             }
         }
 
-        /*
         if (includeTestMethodPredicate != null) {
             Iterator<Class<?>> iterator = testClassToMethodMap.keySet().iterator();
             while (iterator.hasNext()) {
                 Class<?> clazz = iterator.next();
-                Iterator<Method> methodIterator = testClassToMethodMap.get(clazz).iterator();
+                Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
+                Iterator<Method> methodIterator = methods.iterator();
                 while (methodIterator.hasNext()) {
-                    if (!includeTestMethodPredicate.test(methodIterator.next())) {
-                        iterator.remove();
+                    Method method = methodIterator.next();
+                    if (!includeTestMethodPredicate.test(method)) {
+                        methodIterator.remove();
                     }
+                }
+
+                if (methods.isEmpty()) {
+                    testClassToMethodMap.remove(clazz);
+                } else {
+                    testClassToMethodMap.put(clazz, methods);
                 }
             }
         }
-        */
+
+        if (excludeTestMethodPredicate != null) {
+            Iterator<Class<?>> iterator = testClassToMethodMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
+                Iterator<Method> methodIterator = methods.iterator();
+                while (methodIterator.hasNext()) {
+                    Method method = methodIterator.next();
+                    if (excludeTestMethodPredicate.test(method)) {
+                        methodIterator.remove();
+                    }
+                }
+
+                if (methods.isEmpty()) {
+                    testClassToMethodMap.remove(clazz);
+                } else {
+                    testClassToMethodMap.put(clazz, methods);
+                }
+            }
+        }
 
         processSelectors(engineDescriptor, testClassToMethodMap);
     }
