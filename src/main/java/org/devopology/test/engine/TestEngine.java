@@ -16,9 +16,11 @@
 
 package org.devopology.test.engine;
 
+import org.devopology.test.engine.support.TestEngineConfiguration;
 import org.devopology.test.engine.support.TestEngineConfigurationParameters;
 import org.devopology.test.engine.support.TestEngineDiscoverySelectorResolver;
 import org.devopology.test.engine.support.TestEngineEngineDiscoveryRequest;
+import org.devopology.test.engine.support.TestEngineException;
 import org.devopology.test.engine.support.TestEngineExecutor;
 import org.devopology.test.engine.support.TestEngineInformation;
 import org.devopology.test.engine.support.TestEngineSummaryEngineExecutionListener;
@@ -107,22 +109,23 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             return;
         }
 
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        int threadCount = availableProcessors;
-        String value = System.getProperty("devopology.test.engine.thread.count");
-        if (value != null) {
+        int threadCount = Runtime.getRuntime().availableProcessors();
+
+        String threadCountValue = TestEngineConfiguration.getValue(
+                "devopology.test.engine.thread.count",
+                "DEVOPOLOGY_TEST_ENGINE_THREAD_COUNT");
+
+        if (threadCountValue != null) {
             try {
-                threadCount = Integer.parseInt(value);
+                threadCount = Integer.parseInt(threadCountValue);
             } catch (NumberFormatException e) {
-                LOGGER.warning("Invalid thread count", e);
+                throw new TestEngineException(String.format("Invalid thread count [%s]", threadCountValue), e);
             }
         }
 
-        if (threadCount < 0) {
-            threadCount = availableProcessors;
+        if (threadCount < 1) {
+            throw new TestEngineException(String.format("Invalid thread count [%d]", threadCount));
         }
-
-        //LOGGER.infoRaw(String.format("thread count [%d]", threadCount));
 
         new TestEngineExecutor(threadCount).execute(executionRequest);
     }

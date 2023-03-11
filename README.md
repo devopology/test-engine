@@ -13,7 +13,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Devopology Test Engine v2.0.0](https://github.com/devopology/test-engine/releases/tag/v2.0.0) (2023-03-09)
+- General Availability (GA): [Devopology Test Engine v2.0.1](https://github.com/devopology/test-engine/releases/tag/v2.0.1) (TBD)
 
 **Notes**
 
@@ -60,9 +60,19 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
   <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
   </dependency>
 </dependencies>
+```
+
+To use the Test Engine `CsvSource`, you need to also include the uniVocity parsers jar
+
+```xml
+  <dependency>
+    <groupId>com.univocity</groupId>
+    <artifactId>univocity-parsers</artifactId>
+    <version>2.9.1</version>
+  </dependency>
 ```
 
 **Notes**
@@ -71,7 +81,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Examples                                         |
+| Annotation                      | Scope  |  Required | Static | Example                                          |
 |---------------------------------|--------|-----------|--------|--------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
 | `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
@@ -91,15 +101,16 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 - By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
 
 
-- `@TestEngine.Test.Order` can be used to control **test method order**
+- `@TestEngine.Order` can be used to control method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
+  - Method order is relative to other methods with the same annotation
 
 ## Additional Annotations
 
-| Annotation                      | Scope       | Required | Usage                                                             |
-|---------------------------------|-------------|----------|-------------------------------------------------------------------|
-| `@TestEngine.BaseClass`         | class       | no       | Marks a test class as being a base class (skips direct execution) |
-| `@TestEngine.Test.Order(<int>)` | test method | no       | Provides an order index for a `@TestEngine.Test` method           |
+| Annotation                 | Scope  | Required | Usage                                                                               |
+|----------------------------|--------|----------|-------------------------------------------------------------------------------------|
+| `@TestEngine.BaseClass`    | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
+| `@TestEngine.Order(<int>)` | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
 
 ## What is a `Parameter` ?
 
@@ -120,7 +131,69 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
   - `long`
   - `float`
   - `double`
-  - `String` 
+  - `String`
+
+The `Parameter` interface also has methods to wrap an Object
+
+Example
+
+```java
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(
+                    Parameter.of(
+                            "Array [" + i + "]",
+                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+        }
+        return collection.stream();
+    }
+```
+
+The value of the `Parameter` is a String[] array
+
+```java
+String[] values = paramater.value();
+```
+
+**Notes**
+
+## Configuration values
+
+The Devopology Test Engine has 5 configuration parameters
+
+- thread count
+  - Java system property `devopology.test.engine.thread.count`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_THREAD_COUNT`
+
+
+- test class name include filter (regex)
+  - Java system property `devopology.test.engine.test.class.include`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_INCLUDE`
+
+
+- test class name exclude filter (regex)
+  - Java system property `devopology.test.engine.test.class.exclude`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_EXCLUDE`
+
+
+- test method name include filter (regex)
+  - Java system property `devopology.test.engine.test.method.include`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_INCLUDE`
+
+- test method name exclude filter (regex)
+  - Java system property `devopology.test.engine.test.method.exclude`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE`
+
+Using a combination of the properties allows for running individual test classes / test methods
+
+**Notes**
+
+- Java system properties take precedence over environment variables
+
+
+- If all test methods are excluded, then the test class will be excluded
 
 ## Example Usage
 
@@ -189,11 +262,20 @@ https://github.com/devopology/test-engine/tree/main/src/test/java/org/devopology
 
 ## Getting Help
 
-Github discussions is the current mechanism for help/support
+GitHub's discussions is the current mechanism for help/support
 
 ## Contributing
 
 Contributions to the Devopology Test Engine are both welcomed and appreciated.
+
+The project uses a simplified GitFlow branching strategy
+ - `main` is the latest release
+ - `development` is the next release
+
+For changes, you should...
+- Create a branch based on `development`
+- Make your changes
+- Open a PR against `development`
 
 ## Design
 
@@ -241,7 +323,7 @@ State Machine flow...
 
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported to Java
-  - The thread count can be changed by using a Java system property `devopology.test.engine.thread.count=<THREAD COUNT>`
+  - The thread count can be changed by using a Java system property or environment variable
 
 ## Command Line (standalone) Usage
 

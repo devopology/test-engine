@@ -28,4 +28,5 @@ hs_err_pid*
 **/repository/*
 
 dependency-reduced-pom.xml
+build.sh
 patch.sh

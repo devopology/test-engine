@@ -19,20 +19,31 @@ package org.devopology.test.engine.api;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Class to implement a ParameterMap
  */
 @SuppressWarnings("unchecked")
-public class ParameterMap {
-
-    private final Map<String, Object> map;
+public class ParameterMap extends LinkedHashMap<String, Object> {
 
     /**
      * Constructor
      */
     public ParameterMap() {
-        this.map = new LinkedHashMap<>();
+        super();
+    }
+
+    /**
+     * Method to return whether a key exists in the map
+     *
+     * @param key key whose presence in this map is to be tested
+     * @return
+     */
+    public boolean containsKey(Object key) {
+        validateKey(key);
+        return super.containsKey(key);
     }
 
     /**
@@ -43,32 +54,48 @@ public class ParameterMap {
      * @return
      */
     public ParameterMap put(String key, Object object) {
-        Objects.requireNonNull(key);
-
-        String keyTrimmed = key.trim();
-        if (keyTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-
-        map.put(keyTrimmed, object);
+        validateKey(key);
+        super.put(key, object);
         return this;
     }
 
     /**
-     * Method to return whether a key exists in the map
+     * Method to merge a map into this map
      *
-     * @param key
+     * @param map mappings to be stored in this map
+     */
+    public void putAll(Map map) {
+        Objects.requireNonNull(map);
+
+        Set<Map.Entry<Object, Object>> set = map.entrySet();
+        for (Map.Entry<Object, Object> entry : set) {
+            String key = validateKey(entry.getKey());
+            put(key, entry.getValue());
+        }
+    }
+
+    /**
+     * Method to add a key / value if it doesn't exist in this map
+     *
+     * @param key key with which the specified value is to be associated
+     * @param object value to be associated with the specified key
      * @return
      */
-    public boolean containsKey(String key) {
-        Objects.requireNonNull(key);
+    public Object putIfAbsent(String key, Object object) {
+        validateKey(key);
+        return putIfAbsent(key, object);
+    }
 
-        String keyTrimmed = key.trim();
-        if (keyTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-
-        return map.containsKey(keyTrimmed);
+    /**
+     * Method to merge a map into this map (Unsupported)
+     *
+     * @param key
+     * @param value
+     * @param remappingFunction
+     * @return
+     */
+    public Object merge(String key, Object value, BiFunction<Object, Object, Object> remappingFunction) {
+        throw new UnsupportedOperationException("Merge is not supported");
     }
 
     /**
@@ -81,12 +108,11 @@ public class ParameterMap {
     public <T> T get(String key) {
         Objects.requireNonNull(key);
 
-        String keyTrimmed = key.trim();
-        if (keyTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key is empty");
         }
 
-        return (T) map.get(keyTrimmed);
+        return (T) super.get(key);
     }
 
     /**
@@ -105,16 +131,20 @@ public class ParameterMap {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ParameterMap that = (ParameterMap) o;
-        return Objects.equals(map, that.map);
-    }
+    private static String validateKey(Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(map);
+        if (!(key instanceof String)) {
+            throw new IllegalArgumentException("Illegal key type [" + key.getClass().getName() + "] String is required");
+        }
+
+        String stringKey = (String) key;
+        if (stringKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key is empty");
+        }
+
+        return stringKey;
     }
 }

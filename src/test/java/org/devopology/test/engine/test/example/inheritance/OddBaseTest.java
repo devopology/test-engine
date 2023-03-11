@@ -2,8 +2,6 @@ package org.devopology.test.engine.test.example.inheritance;
 
 import org.devopology.test.engine.api.Parameter;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class OddBaseTest extends BaseTest {

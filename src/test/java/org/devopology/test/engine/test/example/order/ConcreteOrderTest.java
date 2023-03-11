@@ -1,4 +1,4 @@
-package org.devopology.test.engine.test.example;
+package org.devopology.test.engine.test.example.order;
 
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
@@ -13,12 +13,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example test
  */
-public class MethodOrderTest {
+public class ConcreteOrderTest extends BaseOrderTest {
 
-    private static final List<String> EXPECTED_LIST = List.of("test2", "test3", "testA", "testB");
-    private static final List<String> ACTUAL_LIST = new ArrayList<>();
-
-    private Parameter parameter;
+    private static final List<String> EXPECTED_LIST =
+            List.of(
+                    "beforeClass2",
+                    "beforeClass",
+                    "beforeAll2",
+                    "beforeAll",
+                    "test2",
+                    "test3",
+                    "testA",
+                    "testB",
+                    "afterAll2",
+                    "afterAll",
+                    "afterClass2",
+                    "afterClass");
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
@@ -35,9 +45,18 @@ public class MethodOrderTest {
         this.parameter = parameter;
     }
 
+    @TestEngine.BeforeClass
+    @TestEngine.Order(2)
+    public static void beforeClass() {
+        System.out.println("beforeClass()");
+        ACTUAL_LIST.add("beforeClass");
+    }
+
     @TestEngine.BeforeAll
+    @TestEngine.Order(2)
     public void beforeAll() {
         System.out.println("beforeAll()");
+        ACTUAL_LIST.add("beforeAll");
     }
 
     @TestEngine.Test
@@ -52,23 +71,26 @@ public class MethodOrderTest {
         ACTUAL_LIST.add("testB");
     }
 
-    @TestEngine.Test.Order(2)
     @TestEngine.Test
+    @TestEngine.Order(2)
     public void test3() {
         System.out.println("test3(" + parameter.value() + ")");
         ACTUAL_LIST.add("test3");
     }
 
-    @TestEngine.Test.Order(1)
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
-        ACTUAL_LIST.add("test2");
-    }
-
     @TestEngine.AfterAll
+    @TestEngine.Order(2)
     public void afterAll() {
         System.out.println("afterAll()");
+        ACTUAL_LIST.add("afterAll");
+    }
+
+    @TestEngine.AfterClass
+    @TestEngine.Order(2)
+    public static void afterClass() {
+        System.out.println("afterClass()");
+        ACTUAL_LIST.add("afterClass");
         assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
+
 }

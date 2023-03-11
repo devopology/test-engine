@@ -7,7 +7,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <name>Devopology - Test Engine</name>
 
     <properties>
@@ -140,6 +140,11 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.24.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.9.1</version>
         </dependency>
     </dependencies>
 

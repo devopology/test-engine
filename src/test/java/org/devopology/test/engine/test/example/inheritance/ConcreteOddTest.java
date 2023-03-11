@@ -3,7 +3,6 @@ package org.devopology.test.engine.test.example.inheritance;
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
 
-import java.util.Collection;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;

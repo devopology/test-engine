@@ -2,22 +2,21 @@ package org.devopology.test.engine.test.example;
 
 import org.devopology.test.engine.api.Parameter;
 import org.devopology.test.engine.api.TestEngine;
+import org.devopology.test.engine.api.source.EnumSource;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 /**
  * Example test
  */
-public class ParameterStreamOfTest {
+public class EnumSourceTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        return Stream.of(
-                Parameter.of(String.valueOf(1)),
-                Parameter.of("String"),
-                Parameter.of(String.valueOf(3.0f)));
+    public static Stream<Parameter> parameters() throws IOException {
+        return EnumSource.of(DaysOfTheWeek.class);
     }
 
     @TestEngine.ParameterSetter
@@ -43,5 +42,26 @@ public class ParameterStreamOfTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    private enum DaysOfTheWeek {
+
+        SUNDAY("sunday"),
+        MONDAY("monday"),
+        TUESDAY("tuesday"),
+        WEDNESDAY("wednesday"),
+        THURSDAY("thursday"),
+        FRIDAY("friday"),
+        SATURDAY("saturday");
+
+        private String value;
+
+        DaysOfTheWeek(String value) {
+            this.value = value;
+        }
+
+        public String toString() {
+            return value;
+        }
     }
 }
