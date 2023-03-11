@@ -16,7 +16,7 @@ public class ParameterStreamOfTest {
     public static Stream<Parameter> parameters() {
         return Stream.of(
                 Parameter.of(String.valueOf(1)),
-                Parameter.of(String.valueOf("String")),
+                Parameter.of("String"),
                 Parameter.of(String.valueOf(3.0f)));
     }
 
