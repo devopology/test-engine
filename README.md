@@ -323,7 +323,7 @@ State Machine flow...
 
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported to Java
-  - The thread count can be changed by using a Java system property `devopology.test.engine.thread.count=<THREAD COUNT>`
+  - The thread count can be changed by using a Java system property or environment variable
 
 ## Command Line (standalone) Usage
 
