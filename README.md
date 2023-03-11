@@ -169,8 +169,10 @@ Using a combination of the properties allows for running individual test class /
 
 **Notes**
 
-Java system properties take precedence over environment variables
+- Java system properties take precedence over environment variables
 
+
+- If all test methods are excluded, then the test class will be excluded
 
 ## Example Usage
 
