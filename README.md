@@ -165,7 +165,7 @@ The Devopology Test Engine has 5 configuration parameters
   - Java system property `devopology.test.engine.test.method.exclude`
   - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE`
 
-Using a combination of the properties allows for running individual test class / test methods
+Using a combination of the properties allows for running individual test classes / test methods
 
 **Notes**
 
