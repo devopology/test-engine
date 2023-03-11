@@ -481,7 +481,7 @@ public final class TestEngineUtils {
 
     /**
      * Method to sort a List of methods first by @TestEngine.Order annotation, then alphabetically
-     * 
+     *
      * @param methods
      */
     private static void sortByOrderAnnotation(List<Method> methods) {
