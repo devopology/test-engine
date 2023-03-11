@@ -17,11 +17,16 @@
 package org.devopology.test.engine.support;
 
 import org.devopology.test.engine.api.Parameter;
+import org.devopology.test.engine.api.TestEngine;
 import org.devopology.test.engine.support.descriptor.TestEngineClassTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
+import org.devopology.test.engine.support.predicate.ExcludeTestClassPredicate;
+import org.devopology.test.engine.support.predicate.ExcludeTestMethodPredicate;
+import org.devopology.test.engine.support.predicate.IncludeTestClassPredicate;
+import org.devopology.test.engine.support.predicate.IncludeTestMethodPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -38,6 +43,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -54,6 +61,11 @@ public class TestEngineDiscoverySelectorResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoverySelectorResolver.class);
 
+    private final IncludeTestClassPredicate includeTestClassPredicate;
+    private final ExcludeTestClassPredicate excludeTestClassPredicate;
+    private final IncludeTestMethodPredicate includeTestMethodPredicate;
+    private final ExcludeTestMethodPredicate excludeTestMethodPredicate;
+
     /**
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
      */
@@ -67,6 +79,33 @@ public class TestEngineDiscoverySelectorResolver {
      */
     private static final Predicate<Method> IS_TEST_METHOD =
             method -> TestEngineUtils.getTestMethods(method.getDeclaringClass()).contains(method);
+
+    public TestEngineDiscoverySelectorResolver() {
+        String includeTestClassPredicateRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.class.include",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_INCLUDE");
+
+        if (includeTestClassPredicateRegex != null) {
+            includeTestClassPredicate = IncludeTestClassPredicate.of(includeTestClassPredicateRegex);
+        } else {
+            includeTestClassPredicate = null;
+        }
+
+        String excludeTestClassPredicateRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.class.exclude",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_EXCLUDE");
+
+        if (excludeTestClassPredicateRegex != null) {
+            excludeTestClassPredicate = ExcludeTestClassPredicate.of(excludeTestClassPredicateRegex);
+        } else {
+            excludeTestClassPredicate = null;
+        }
+
+        includeTestMethodPredicate = null; // IncludeTestMethodPredicate.of("test1");
+        excludeTestMethodPredicate = null; // ExcludeTestMethodPredicate.of("test");
+    }
 
     /**
      * Method to resolve test classes / methods, adding them to the EngineDescriptor
@@ -91,6 +130,44 @@ public class TestEngineDiscoverySelectorResolver {
 
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
+
+        Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+
+        if (includeTestClassPredicate != null) {
+            Iterator<Class<?>> iterator = workingTestClassToMethodMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                if (!includeTestClassPredicate.test(clazz)) {
+                    testClassToMethodMap.remove(clazz);
+                }
+            }
+        }
+
+        if (excludeTestClassPredicate != null) {
+            Iterator<Class<?>> iterator = workingTestClassToMethodMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                if (excludeTestClassPredicate.test(clazz)) {
+                    System.out.println("DEBUG excluding [" + clazz.getName() + "]");
+                    testClassToMethodMap.remove(clazz);
+                }
+            }
+        }
+
+        /*
+        if (includeTestMethodPredicate != null) {
+            Iterator<Class<?>> iterator = testClassToMethodMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                Iterator<Method> methodIterator = testClassToMethodMap.get(clazz).iterator();
+                while (methodIterator.hasNext()) {
+                    if (!includeTestMethodPredicate.test(methodIterator.next())) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+        */
 
         processSelectors(engineDescriptor, testClassToMethodMap);
     }
