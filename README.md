@@ -161,7 +161,7 @@ The Devopology Test Engine has 5 configuration parameters
   - Java system property `devopology.test.engine.test.method.include`
   - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_INCLUDE`
 
-- test method name include filter (regex)
+- test method name exclude filter (regex)
   - Java system property `devopology.test.engine.test.method.exclude`
   - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE`
 
