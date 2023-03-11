@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  * Class to create a Stream of Parameters where each Parameter
  * value is a line, skipping lines that start with a "#"
  */
-public class LineSource {
+public final class LineSource {
 
     /**
      * Constructor

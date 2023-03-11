@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 /**
  * Class to create a Stream of Parameters from a CSV file with a header line
  */
-public class CsvSource {
+public final class CsvSource {
 
     /**
      * Constructor

@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * Class to create a Stream of Parameters from an Enum
  */
 @SuppressWarnings("unchecked")
-public class EnumSource {
+public final class EnumSource {
 
     /**
      * Constructor
