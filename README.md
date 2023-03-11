@@ -131,13 +131,33 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
   - `long`
   - `float`
   - `double`
-  - `String` 
+  - `String`
 
+The `Parameter` interface also has methods to wrap an Object
 
-- A `null` String will have the name `((null))`
+Example
 
+```java
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(
+                    Parameter.of(
+                            "Array [" + i + "]",
+                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+        }
+        return collection.stream();
+    }
+```
 
-- An empty string will have the name `((empty))`
+The value of the `Parameter` is a String[] array
+
+```java
+String[] values = paramater.value();
+```
+
+**Notes**
 
 ## Configuration values
 
