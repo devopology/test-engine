@@ -81,7 +81,7 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Examples                                         |
+| Annotation                      | Scope  |  Required | Static | Example                                          |
 |---------------------------------|--------|-----------|--------|--------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
 | `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
