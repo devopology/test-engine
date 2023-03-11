@@ -15,25 +15,25 @@ public @interface TestEngine {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface ParameterSupplier {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BeforeClass {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BeforeAll {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BeforeEach {
 
@@ -51,25 +51,25 @@ public @interface TestEngine {
         }
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterEach {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterAll {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterClass {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Disabled {
 
@@ -81,7 +81,7 @@ public @interface TestEngine {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.TYPE })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface DisplayName {
         String value();
