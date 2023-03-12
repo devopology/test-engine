@@ -175,8 +175,6 @@ public class TestEngineDiscoverySelectorResolver {
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
-
-
         if (includeTestClassPredicate != null) {
             Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
             for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
