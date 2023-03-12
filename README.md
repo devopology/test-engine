@@ -107,11 +107,11 @@ To use the Test Engine `CsvSource`, you need to also include the uniVocity parse
 
 ## Additional Annotations
 
-| Annotation                 | Scope  | Required | Usage                                                                               |
-|----------------------------|--------|----------|-------------------------------------------------------------------------------------|
-| `@TestEngine.BaseClass`    | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
-| `@TestEngine.Order(<int>)` | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
-
+| Annotation                  | Scope  | Required | Usage                                                                               |
+|-----------------------------|--------|----------|-------------------------------------------------------------------------------------|
+| `@TestEngine.BaseClass`     | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
+| `@TestEngine.Order(<int>)`  | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class  | no       | Provides a way to tag a test class                                                  | 
 ## What is a `Parameter` ?
 
 `Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
@@ -161,7 +161,7 @@ String[] values = paramater.value();
 
 ## Configuration values
 
-The Devopology Test Engine has 5 configuration parameters
+The Devopology Test Engine has 7 configuration parameters
 
 - thread count
   - Java system property `devopology.test.engine.thread.count`
@@ -185,6 +185,15 @@ The Devopology Test Engine has 5 configuration parameters
 - test method name exclude filter (regex)
   - Java system property `devopology.test.engine.test.method.exclude`
   - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE`
+
+- test class tag include filter (regex)
+  - Java system property `devopology.test.engine.test.class.tag.include`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE`
+
+- test class tag exclude filter (regex)
+  - Java system property `devopology.test.engine.test.class.tag.exclude`
+  - Environment variable `DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE`
+
 
 Using a combination of the properties allows for running individual test classes / test methods
 
