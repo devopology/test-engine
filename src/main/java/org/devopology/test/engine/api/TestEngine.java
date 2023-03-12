@@ -87,4 +87,10 @@ public @interface TestEngine {
     @interface DisplayName {
         String value();
     }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Tag {
+        String value();
+    }
 }

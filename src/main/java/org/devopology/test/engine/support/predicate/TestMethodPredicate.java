@@ -2,9 +2,9 @@ package org.devopology.test.engine.support.predicate;
 
 import java.lang.reflect.Method;
 
-public final class IncludeTestMethodPredicate extends RegexPredicate<Method> {
+public final class TestMethodPredicate extends RegexPredicate<Method> {
 
-    private IncludeTestMethodPredicate(String regex) {
+    private TestMethodPredicate(String regex) {
         super(regex);
     }
 
@@ -14,7 +14,7 @@ public final class IncludeTestMethodPredicate extends RegexPredicate<Method> {
         return matcher.find();
     }
 
-    public static IncludeTestMethodPredicate of(String regex) {
-        return new IncludeTestMethodPredicate(regex);
+    public static TestMethodPredicate of(String regex) {
+        return new TestMethodPredicate(regex);
     }
 }
