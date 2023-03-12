@@ -65,7 +65,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
 </dependencies>
 ```
 
-To use the Test Engine `CsvSource`, you need to also include the uniVocity parsers jar
+To use the Test Engine `CsvSource`, you need to also include the `univocity-parsers` jar dependency
 
 ```xml
   <dependency>
