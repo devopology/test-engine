@@ -13,7 +13,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Devopology Test Engine v2.0.1](https://github.com/devopology/test-engine/releases/tag/v2.0.1) (TBD)
+- General Availability (GA): [Devopology Test Engine v2.0.2](https://github.com/devopology/test-engine/releases/tag/v2.0.2)
 
 **Notes**
 
@@ -60,7 +60,7 @@ Add the Junit 5 and Devopology Test Engine jar dependencies...
   <dependency>
     <groupId>org.devopology</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
   </dependency>
 </dependencies>
 ```
