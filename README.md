@@ -112,6 +112,15 @@ To use the Test Engine `CsvSource`, you need to also include the `univocity-pars
 | `@TestEngine.BaseClass`     | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
 | `@TestEngine.Order(<int>)`  | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
 | `@TestEngine.Tag(<string>)` | class  | no       | Provides a way to tag a test class                                                  | 
+
+
+**Notes**
+
+- Only 1 `@TestEngine.Tag(<string>)` is supported for a test class.
+
+
+- It's recommended to use a tag string format of `/tag1/tag2/tag3/`
+
 ## What is a `Parameter` ?
 
 `Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
@@ -163,7 +172,7 @@ String[] values = paramater.value();
 
 The Devopology Test Engine has 7 configuration parameters
 
-- thread count
+- thread count (integer)
   - Java system property `devopology.test.engine.thread.count`
   - Environment variable `DEVOPOLOGY_TEST_ENGINE_THREAD_COUNT`
 
