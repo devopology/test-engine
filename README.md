@@ -166,8 +166,6 @@ The value of the `Parameter` is a String[] array
 String[] values = paramater.value();
 ```
 
-**Notes**
-
 ## Configuration values
 
 The Devopology Test Engine has 7 configuration parameters
