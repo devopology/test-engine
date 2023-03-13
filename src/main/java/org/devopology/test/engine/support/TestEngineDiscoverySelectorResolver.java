@@ -22,8 +22,8 @@ import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDesc
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
-import org.devopology.test.engine.support.predicate.TestClassTagPredicate;
 import org.devopology.test.engine.support.predicate.TestClassPredicate;
+import org.devopology.test.engine.support.predicate.TestClassTagPredicate;
 import org.devopology.test.engine.support.predicate.TestMethodPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
@@ -413,12 +413,11 @@ public class TestEngineDiscoverySelectorResolver {
 
                 // Build the test descriptor tree if we have test parameters
                 // i.e. Tests with an empty set of parameters will be ignored
-                String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
                 TestEngineClassTestDescriptor testClassTestDescriptor =
                         new TestEngineClassTestDescriptor(
                                 uniqueId.append("/", testClass.getName()),
-                                testClassDisplayName,
+                                testClass.getName(),
                                 testClass);
 
                 List<Parameter> testParameterList = new ArrayList<>(testParameters);
@@ -429,7 +428,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                     TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
                             new TestEngineParameterTestDescriptor(
-                                    uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
+                                    uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName),
                                     testParameterName,
                                     testClass,
                                     testParameter);
@@ -444,13 +443,12 @@ public class TestEngineDiscoverySelectorResolver {
                         }
 
                         // Build the test descriptor for each test class / test parameter / test method
-                        String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
                         String testMethodUniqueName = testParameterName + "/" + UUID.randomUUID();
 
                         TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
                                 new TestEngineTestMethodTestDescriptor(
-                                        uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
-                                        testMethodDisplayName,
+                                        uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
+                                        testMethod.getName(),
                                         testClass,
                                         testParameter,
                                         testMethod);
