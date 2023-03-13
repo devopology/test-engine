@@ -82,9 +82,9 @@ public @interface TestEngine {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface DisplayName {
+    @interface Tag {
         String value();
     }
 }

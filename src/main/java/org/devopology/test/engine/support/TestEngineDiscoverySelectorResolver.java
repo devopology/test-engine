@@ -22,10 +22,9 @@ import org.devopology.test.engine.support.descriptor.TestEngineParameterTestDesc
 import org.devopology.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
 import org.devopology.test.engine.support.logger.Logger;
 import org.devopology.test.engine.support.logger.LoggerFactory;
-import org.devopology.test.engine.support.predicate.ExcludeTestClassPredicate;
-import org.devopology.test.engine.support.predicate.ExcludeTestMethodPredicate;
-import org.devopology.test.engine.support.predicate.IncludeTestClassPredicate;
-import org.devopology.test.engine.support.predicate.IncludeTestMethodPredicate;
+import org.devopology.test.engine.support.predicate.TestClassPredicate;
+import org.devopology.test.engine.support.predicate.TestClassTagPredicate;
+import org.devopology.test.engine.support.predicate.TestMethodPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -59,10 +58,12 @@ public class TestEngineDiscoverySelectorResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoverySelectorResolver.class);
 
-    private final IncludeTestClassPredicate includeTestClassPredicate;
-    private final ExcludeTestClassPredicate excludeTestClassPredicate;
-    private final IncludeTestMethodPredicate includeTestMethodPredicate;
-    private final ExcludeTestMethodPredicate excludeTestMethodPredicate;
+    private final TestClassPredicate includeTestClassPredicate;
+    private final TestClassPredicate excludeTestClassPredicate;
+    private final TestMethodPredicate includeTestMethodPredicate;
+    private final TestMethodPredicate excludeTestMethodPredicate;
+    private final TestClassTagPredicate includeTestClassTagPredicate;
+    private final TestClassTagPredicate excludeTestClassTagPredicate;
 
     /**
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
@@ -85,7 +86,7 @@ public class TestEngineDiscoverySelectorResolver {
                         "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_INCLUDE");
 
         if (includeTestClassPredicateRegex != null) {
-            includeTestClassPredicate = IncludeTestClassPredicate.of(includeTestClassPredicateRegex);
+            includeTestClassPredicate = TestClassPredicate.of(includeTestClassPredicateRegex);
         } else {
             includeTestClassPredicate = null;
         }
@@ -96,7 +97,7 @@ public class TestEngineDiscoverySelectorResolver {
                         "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_EXCLUDE");
 
         if (excludeTestClassPredicateRegex != null) {
-            excludeTestClassPredicate = ExcludeTestClassPredicate.of(excludeTestClassPredicateRegex);
+            excludeTestClassPredicate = TestClassPredicate.of(excludeTestClassPredicateRegex);
         } else {
             excludeTestClassPredicate = null;
         }
@@ -107,7 +108,7 @@ public class TestEngineDiscoverySelectorResolver {
                         "DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_INCLUDE");
 
         if (includeTestMethodPredicateRegex != null) {
-            includeTestMethodPredicate = IncludeTestMethodPredicate.of(includeTestMethodPredicateRegex);
+            includeTestMethodPredicate = TestMethodPredicate.of(includeTestMethodPredicateRegex);
         } else {
             includeTestMethodPredicate = null;
         }
@@ -115,12 +116,38 @@ public class TestEngineDiscoverySelectorResolver {
         String excludeTestMethodPredicateRegex =
                 TestEngineConfiguration.getValue(
                         "devopology.test.engine.test.method.exclude",
-                        "DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_exclude");
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_METHOD_EXCLUDE");
 
         if (excludeTestMethodPredicateRegex != null) {
-            excludeTestMethodPredicate = ExcludeTestMethodPredicate.of(excludeTestMethodPredicateRegex);
+            excludeTestMethodPredicate = TestMethodPredicate.of(excludeTestMethodPredicateRegex);
         } else {
             excludeTestMethodPredicate = null;
+        }
+
+        String includeTestClassTagsRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.class.tag.include",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE");
+
+
+
+        if (includeTestClassTagsRegex != null) {
+            includeTestClassTagPredicate = TestClassTagPredicate.of(includeTestClassTagsRegex);
+        } else {
+            includeTestClassTagPredicate = null;
+        }
+
+        String excludeTestClassTagsRegex =
+                TestEngineConfiguration.getValue(
+                        "devopology.test.engine.test.class.tag.exclude",
+                        "DEVOPOLOGY_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE");
+
+
+
+        if (excludeTestClassTagsRegex != null) {
+            excludeTestClassTagPredicate = TestClassTagPredicate.of(excludeTestClassTagsRegex);
+        } else {
+            excludeTestClassTagPredicate = null;
         }
     }
 
@@ -148,9 +175,8 @@ public class TestEngineDiscoverySelectorResolver {
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
-        Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-
         if (includeTestClassPredicate != null) {
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
             for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
                 if (!includeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
@@ -159,6 +185,7 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (excludeTestClassPredicate != null) {
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
             for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
                 if (excludeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
@@ -167,7 +194,8 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (includeTestMethodPredicate != null) {
-            for (Class<?> clazz : testClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
                 Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
                 methods.removeIf(method -> !includeTestMethodPredicate.test(method));
 
@@ -180,14 +208,33 @@ public class TestEngineDiscoverySelectorResolver {
         }
 
         if (excludeTestMethodPredicate != null) {
-            for (Class<?> clazz : testClassToMethodMap.keySet()) {
-                Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+                Collection<Method> methods = new ArrayList<>(workingTestClassToMethodMap.get(clazz));
                 methods.removeIf(excludeTestMethodPredicate);
 
                 if (methods.isEmpty()) {
                     testClassToMethodMap.remove(clazz);
                 } else {
                     testClassToMethodMap.put(clazz, methods);
+                }
+            }
+        }
+
+        if (includeTestClassTagPredicate != null) {
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+                if (!includeTestClassTagPredicate.test(clazz)) {
+                    testClassToMethodMap.remove(clazz);
+                }
+            }
+        }
+
+        if (excludeTestClassTagPredicate != null) {
+            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+                if (excludeTestClassTagPredicate.test(clazz)) {
+                    testClassToMethodMap.remove(clazz);
                 }
             }
         }
@@ -366,12 +413,11 @@ public class TestEngineDiscoverySelectorResolver {
 
                 // Build the test descriptor tree if we have test parameters
                 // i.e. Tests with an empty set of parameters will be ignored
-                String testClassDisplayName = TestEngineUtils.getClassDisplayName(testClass);
 
                 TestEngineClassTestDescriptor testClassTestDescriptor =
                         new TestEngineClassTestDescriptor(
                                 uniqueId.append("/", testClass.getName()),
-                                testClassDisplayName,
+                                testClass.getName(),
                                 testClass);
 
                 List<Parameter> testParameterList = new ArrayList<>(testParameters);
@@ -382,7 +428,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                     TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
                             new TestEngineParameterTestDescriptor(
-                                    uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName),
+                                    uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName),
                                     testParameterName,
                                     testClass,
                                     testParameter);
@@ -397,13 +443,12 @@ public class TestEngineDiscoverySelectorResolver {
                         }
 
                         // Build the test descriptor for each test class / test parameter / test method
-                        String testMethodDisplayName = TestEngineUtils.getMethodDisplayName(testMethod);
                         String testMethodUniqueName = testParameterName + "/" + UUID.randomUUID();
 
                         TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
                                 new TestEngineTestMethodTestDescriptor(
-                                        uniqueId.append("/", testClassDisplayName + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
-                                        testMethodDisplayName,
+                                        uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
+                                        testMethod.getName(),
                                         testClass,
                                         testParameter,
                                         testMethod);

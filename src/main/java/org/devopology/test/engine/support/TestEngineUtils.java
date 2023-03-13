@@ -536,68 +536,6 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get the optional test class display name
-     *
-     * @param clazz
-     * @return
-     */
-    public static String getClassDisplayName(Class<?> clazz) {
-        String displayName = classDisplayNameCache.get(clazz);
-        if (displayName != null) {
-            return displayName;
-        }
-
-        if (clazz.isAnnotationPresent(TestEngine.DisplayName.class)) {
-            try {
-                Annotation annotation = clazz.getAnnotation(TestEngine.DisplayName.class);
-                Class<? extends Annotation> type = annotation.annotationType();
-                Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
-                displayName = valueMethod.invoke(annotation, (Object[]) null).toString();
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
-        }
-
-        if (displayName == null) {
-            displayName = clazz.getName();
-        }
-
-        classDisplayNameCache.put(clazz, displayName);
-        return displayName;
-    }
-
-    /**
-     * Method to get the optional test method display name
-     *
-     * @param method
-     * @return
-     */
-    public static String getMethodDisplayName(Method method) {
-        String displayName = methodDisplayNameCache.get(method);
-        if (displayName != null) {
-            return displayName;
-        }
-
-        if (method.isAnnotationPresent(TestEngine.DisplayName.class)) {
-            try {
-                Annotation annotation = method.getAnnotation(TestEngine.DisplayName.class);
-                Class<? extends Annotation> type = annotation.annotationType();
-                Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
-                displayName = valueMethod.invoke(annotation, (Object[]) null).toString();
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
-        }
-
-        if (displayName == null) {
-            displayName = method.getName();
-        }
-
-        methodDisplayNameCache.put(method, displayName);
-        return displayName;
-    }
-
-    /**
      * Method to create a TestPlan from a TestDescriptor
      *
      * @param testDescriptor

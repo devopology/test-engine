@@ -27,7 +27,7 @@ public class CustomParameterTest {
 
     @TestEngine.ParameterSetter
     public void setParameter(Parameter parameter) {
-        customParameter = parameter.value();
+        customParameter = (CustomParameter) parameter;
     }
 
     @TestEngine.BeforeAll
@@ -67,12 +67,12 @@ public class CustomParameterTest {
 
         @Override
         public <T> T value() {
-            return (T) this;
+            return (T) value;
         }
 
         @Override
         public <T> T value(Class<T> clazz) {
-            return clazz.cast(this);
+            return clazz.cast(value());
         }
 
         public static CustomParameter of(String name, String value) {
