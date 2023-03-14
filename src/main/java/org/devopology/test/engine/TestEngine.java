@@ -151,10 +151,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             String separator = stringBuilder.toString();
 
-            LOGGER.infoRaw(separator);
-            LOGGER.infoRaw(banner);
-            LOGGER.infoRaw(separator);
-            LOGGER.infoRaw("Scanning all classpath jars for tests...");
+            LOGGER.info(separator);
+            LOGGER.info(banner);
+            LOGGER.info(separator);
+            LOGGER.info("Scanning all classpath jars for tests...");
 
             Set<Path> classPathRoots =
                     new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
@@ -218,11 +218,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             separator = stringBuilder.toString();
 
-            LOGGER.infoRaw(separator);
-            LOGGER.infoRaw(banner);
-            LOGGER.infoRaw(separator);
-            LOGGER.infoRaw("");
-            LOGGER.infoRaw(
+            LOGGER.info(separator);
+            LOGGER.info(banner);
+            LOGGER.info(separator);
+            LOGGER.info("");
+            LOGGER.info(
                     "TESTS : "
                             + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
                             + ", "
@@ -238,21 +238,21 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             + " : "
                             + testExecutionSummary.getTestsSkippedCount());
 
-            LOGGER.infoRaw("");
-            LOGGER.infoRaw(separator);
+            LOGGER.info("");
+            LOGGER.info(separator);
 
             failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
             if (failed) {
-                LOGGER.infoRaw("FAILED");
+                LOGGER.info("FAILED");
             } else {
-                LOGGER.infoRaw("PASSED");
+                LOGGER.info("PASSED");
             }
 
-            LOGGER.infoRaw(separator);
-            LOGGER.infoRaw("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
-            LOGGER.infoRaw("Finished At : " + HumanReadableTime.now());
-            LOGGER.infoRaw(separator);
+            LOGGER.info(separator);
+            LOGGER.info("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
+            LOGGER.info("Finished At : " + HumanReadableTime.now());
+            LOGGER.info(separator);
         } catch (Throwable t) {
             failed = true;
             LOGGER.error("Internal Error occurred.");

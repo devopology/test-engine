@@ -16,6 +16,7 @@
 
 package org.devopology.test.engine.support.logger.impl;
 
+import org.devopology.test.engine.support.TestEngineConfiguration;
 import org.devopology.test.engine.support.logger.Logger;
 
 import java.io.PrintStream;
@@ -56,41 +57,30 @@ public class LoggerImpl implements Logger {
         LOG_LEVEL_MAP.put("ALL", ALL);
     }
 
-    private final String className;
+    private final String name;
     private int logLevel = INFO;
 
     /**
      * Constructor
      *
-     * @param className
+     * @param name
      */
-    public LoggerImpl(String className) {
-        Objects.requireNonNull(className);
-
-        String classNameTrimmed = className.trim();
-
-        if (classNameTrimmed.isEmpty()) {
-            throw new IllegalArgumentException();
+    public LoggerImpl(String name) {
+        if ((name == null) || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("name is required");
         }
-
-        this.className = classNameTrimmed;
-
-        String logLevelString = System.getProperty("devopology.test.engine.log.level");
-        if (logLevelString != null) {
-            logLevelString = logLevelString.toUpperCase(Locale.getDefault()).trim();
-        }
-
-        if (logLevelString == null) {
-            logLevelString = System.getenv().get("DEVOPOLOGY_TEST_ENGINE_LOG_LEVEL");
-            if (logLevelString != null) {
-                logLevelString = logLevelString.toUpperCase(Locale.getDefault()).trim();
-            }
-        }
-
-        if ((logLevelString == null) || logLevelString.isEmpty()) {
-            logLevel = INFO;
+        
+        this.name = name.trim();
+        
+        String logLevelValue =
+                TestEngineConfiguration.getValue(
+                "devopology.test.engine.log.level",
+                "DEVOPOLOGY_TEST_ENGINE_LOG_LEVEL");
+        
+        if ((logLevelValue != null) && !logLevelValue.trim().isEmpty()) {
+            logLevel = LOG_LEVEL_MAP.getOrDefault(logLevelValue.trim().toUpperCase(), INFO);
         } else {
-            logLevel = LOG_LEVEL_MAP.getOrDefault(logLevelString, INFO);
+            logLevel = INFO;
         }
     }
 
@@ -110,7 +100,7 @@ public class LoggerImpl implements Logger {
      */
     public void info(String message) {
         if (isInfoEnabled()) {
-            log(System.out, createMessage("INFO", className, message));
+            log(System.out, createMessage("INFO", name, message));
         }
     }
 
@@ -123,26 +113,7 @@ public class LoggerImpl implements Logger {
     public void info(String format, Object ... objects) {
         if (isInfoEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage("INFO", className, String.format(format, objects)));
-        }
-    }
-
-    public void infoRaw(String message) {
-        if (isInfoEnabled()) {
-            log(System.out, createMessageRaw("INFO", message));
-        }
-    }
-
-    public void infoRaw(String format, Object object) {
-        if (isInfoEnabled()) {
-            infoRaw(format, new Object[]{object});
-        }
-    }
-
-    public void infoRaw(String format, Object ... objects) {
-        if (isInfoEnabled()) {
-            Objects.requireNonNull(format);
-            log(System.out, createMessageRaw("INFO", String.format(format, objects)));
+            log(System.out, createMessage("INFO", name, String.format(format, objects)));
         }
     }
 
@@ -162,7 +133,7 @@ public class LoggerImpl implements Logger {
      */
     public void warning(String message) {
         if (isWarningEnabled()) {
-            log(System.out, createMessage("WARNING", className, message));
+            log(System.out, createMessage("WARNING", name, message));
         }
     }
 
@@ -175,7 +146,7 @@ public class LoggerImpl implements Logger {
     public void warning(String format, Object ... objects) {
         if (isWarningEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage("WARNING", className, String.format(format, objects)));
+            log(System.out, createMessage("WARNING", name, String.format(format, objects)));
         }
     }
 
@@ -195,7 +166,7 @@ public class LoggerImpl implements Logger {
      */
     public void error(String message) {
         if (isErrorEnabled()) {
-            log(System.err, createMessage("ERROR", className, message));
+            log(System.err, createMessage("ERROR", name, message));
         }
     }
 
@@ -208,7 +179,7 @@ public class LoggerImpl implements Logger {
     public void error(String format, Object ... objects) {
         if (isErrorEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage("ERROR", className, String.format(format, objects)));
+            log(System.out, createMessage("ERROR", name, String.format(format, objects)));
         }
     }
 
@@ -228,7 +199,7 @@ public class LoggerImpl implements Logger {
      */
     public void debug(String message) {
         if (isDebugEnabled()) {
-            log(System.out, createMessage("DEBUG", className, message));
+            log(System.out, createMessage("DEBUG", name, message));
         }
     }
 
@@ -241,7 +212,7 @@ public class LoggerImpl implements Logger {
     public void debug(String format, Object ... objects) {
         if (isDebugEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage("DEBUG", className, String.format(format, objects)));
+            log(System.out, createMessage("DEBUG", name, String.format(format, objects)));
         }
     }
 
@@ -261,7 +232,7 @@ public class LoggerImpl implements Logger {
      */
     public void trace(String message) {
         if (isTraceEnabled()) {
-            log(System.out, createMessage("TRACE", className, message));
+            log(System.out, createMessage("TRACE", name, message));
         }
     }
 
@@ -274,7 +245,7 @@ public class LoggerImpl implements Logger {
     public void trace(String format, Object ... objects) {
         if (isTraceEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage("TRACE", className, String.format(format, objects)));
+            log(System.out, createMessage("TRACE", name, String.format(format, objects)));
         }
     }
 
@@ -295,37 +266,27 @@ public class LoggerImpl implements Logger {
      * Method to create a log message
      *
      * @param level
-     * @param className
+     * @param name
      * @param message
      * @return
      */
-    private static String createMessage(String level, String className, String message) {
-        synchronized (SIMPLE_DATE_FORMAT) {
-            return java.lang.String.format(
-                    "%s [%s] %-5s %s - %s",
-                    SIMPLE_DATE_FORMAT.format(new Date()),
-                    Thread.currentThread().getName(),
-                    level,
-                    className,
-                    message);
-        }
-    }
+    private static String createMessage(String level, String name, String message) {
+        String dateTime;
 
-    /**
-     * Method to create a log message
-     *
-     * @param level
-     * @param message
-     * @return
-     */
-    private static String createMessageRaw(String level, String message) {
         synchronized (SIMPLE_DATE_FORMAT) {
-            return java.lang.String.format(
-                    "%s [%s] %-5s %s",
-                    SIMPLE_DATE_FORMAT.format(new Date()),
+            dateTime = SIMPLE_DATE_FORMAT.format(new Date());
+        }
+
+        int index = dateTime.indexOf(" ");
+        String date = dateTime.substring(0, index);
+        String time = dateTime.substring(index + 1);
+
+        return String.format(
+                    "%s | %s | %s | %s | %s",
+                    date,
+                    time,
                     Thread.currentThread().getName(),
                     level,
                     message);
-        }
     }
 }

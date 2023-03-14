@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
+@SuppressWarnings("unchecked")
 public class CustomParameterTest2 {
 
     private Long value;

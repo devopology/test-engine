@@ -52,20 +52,20 @@ public final class LoggerFactory {
      * @return
      */
     public static Logger getLogger(String name) {
-        synchronized (LOGGER_MAP) {
-            String nameTrimmed;
-            if ((name != null) && !name.trim().isEmpty()) {
-                nameTrimmed = name.trim();
-            } else {
-                nameTrimmed = "UNDEFINED";
-            }
+        if ((name == null) || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("name is required");
+        }
 
-            Logger logger = LOGGER_MAP.get(nameTrimmed);
+        Logger logger;
+
+        synchronized (LOGGER_MAP) {
+            logger = LOGGER_MAP.get(name.trim());
             if (logger == null) {
-                logger = new LoggerImpl(nameTrimmed);
+                logger = new LoggerImpl(name.trim());
                 LOGGER_MAP.put(name, logger);
             }
-            return logger;
         }
+
+        return logger;
     }
 }

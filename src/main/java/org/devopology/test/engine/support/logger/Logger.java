@@ -49,29 +49,6 @@ public interface Logger {
     void info(String format, Object ... objects);
 
     /**
-     * Method to log a "raw" INFO message
-     *
-     * @param message
-     */
-    void infoRaw(String message);
-
-    /**
-     * Method to log a "raw" INFO message
-     *
-     * @param format
-     * @param object
-     */
-    void infoRaw(String format, Object object);
-
-    /**
-     * Method to log a "raw" INFO message
-     *
-     * @param format
-     * @param objects
-     */
-    void infoRaw(String format, Object ... objects);
-
-    /**
      * Method to return if WARNING logging is enabled
      *
      * @return

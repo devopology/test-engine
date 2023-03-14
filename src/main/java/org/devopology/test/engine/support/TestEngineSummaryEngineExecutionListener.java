@@ -85,9 +85,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter parameter = testEngineParameterTestDescriptor.getTestParameter();
                     String parameterDisplayName = parameter.name();
                     stringBuilder
-                            .append("[")
                             .append(parameterDisplayName)
-                            .append("] - ")
+                            .append(" | ")
                             .append(TEST)
                             .append(" ")
                             .append(testClass.getName());
@@ -99,9 +98,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     String parameterDisplayName = parameter.name();
                     stringBuilder
-                            .append("[")
                             .append(parameterDisplayName)
-                            .append("] - ")
+                            .append(" | ")
                             .append(TEST)
                             .append(" ")
                             .append(testClass.getName())
@@ -112,7 +110,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         );
 
         if (detailedOutput && (stringBuilder.length() > 0)) {
-            LOGGER.infoRaw(stringBuilder.toString());
+            LOGGER.info(stringBuilder.toString());
         }
     }
 
@@ -132,9 +130,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter parameter = testengineParameterTestDescriptor.getTestParameter();
                     String parameterDisplayName = parameter.name();
                     stringBuilder
-                            .append("[")
                             .append(parameterDisplayName)
-                            .append("] - ")
+                            .append(" | ")
                             .append("%s ")
                             .append(testClass.getName());
                 }),
@@ -145,9 +142,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     String parameterDisplayName = parameter.name();
                     stringBuilder
-                            .append("[")
                             .append(parameterDisplayName)
-                            .append("] - ")
+                            .append(" | ")
                             .append("%s ")
                             .append(testClass.getName())
                             .append(" ")
@@ -178,7 +174,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             }
 
             if (detailedOutput && (string != null)) {
-                LOGGER.infoRaw(string);
+                LOGGER.info(string);
             }
         }
     }
