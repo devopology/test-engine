@@ -108,7 +108,7 @@ public final class HumanReadableTime {
 
     public static String now() {
         SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
 
         return simpleDateFormat.format(new Date());
     }

@@ -34,7 +34,7 @@ import java.util.Objects;
 public class LoggerImpl implements Logger {
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH);
 
     private static final int OFF = 0;
     private static final int ERROR = 100;
@@ -78,7 +78,7 @@ public class LoggerImpl implements Logger {
                 "DEVOPOLOGY_TEST_ENGINE_LOG_LEVEL");
         
         if ((logLevelValue != null) && !logLevelValue.trim().isEmpty()) {
-            logLevel = LOG_LEVEL_MAP.getOrDefault(logLevelValue.trim().toUpperCase(), INFO);
+            logLevel = LOG_LEVEL_MAP.getOrDefault(logLevelValue.trim().toUpperCase(Locale.ENGLISH), INFO);
         } else {
             logLevel = INFO;
         }
